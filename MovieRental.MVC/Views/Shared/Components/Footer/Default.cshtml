@@ -1,0 +1,65 @@
+﻿@model FooterViewModel
+
+<div class="pt-5 pb-4 bg-dark footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <h6>BEST LANGUAGE GENRE MOVIES</h6>
+                <ul>
+                    <li><a href="/movies/filter?language=punjabi&genre=action">Punjabi Action Movies</a></li>
+                    <li><a href="/movies/filter?language=english&genre=animated">English Animated Movies</a></li>
+                    <li><a href="/movies/filter?language=english&genre=fantasy">English Fantasy Movies</a></li>
+                    <li><a href="/movies/filter?language=english&genre=comedy">English Comedy Movies</a></li>
+                    <li><a href="/movies/filter?language=english&genre=action">English Action Movies</a></li>
+                    <li><a href="/movies/filter?language=tamil&genre=action">Tamil Action Movies</a></li>
+                    <li><a href="/movies/filter?language=hindi&genre=animated">Hindi Animated Movies</a></li>
+                </ul>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <h6>MOVIES BY GENRE</h6>
+                <ul>
+                    <li><a href="/movies/filter?genre=animated">Best Animated Movies</a></li>
+                    <li><a href="/movies/filter?genre=fantasy">Best Fantasy Movies</a></li>
+                    <li><a href="/movies/filter?genre=comedy">Best Comedy Movies</a></li>
+                    <li><a href="/movies/filter?genre=action">Best Action Movies</a></li>
+                    <li><a href="/movies/filter?genre=action&language=tamil">Tamil Action Movies</a></li>
+                    <li><a href="/movies/filter?genre=action&language=punjabi">Punjabi Action Movies</a></li>
+                    <li><a href="/movies/filter?genre=animated&language=hindi">Hindi Animated Movies</a></li>
+                </ul>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <h6>POPULAR MOVIES</h6>
+                <ul>
+                    <li><a href="/movies/filter?sort=popular&genre=comedy&language=english">English Comedy Movies</a></li>
+                    <li><a href="/movies/filter?sort=popular&genre=action&language=english">English Action Movies</a></li>
+                    <li><a href="/movies/filter?sort=popular&genre=action&language=punjabi">Punjabi Action Movies</a></li>
+                    <li><a href="/movies/filter?sort=popular&genre=animated&language=english">English Animated Movies</a></li>
+                    <li><a href="/movies/filter?sort=popular&genre=fantasy&language=english">English Fantasy Movies</a></li>
+                    <li><a href="/movies/filter?sort=popular&genre=action&language=tamil">Tamil Action Movies</a></li>
+                    <li><a href="/movies/filter?sort=popular&genre=animated&language=hindi">Hindi Animated Movies</a></li>
+                </ul>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <h6>ABOUT MOVBOK</h6>
+                <ul>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/press">Press Coverage</a></li>
+                    <li><a href="/careers">Current Openings</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                    <li><a href="/help">Help & Support</a></li>
+                    <li><a href="/terms">Terms of Service</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="py-5">
+    <div class="container">
+        <p class="m-0 text-center">
+            Copyright &copy; <strong>Movbok</strong> @DateTime.UtcNow.Year |
+            Made with <i class="fas fa-heart fa-fw text-danger"></i> by
+            <a class="text-danger" target="_blank" href="https://www.instagram.com/iamgurdeeposahan/">Askbootstrap</a>
+        </p>
+    </div>
+</footer>

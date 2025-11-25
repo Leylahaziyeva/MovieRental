@@ -1,0 +1,214 @@
+﻿@model HomeViewModel
+@inject StringLocalizerManager localizer
+
+<!-- Slider Section -->
+<div class="pt-3 pb-3 bg-white shadow-sm">
+    <div class="osahan-slider">
+        @if (Model.Sliders != null && Model.Sliders.Any())
+        {
+            foreach (var slider in Model.Sliders)
+            {
+                <div class="osahan-slider-item position-relative">
+                    @if (!string.IsNullOrEmpty(slider.ActionUrl))
+                    {
+                        <a href="@slider.ActionUrl">
+                            <img src="~/img/@slider.ImageUrl" class="img-fluid rounded" alt="@slider.Title">
+                        </a>
+                    }
+                    else
+                    {
+                        <img src="~/img/@slider.ImageUrl" class="img-fluid rounded" alt="@slider.Title">
+                    }
+
+                    @if (!string.IsNullOrEmpty(slider.Title) || !string.IsNullOrEmpty(slider.Subtitle))
+                    {
+                        <div class="slider-content position-absolute" style="top: 50%; left: 5%; transform: translateY(-50%); max-width: 50%;">
+                            @if (!string.IsNullOrEmpty(slider.Title))
+                            {
+                                <h1 class="text-white display-4 font-weight-bold mb-3">@slider.Title</h1>
+                            }
+                            @if (!string.IsNullOrEmpty(slider.Subtitle))
+                            {
+                                <p class="text-white h4 mb-3">@slider.Subtitle</p>
+                            }
+                            @if (!string.IsNullOrEmpty(slider.Description))
+                            {
+                                <p class="text-white mb-4">@slider.Description</p>
+                            }
+                            @if (!string.IsNullOrEmpty(slider.ActionUrl))
+                            {
+                                <a href="@slider.ActionUrl" class="btn btn-danger btn-lg">
+                                    @slider.ButtonText ?? @localizer.GetValue("BookNow")
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<div class="container">
+    <!-- Offers Section -->
+    <div class="d-sm-flex align-items-center justify-content-between mt-5 mb-3 overflow-hidden">
+        <h1 class="h5 mb-0 float-left">@localizer.GetValue("Offers")</h1>
+        <a asp-controller="Offers" asp-action="Index" class="d-sm-inline-block text-xs float-right">
+            @localizer.GetValue("ViewAll") <i class="fas fa-eye fa-sm"></i>
+        </a>
+    </div>
+    <div class="row">
+        @if (Model.Offers != null && Model.Offers.Any())
+        {
+            @foreach (var offer in Model.Offers)
+            {
+                <div class="col-xl-3 col-md-4 mb-4">
+                    <div class="card offer-card shadow-sm border-0">
+                        <a asp-controller="Offers" asp-action="Details" asp-route-id="@offer.Id">
+                            <div class="m-card-cover">
+                                <img src="~/img/@offer.ImageUrl" class="card-img-top" alt="@offer.Title">
+                            </div>
+                            <div class="card-body p-3">
+                                <img src="~/img/@offer.LogoUrl" class="rounded-circle" alt="@offer.Title" style="width: 50px; height: 50px;">
+                                <p class="card-text text-gray-900 mt-3 mb-1">@offer.Title</p>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt fa-sm mr-1"></i>
+                                        @localizer.GetValue("ValidTill")
+                                        <span class="text-gray-700">@offer.ValidTo.ToString("dd MMM yyyy")</span>
+                                    </small>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Movies Section -->
+    <div class="d-sm-flex align-items-center justify-content-between mt-4 mb-3 overflow-hidden">
+        <h1 class="h5 mb-0 float-left">@localizer.GetValue("Movies")</h1>
+        <a asp-controller="Movie" asp-action="Index" class="d-sm-inline-block text-xs float-right">
+            @localizer.GetValue("ViewAll") <i class="fas fa-eye fa-sm"></i>
+        </a>
+    </div>
+    <div class="row">
+        @if (Model.FeaturedMovies != null && Model.FeaturedMovies.Any())
+        {
+            @foreach (var movie in Model.FeaturedMovies)
+            {
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card m-card shadow-sm border-0">
+                        <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.Id">
+                            <div class="m-card-cover">
+                                <div class="position-absolute bg-white shadow-sm rounded text-center p-2 m-2 love-box">
+                                    <h6 class="text-gray-900 mb-0 font-weight-bold">
+                                        <i class="fas fa-heart text-danger"></i> @movie.Rating%
+                                    </h6>
+                                    <small class="text-muted">@movie.VotesCount</small>
+                                </div>
+                                <img src="~/img/@movie.PosterUrl" class="card-img-top" alt="@movie.Title">
+                            </div>
+                            <div class="card-body p-3">
+                                <h5 class="card-title text-white mb-1">@movie.Title</h5>
+                                <p class="card-text">
+                                    <small class="text-white">@movie.Language</small>
+                                    <small class="text-danger ml-2">
+                                        <i class="fas fa-calendar-alt fa-sm"></i> @movie.ReleaseDate.ToString("dd MMM")
+                                    </small>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Events Section -->
+    <div class="d-sm-flex align-items-center justify-content-between mt-4 mb-3 overflow-hidden">
+        <h1 class="h5 mb-0 float-left">@localizer.GetValue("Events")</h1>
+        <a asp-controller="Events" asp-action="Index" class="d-sm-inline-block text-xs float-right">
+            @localizer.GetValue("ViewAll") <i class="fas fa-eye fa-sm"></i>
+        </a>
+    </div>
+    <div class="row">
+        @if (Model.Events != null && Model.Events.Any())
+        {
+            @foreach (var evt in Model.Events)
+            {
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card e-card shadow-sm border-0">
+                        <a asp-controller="Events" asp-action="Details" asp-route-id="@evt.Id">
+                            <div class="m-card-cover">
+                                <img src="~/img/@evt.ImageUrl" class="card-img-top" alt="@evt.Name">
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-2 auto py-3 pl-3">
+                                        <div class="bg-white rounded text-center">
+                                            <h6 class="text-danger mb-0 font-weight-bold">@evt.EventDate.Day</h6>
+                                            <small class="text-muted">@evt.EventDate.ToString("MMM").ToUpper()</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-10 p-3">
+                                        <p class="card-text text-gray-900 mb-1">@evt.Name</p>
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                <i class="fas fa-map-marker-alt fa-sm mr-1"></i> @evt.Location
+                                            </small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Sports Section -->
+    <div class="d-sm-flex align-items-center justify-content-between mt-4 mb-3 overflow-hidden">
+        <h1 class="h5 mb-0 float-left">@localizer.GetValue("Sports")</h1>
+        <a asp-controller="Sports" asp-action="Index" class="d-sm-inline-block text-xs float-right">
+            @localizer.GetValue("ViewAll") <i class="fas fa-eye fa-sm"></i>
+        </a>
+    </div>
+    <div class="row pb-4 mb-2">
+        @if (Model.Sports != null && Model.Sports.Any())
+        {
+            @foreach (var sport in Model.Sports)
+            {
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card e-card shadow-sm border-0">
+                        <a asp-controller="Sports" asp-action="Details" asp-route-id="@sport.Id">
+                            <div class="m-card-cover">
+                                <img src="~/img/@sport.ImageUrl" class="card-img-top" alt="@sport.Name">
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-2 auto py-3 pl-3">
+                                        <div class="bg-white rounded text-center">
+                                            <h6 class="text-danger mb-0 font-weight-bold">@sport.EventDate.Day</h6>
+                                            <small class="text-muted">@sport.EventDate.ToString("MMM").ToUpper()</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-10 p-3">
+                                        <p class="card-text text-gray-900 mb-1">@sport.Name</p>
+                                        <p class="card-text">
+                                            <small class="text-muted">
+                                                <i class="fas fa-map-marker-alt fa-sm mr-1"></i> @sport.Location
+                                            </small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

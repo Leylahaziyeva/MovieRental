@@ -1,0 +1,16 @@
+﻿using MovieRental.BLL.ViewModels.Currency;
+using MovieRental.BLL.ViewModels.Language;
+using MovieRental.DAL.DataContext.Entities;
+
+namespace MovieRental.BLL.ViewModels.Header
+{
+    public class HeaderViewModel
+    {
+        public List<LanguageViewModel>? Languages { get; set; }
+        public LanguageViewModel? SelectedLanguage { get; set; }
+        public Logo Logo { get; set; } = null!;
+        public List<CurrencyViewModel> Currencies { get; set; } = new();
+        public CurrencyViewModel? SelectedCurrency { get; set; }
+        //public SearchInfo? SearchInfo { get; set; }
+    }
+}

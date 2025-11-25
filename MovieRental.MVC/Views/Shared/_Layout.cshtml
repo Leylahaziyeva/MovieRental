@@ -1,0 +1,43 @@
+﻿@inject StringLocalizerManager Localizer
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from askbootstrap.com/preview/movbok/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 26 Oct 2025 16:08:19 GMT -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" type="image/png" href="~/img/logo-icon.png">
+    <title>Movbok - Movies, Events, Sports Website HTML Template</title>
+    <!-- Slick Slider -->
+    <link rel="stylesheet" type="text/css" href="~/vendor/slick/slick.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/vendor/slick/slick-theme.min.css" />
+    <!-- Custom fonts for this template-->
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <!-- Bootstrap core CSS -->
+    <link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="~/css/osahan.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header -->
+    @await Component.InvokeAsync("Header")
+    <!-- /Header -->
+    @RenderBody()
+
+    <!-- Footer -->
+    @await Component.InvokeAsync("Footer")
+    <!-- /Footer -->
+    <!-- Bootstrap core JavaScript -->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- slick Slider JS-->
+    <script src="~/vendor/slick/slick.min.js"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="~/js/osahan.js"></script>
+</body>
+
+<!-- Mirrored from askbootstrap.com/preview/movbok/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 26 Oct 2025 16:08:42 GMT -->
+</html>
