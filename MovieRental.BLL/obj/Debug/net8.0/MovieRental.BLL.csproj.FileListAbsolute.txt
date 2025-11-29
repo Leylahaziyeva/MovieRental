@@ -8,6 +8,7 @@ C:\Users\lenovo\source\repos\MovieRental\MovieRental.BLL\obj\Debug\net8.0\MovieR
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.BLL\obj\Debug\net8.0\MovieRental.BLL.AssemblyInfoInputs.cache
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.BLL\obj\Debug\net8.0\MovieRental.BLL.AssemblyInfo.cs
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.BLL\obj\Debug\net8.0\MovieRental.BLL.csproj.CoreCompileInputs.cache
+C:\Users\lenovo\source\repos\MovieRental\MovieRental.BLL\obj\Debug\net8.0\MovieRental.BLL.sourcelink.json
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.BLL\obj\Debug\net8.0\MovieRen.CA057151.Up2Date
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.BLL\obj\Debug\net8.0\MovieRental.BLL.dll
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.BLL\obj\Debug\net8.0\refint\MovieRental.BLL.dll

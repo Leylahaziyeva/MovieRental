@@ -1,8 +1,5 @@
 ﻿using MovieRental.BLL.Services.Contracts;
 using MovieRental.BLL.ViewModels;
-using MovieRental.BLL.ViewModels.Movie;
-using MovieRental.BLL.ViewModels.Event;
-using MovieRental.BLL.ViewModels.Sport;
 
 namespace MovieRental.BLL.Services.Implementations
 {
@@ -36,56 +33,53 @@ namespace MovieRental.BLL.Services.Implementations
             var language = await _cookieService.GetLanguageAsync();
             int languageId = language?.Id ?? 1;
 
-            var sliders = await _sliderService.GetAllActiveSlidersAsync(languageId);
+            var slidersTask = _sliderService.GetAllActiveSlidersAsync(languageId);
+            var offersTask = _offerService.GetActiveOffersAsync(languageId);
 
-            var offers = await _offerService.GetActiveOffersAsync(languageId);
+            var featuredMoviesTask = _movieService.GetFeaturedMoviesAsync(languageId, 4);
+            var latestMoviesTask = _movieService.GetLatestMoviesAsync(languageId, 4);
+            var popularMoviesTask = _movieService.GetPopularMoviesAsync(languageId, 4);
+            var upcomingMoviesTask = _movieService.GetUpcomingMoviesAsync(languageId, 4);
 
-            var movieFilter = new MovieFilterViewModel
-            {
-                CurrentLanguageId = languageId
-            };
-            var allMoviesResult = await _movieService.GetFilteredMoviesAsync(movieFilter);
 
-            var allMovies = allMoviesResult.Movies?.ToList() ?? new();
+            var upcomingEventsTask = _eventService.GetUpcomingEventsAsync(languageId);
+            var featuredSportsTask = _sportService.GetFeaturedSportsAsync(4);
 
-            // FeaturedMovies - IsFeatured = true olanlar
-            var featuredMovies = allMovies.Where(m => m.IsFeatured).Take(4).ToList();
+            await Task.WhenAll(
+                slidersTask,
+                offersTask,
+                featuredMoviesTask,
+                latestMoviesTask,
+                popularMoviesTask,
+                upcomingMoviesTask,
+                upcomingEventsTask,
+                featuredSportsTask
+            );
 
-            // LatestMovies - Ən yeni əlavə olunanlar (CreatedAt-a görə)
-            var latestMovies = allMovies.OrderByDescending(m => m.Id).Take(4).ToList();
+            var sliders = await slidersTask;
+            var offers = await offersTask;
+            var featuredMovies = await featuredMoviesTask;
+            var latestMovies = await latestMoviesTask;
+            var popularMovies = await popularMoviesTask;
+            var upcomingMovies = await upcomingMoviesTask;
+            var upcomingEvents = await upcomingEventsTask;
+            var featuredSports = await featuredSportsTask;
 
-            // PopularMovies - Ən çox vote alanlar
-            var popularMovies = allMovies.OrderByDescending(m => m.VotesCount).Take(4).ToList();
-
-            // UpcomingMovies - Gələcək tarixli filmlər
-            var upcomingMovies = allMovies
-                .Where(m => m.ReleaseDate > DateTime.Now)
-                .OrderBy(m => m.ReleaseDate)
+            var featuredEventsList = upcomingEvents
+                .Where(e => e.IsFeatured)
                 .Take(4)
                 .ToList();
-
-            var eventFilter = new EventFilterViewModel
-            {
-                CurrentLanguageId = languageId
-            };
-            var eventsResult = await _eventService.GetFilteredEventsAsync(eventFilter);
-
-            var sportFilter = new SportFilterViewModel
-            {
-                CurrentLanguageId = languageId
-            };
-            var sportsResult = await _sportService.GetFilteredSportsAsync(sportFilter);
 
             var homeViewModel = new HomeViewModel
             {
                 Sliders = sliders.ToList(),
                 Offers = offers.Take(4).ToList(),
-                FeaturedMovies = featuredMovies,
-                LatestMovies = latestMovies,
-                PopularMovies = popularMovies,
-                UpcomingMovies = upcomingMovies,
-                Events = eventsResult.Events?.Take(4).ToList() ?? new(),
-                Sports = sportsResult.Sports?.Take(4).ToList() ?? new()
+                FeaturedMovies = featuredMovies.ToList(),
+                LatestMovies = latestMovies.ToList(),
+                PopularMovies = popularMovies.ToList(),
+                UpcomingMovies = upcomingMovies.ToList(),
+                Events = featuredEventsList,
+                Sports = featuredSports.ToList()
             };
 
             return homeViewModel;

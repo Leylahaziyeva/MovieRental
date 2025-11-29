@@ -2,29 +2,38 @@
 {
     public class Event : TimeStample
     {
-        public required string ImageUrl { get; set; }           
+        public required string ImageUrl { get; set; }
+        public string? CoverImageUrl { get; set; }
         public DateTime EventDate { get; set; }
-        public required string Location { get; set; }            // "Glasgow, Scotland"
         public decimal? Price { get; set; }
 
         public bool IsActive { get; set; } = true;
         public bool IsFeatured { get; set; }
 
+        public string? ContactPhone { get; set; }
+        public string? ContactEmail { get; set; }
+        public string? Venue { get; set; }
+        public string? GoogleMapsUrl { get; set; }
+        public string? AgeRestriction { get; set; }
         public int? CurrencyId { get; set; }
         public Currency? Currency { get; set; }
 
-        public List<EventTranslation> EventTranslations { get; set; } = new List<EventTranslation>();
+        public List<EventTranslation> EventTranslations { get; set; } = [];
+        public List<Person>? Artists { get; set; }
     }
 
     public class EventTranslation : TimeStample
     {
-        public required string Name { get; set; }           
-        public required string Description { get; set; }      
+        public required string Name { get; set; }
+        public required string Description { get; set; }
+        public required string Location { get; set; }
+        public string? Categories { get; set; }        // "Classical, Rock, Sufi"
+        public string? Languages { get; set; }
 
         public int EventId { get; set; }
-        public virtual Event Event { get; set; } = null!;
+        public Event? Event { get; set; }
 
         public int LanguageId { get; set; }
-        public virtual Language Language { get; set; } = null!;
+        public Language? Language { get; set; }
     }
 }

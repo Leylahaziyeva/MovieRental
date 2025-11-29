@@ -3,10 +3,10 @@
     public class Rental : TimeStample
     {
         public required string UserId { get; set; }
-        public virtual AppUser User { get; set; } = null!;
+        public AppUser? User { get; set; } 
 
         public int MovieId { get; set; }
-        public virtual Movie Movie { get; set; } = null!;
+        public Movie? Movie { get; set; } 
 
         public DateTime RentalDate { get; set; }
         public DateTime ExpiryDate { get; set; }

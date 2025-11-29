@@ -14,7 +14,7 @@
         public int? CurrencyId { get; set; }
         public Currency? Currency { get; set; }
 
-        public List<OfferTranslation> OfferTranslations { get; set; } = new List<OfferTranslation>();
+        public List<OfferTranslation> OfferTranslations { get; set; } = [];
     }
 
     public class OfferTranslation : TimeStample
@@ -23,9 +23,9 @@
         public required string Description { get; set; }    
 
         public int OfferId { get; set; }
-        public virtual Offer Offer { get; set; } = null!;
+        public Offer? Offer { get; set; } 
 
         public int LanguageId { get; set; }
-        public virtual Language Language { get; set; } = null!;
+        public Language? Language { get; set; }
     }
 }

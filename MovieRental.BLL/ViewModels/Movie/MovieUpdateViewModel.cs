@@ -1,0 +1,71 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace MovieRental.BLL.ViewModels.Movie
+{
+    public class MovieUpdateViewModel
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
+        public string? Plot { get; set; }
+        public string? DirectorNames { get; set; }  
+        public string? WriterNames { get; set; }   
+        public string? CastNames { get; set; }
+
+        public IFormFile? PosterImage { get; set; }
+        public IFormFile? CoverImage { get; set; }
+        public IFormFile? Video { get; set; }
+        public string? TrailerUrl { get; set; }
+
+        public string? ImageUrl { get; set; }
+        public string? CoverImageUrl { get; set; }
+        public string? VideoUrlExisting { get; set; }
+
+        public int Year { get; set; }
+        public int Duration { get; set; }
+        public DateTime ReleaseDate { get; set; }
+        public decimal? Budget { get; set; }
+
+        public int LovePercentage { get; set; }
+        public int VotesCount { get; set; }
+
+        public decimal RentalPrice { get; set; }
+        public int RentalDurationDays { get; set; }
+        public bool IsAvailableForRent { get; set; }
+
+        public string? Format { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsFeatured { get; set; }
+
+        public int LanguageId { get; set; }
+        public int CurrencyId { get; set; }
+        public List<SelectListItem>? LanguageList { get; set; }
+        public List<SelectListItem>? CurrencyList { get; set; }
+
+        public List<int>? SelectedGenreIds { get; set; }
+        public List<SelectListItem>? GenreList { get; set; }
+
+        public List<int>? SelectedActorIds { get; set; }
+        public List<SelectListItem>? ActorList { get; set; }
+
+        public List<int>? SelectedDirectorIds { get; set; }
+        public List<SelectListItem>? DirectorList { get; set; }
+
+        public List<int>? SelectedWriterIds { get; set; }
+        public List<SelectListItem>? WriterList { get; set; }
+    }
+
+    public class MovieTranslationUpdateViewModel
+    {
+        public int Id { get; set; }
+        public required string Title { get; set; }
+        public required string Plot { get; set; }
+        public required string DirectorNames { get; set; }
+        public required string WriterNames { get; set; }
+        public required string CastNames { get; set; }
+
+        public int MovieId { get; set; }
+        public int LanguageId { get; set; }
+        public List<SelectListItem>? LanguageList { get; set; }
+    }
+}

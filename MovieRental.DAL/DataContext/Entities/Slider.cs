@@ -2,17 +2,17 @@
 {
     public class Slider : TimeStample
     {
-        public required string ImageUrl { get; set; }        // Cloudinary
+        public required string ImageUrl { get; set; }     
 
         public int? MovieId { get; set; }
-        public virtual Movie? Movie { get; set; }
+        public Movie? Movie { get; set; }
 
         public string? ActionUrl { get; set; }
 
         public int DisplayOrder { get; set; }
         public bool IsActive { get; set; } = true;
 
-        public virtual ICollection<SliderTranslation> SliderTranslations { get; set; } = new List<SliderTranslation>();
+        public virtual ICollection<SliderTranslation> SliderTranslations { get; set; } = [];
     }
 
     public class SliderTranslation : TimeStample
@@ -23,9 +23,9 @@
         public string? ButtonText { get; set; }              // "Book Now"
 
         public int SliderId { get; set; }
-        public virtual Slider Slider { get; set; } = null!;
+        public  Slider? Slider { get; set; }
 
         public int LanguageId { get; set; }
-        public virtual Language Language { get; set; } = null!;
+        public Language? Language { get; set; } 
     }
 }

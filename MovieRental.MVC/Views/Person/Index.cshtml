@@ -1,0 +1,124 @@
+﻿@model PersonListViewModel
+@inject StringLocalizerManager localizer
+
+<div class="container">
+    <div class="d-sm-flex align-items-center justify-content-between mt-5 mb-3 overflow-hidden">
+        <h1 class="h5 mb-0 float-left">@localizer.GetValue("PopularPeople")</h1>
+        <div class="btn-group float-right">
+            <button type="button" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm-sm dropdown-toggle"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @localizer.GetValue("SortBy") &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" asp-action="Index" asp-route-sortBy="ListOrder"
+                   asp-route-filterByType="@Model.FilterByType" asp-route-searchQuery="@Model.SearchQuery">
+                    @localizer.GetValue("ListOrder")
+                </a>
+                <a class="dropdown-item" asp-action="Index" asp-route-sortBy="DateAdded"
+                   asp-route-filterByType="@Model.FilterByType" asp-route-searchQuery="@Model.SearchQuery">
+                    @localizer.GetValue("DateAdded")
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="row list-bp">
+                @if (Model.People != null && Model.People.Any())
+                {
+                    @foreach (var person in Model.People)
+                    {
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card p-card shadow-sm border-0 text-center">
+                                <a asp-action="Details" asp-route-id="@person.Id">
+                                    <div class="people-item">
+                                        <div class="people-item-cover">
+                                            <img src="@person.CoverImageUrl" class="card-img" alt="@person.Name">
+                                        </div>
+                                        <div class="people-item-body p-4">
+                                            <img src="@person.ProfileImageUrl" class="card-img people-pic" alt="@person.Name">
+                                            <h5 class="card-title text-gray-900 mt-3">@person.Name</h5>
+                                            <p class="card-text">
+                                                @if (!string.IsNullOrEmpty(person.Biography))
+                                                {
+                                                    @(person.Biography.Length > 150 ? person.Biography.Substring(0, 150) + "..." : person.Biography)
+                                                }
+                                            </p>
+                                            <p class="card-text">
+                                                <small>
+                                                    <span class="text-muted font-weight-bold">
+                                                        <i class="fas fa-@(person.PersonType == MovieRental.DAL.DataContext.Entities.PersonType.Actor ? "film" :
+                                                                                                                                    person.PersonType == MovieRental.DAL.DataContext.Entities.PersonType.Artist ? "music" : "futbol") fa-sm ml-1"></i>
+                                                @person.KnownFor
+                                            </span>
+                                            @if (person.KnownCredits > 0)
+                                                    {
+                                                        <span> - <span class="text-link">@person.KnownCredits @localizer.GetValue("Credits")</span></span>
+                                                    }
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            @localizer.GetValue("NoPeopleFound")
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation" class="mt-4 mb-5">
+                    <ul class="pagination justify-content-center">
+                        <!-- Previous -->
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage - 1)"
+                               asp-route-filterByType="@Model.FilterByType"
+                               asp-route-searchQuery="@Model.SearchQuery"
+                               asp-route-sortBy="@Model.SortBy">
+                                @localizer.GetValue("Previous")
+                            </a>
+                        </li>
+
+                        <!-- Page Numbers -->
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@i"
+                                   asp-route-filterByType="@Model.FilterByType"
+                                   asp-route-searchQuery="@Model.SearchQuery"
+                                   asp-route-sortBy="@Model.SortBy">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Next -->
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage + 1)"
+                               asp-route-filterByType="@Model.FilterByType"
+                               asp-route-searchQuery="@Model.SearchQuery"
+                               asp-route-sortBy="@Model.SortBy">
+                                @localizer.GetValue("Next")
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>

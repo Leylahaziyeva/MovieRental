@@ -1,0 +1,213 @@
+﻿@model PersonDetailViewModel
+@inject StringLocalizerManager localizer
+
+<div class="container pt-5 pb-4">
+    <div class="row list-bp">
+        <!-- Sidebar - Personal Info -->
+        <div class="col-md-4 col-lg-3">
+            <div class="bg-white p-3 widget shadow-sm rounded mb-4">
+                <img src="@Model.Person!.ProfileImageUrl" class="img-fluid rounded" alt="@Model.Person.Name">
+
+                <h1 class="h6 mb-3 mt-4 font-weight-bold text-gray-900">@localizer.GetValue("PersonalInfo")</h1>
+
+                @if (!string.IsNullOrEmpty(Model.Person.KnownFor))
+                {
+                    <p class="mb-2">
+                        <i class="fas fa-@(Model.Person.PersonType == MovieRental.DAL.DataContext.Entities.PersonType.Actor ? "film" :
+                                                                    Model.Person.PersonType == MovieRental.DAL.DataContext.Entities.PersonType.Artist ? "music" : "futbol") fa-fw"></i>
+                    @Model.Person.KnownFor
+                </p>
+                                }
+
+                <p class="mb-2">
+                    <i class="fas fa-user-circle fa-fw"></i>
+                    @localizer.GetValue("KnownFor") - @Model.Person.PersonTypeDisplay
+                </p>
+
+                @if (!string.IsNullOrEmpty(Model.Person.Gender))
+                {
+                    <p class="mb-2">
+                        <i class="fas fa-venus-mars fa-fw"></i>
+                        @localizer.GetValue("Gender") - @Model.Person.Gender
+                    </p>
+                }
+
+                @if (Model.Person.KnownCredits > 0)
+                {
+                    <p class="mb-2">
+                        <i class="fas fa-list-alt fa-fw"></i>
+                        @localizer.GetValue("KnownCredits") - @Model.Person.KnownCredits
+                    </p>
+                }
+
+                @if (Model.Person.DateOfBirth.HasValue)
+                {
+                    <p class="mb-2">
+                        <i class="fas fa-calendar-alt fa-fw"></i>
+                        @localizer.GetValue("DateOfBirth") - @Model.Person.FormattedDateOfBirth
+                    </p>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Person.PlaceOfBirth))
+                {
+                    <p class="mb-2 pb-1">
+                        <i class="fas fa-map-marker-alt fa-fw"></i>
+                        @Model.Person.PlaceOfBirth
+                    </p>
+                }
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-8 col-lg-9">
+            <!-- Header with Name and Social Links -->
+            <div class="bg-white info-header shadow-sm rounded mb-4">
+                <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+                    <div>
+                        <h3 class="text-gray-900 mb-0 mt-0 font-weight-bold">@Model.Person.Name</h3>
+                        <p class="mb-0 text-gray-800">
+                            <small class="text-muted">
+                                <i class="fas fa-user-circle fa-fw fa-sm mr-1"></i>
+                                @Model.Person.PersonTypeDisplay
+                            </small>
+                        </p>
+                    </div>
+                    <div>
+                        @if (!string.IsNullOrEmpty(Model.Person.FacebookUrl))
+                        {
+                            <a href="@Model.Person.FacebookUrl" target="_blank" class="btn btn-primary btn-circle">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Person.YoutubeUrl))
+                        {
+                            <a href="@Model.Person.YoutubeUrl" target="_blank" class="btn btn-danger btn-circle">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Person.InstagramUrl))
+                        {
+                            <a href="@Model.Person.InstagramUrl" target="_blank" class="btn btn-warning btn-circle">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Person.TwitterUrl))
+                        {
+                            <a href="@Model.Person.TwitterUrl" target="_blank" class="btn btn-info btn-circle">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <!-- Biography -->
+                <div class="p-3 mb-4">
+                    <h1 class="h6 mb-3 mt-0 font-weight-bold text-gray-900">@localizer.GetValue("Biography")</h1>
+                    <div>
+                        <p class="mb-0 text-gray-600">@Model.Person.Biography</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Movies/Events/Sports Section -->
+            @if (Model.Movies != null && Model.Movies.Any())
+            {
+                <div class="bg-white p-3 widget shadow-sm rounded mb-4">
+                    <h1 class="h6 mb-3 mt-0 font-weight-bold text-gray-900">@localizer.GetValue("Movies")</h1>
+                    <div class="row">
+                        @foreach (var movie in Model.Movies.Take(8))
+                        {
+                            <div class="col-xl-3 col-md-6 mb-3">
+                                <div class="card m-card shadow-sm border-0">
+                                    <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.Id">
+                                        <div class="m-card-cover">
+                                            @if (movie.LovePercentage > 0)
+                                            {
+                                                <div class="position-absolute bg-white shadow-sm-sm rounded text-center p-2 m-2 love-box">
+                                                    <h6 class="text-gray-900 mb-0 font-weight-bold">
+                                                        <i class="fas fa-@(movie.LovePercentage >= 70 ? "thumbs-up text-success" : "heart text-danger")"></i>
+                                                        @movie.LovePercentage%
+                                                    </h6>
+                                                    <small class="text-muted">@movie.VotesCount.ToString("N0")</small>
+                                                </div>
+                                            }
+                                            <img src="@movie.PosterImageUrl" class="card-img-top" alt="@movie.Title">
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <h5 class="card-title text-white mb-1">@movie.Title</h5>
+                                            <p class="card-text">
+                                                <small class="text-white">@movie.Language?.Name</small>
+                                                <small class="text-danger ml-2">
+                                                    <i class="fas fa-calendar-alt fa-sm"></i> @movie.ReleaseDate.ToString("MMM yyyy")
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (Model.Events != null && Model.Events.Any())
+            {
+                <div class="bg-white p-3 widget shadow-sm rounded mb-4">
+                    <h1 class="h6 mb-3 mt-0 font-weight-bold text-gray-900">@localizer.GetValue("Events")</h1>
+                    <div class="row">
+                        @foreach (var evt in Model.Events.Take(8))
+                        {
+                            <div class="col-xl-3 col-md-6 mb-3">
+                                <div class="card m-card shadow-sm border-0">
+                                    <a asp-controller="Event" asp-action="Details" asp-route-id="@evt.Id">
+                                        <div class="m-card-cover">
+                                            <img src="@evt.ImageUrl" class="card-img-top" alt="@evt.Name">
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <h5 class="card-title text-white mb-1">@evt.Name</h5>
+                                            <p class="card-text">
+                                                <small class="text-danger">
+                                                    <i class="fas fa-calendar-alt fa-sm"></i> @evt.EventDate.ToString("dd MMM yyyy")
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (Model.Sports != null && Model.Sports.Any())
+            {
+                <div class="bg-white p-3 widget shadow-sm rounded mb-4">
+                    <h1 class="h6 mb-3 mt-0 font-weight-bold text-gray-900">@localizer.GetValue("Sports")</h1>
+                    <div class="row">
+                        @foreach (var sport in Model.Sports.Take(8))
+                        {
+                            <div class="col-xl-3 col-md-6 mb-3">
+                                <div class="card m-card shadow-sm border-0">
+                                    <a asp-controller="Sport" asp-action="Details" asp-route-id="@sport.Id">
+                                        <div class="m-card-cover">
+                                            <img src="@sport.ImageUrl" class="card-img-top" alt="@sport.Name">
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <h5 class="card-title text-white mb-1">@sport.Name</h5>
+                                            <p class="card-text">
+                                                <small class="text-danger">
+                                                    <i class="fas fa-calendar-alt fa-sm"></i> @sport.EventDate.ToString("dd MMM yyyy")
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

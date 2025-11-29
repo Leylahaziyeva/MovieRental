@@ -22,6 +22,21 @@ namespace MovieRental.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("EventArtists", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EventId", "PersonId");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("EventArtists");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -155,89 +170,6 @@ namespace MovieRental.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Actor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Nationality")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProfileImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Actors");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.ActorTranslation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ActorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Biography")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActorId");
-
-                    b.HasIndex("LanguageId");
-
-                    b.ToTable("ActorTranslations");
-                });
-
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -318,130 +250,6 @@ namespace MovieRental.DAL.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Collection", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Collections");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.CollectionMovie", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CollectionId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CollectionId");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("CollectionMovies");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.CollectionTranslation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CollectionId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CollectionId");
-
-                    b.HasIndex("LanguageId");
-
-                    b.ToTable("CollectionTranslations");
-                });
-
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Currency", b =>
                 {
                     b.Property<int>("Id")
@@ -493,6 +301,18 @@ namespace MovieRental.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AgeRestriction")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoverImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -504,6 +324,9 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("GoogleMapsUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -518,10 +341,6 @@ namespace MovieRental.DAL.Migrations
                     b.Property<bool>("IsFeatured")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
@@ -529,6 +348,9 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Venue")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -545,6 +367,9 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Categories")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -565,6 +390,13 @@ namespace MovieRental.DAL.Migrations
                     b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Languages")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -577,9 +409,10 @@ namespace MovieRental.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
-
                     b.HasIndex("LanguageId");
+
+                    b.HasIndex("EventId", "LanguageId")
+                        .IsUnique();
 
                     b.ToTable("EventTranslations");
                 });
@@ -596,9 +429,6 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IconClass")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -627,9 +457,6 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GenreId")
@@ -745,7 +572,8 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<string>("CoverImageUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -760,41 +588,54 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Format")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsAvailableForRent")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsFeatured")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
                     b.Property<int>("LovePercentage")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("PosterImageUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("RentalDurationDays")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(30);
 
                     b.Property<decimal>("RentalPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TrailerUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -804,10 +645,13 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<string>("VideoUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("VotesCount")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -816,65 +660,19 @@ namespace MovieRental.DAL.Migrations
 
                     b.HasIndex("CurrencyId");
 
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.HasIndex("IsFeatured");
+
                     b.HasIndex("LanguageId");
 
+                    b.HasIndex("ReleaseDate");
+
+                    b.HasIndex("Year");
+
                     b.ToTable("Movies");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieActor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ActorId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ActorId1")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("JobTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Role")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActorId");
-
-                    b.HasIndex("ActorId1");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("MovieActors");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieGenre", b =>
@@ -894,9 +692,6 @@ namespace MovieRental.DAL.Migrations
                     b.Property<int>("GenreId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("GenreId1")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -913,9 +708,8 @@ namespace MovieRental.DAL.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.HasIndex("GenreId1");
-
-                    b.HasIndex("MovieId");
+                    b.HasIndex("MovieId", "GenreId")
+                        .IsUnique();
 
                     b.ToTable("MovieGenres");
                 });
@@ -935,17 +729,27 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsPrimary")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("MovieId")
                         .HasColumnType("int");
@@ -960,7 +764,66 @@ namespace MovieRental.DAL.Migrations
 
                     b.HasIndex("MovieId");
 
+                    b.HasIndex("MovieId", "IsPrimary");
+
                     b.ToTable("MovieImages");
+                });
+
+            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MoviePerson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CharacterName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("Role");
+
+                    b.HasIndex("MovieId", "PersonId", "Role");
+
+                    b.ToTable("MoviePersons");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieSocialLink", b =>
@@ -978,13 +841,18 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("IconClass")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -994,7 +862,8 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<string>("Platform")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1004,93 +873,16 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MovieId");
 
+                    b.HasIndex("Platform");
+
                     b.ToTable("MovieSocialLinks");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieTab", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("TabKey")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MovieTabs");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieTabTranslation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LanguageId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MovieTabId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LanguageId");
-
-                    b.HasIndex("MovieTabId");
-
-                    b.ToTable("MovieTabTranslations");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieTranslation", b =>
@@ -1103,7 +895,8 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<string>("Cast")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -1113,7 +906,8 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<string>("Director")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1126,11 +920,13 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<string>("Plot")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1140,13 +936,15 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<string>("Writers")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LanguageId");
 
-                    b.HasIndex("MovieId");
+                    b.HasIndex("MovieId", "LanguageId")
+                        .IsUnique();
 
                     b.ToTable("MovieTranslations");
                 });
@@ -1166,10 +964,14 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1178,7 +980,8 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ThumbnailUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1186,16 +989,19 @@ namespace MovieRental.DAL.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("VideoType")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("VideoType")
+                        .HasColumnType("int");
 
                     b.Property<string>("VideoUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MovieId");
+
+                    b.HasIndex("VideoType");
 
                     b.ToTable("MovieVideos");
                 });
@@ -1215,7 +1021,8 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1228,7 +1035,8 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1240,7 +1048,8 @@ namespace MovieRental.DAL.Migrations
 
                     b.HasIndex("LanguageId");
 
-                    b.HasIndex("MovieVideoId");
+                    b.HasIndex("MovieVideoId", "LanguageId")
+                        .IsUnique();
 
                     b.ToTable("MovieVideoTranslations");
                 });
@@ -1440,6 +1249,119 @@ namespace MovieRental.DAL.Migrations
                     b.HasIndex("OfferId");
 
                     b.ToTable("OfferTranslations");
+                });
+
+            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Person", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CoverImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FacebookUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstagramUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("KnownCredits")
+                        .HasColumnType("int");
+
+                    b.Property<string>("KnownFor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PersonType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PlaceOfBirth")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProfileImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TwitterUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("YoutubeUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Persons");
+                });
+
+            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.PersonTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Biography")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LanguageId");
+
+                    b.HasIndex("PersonId", "LanguageId")
+                        .IsUnique();
+
+                    b.ToTable("PersonTranslations");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Rental", b =>
@@ -1805,6 +1727,21 @@ namespace MovieRental.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AgeRestriction")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Categories")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoverImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1816,6 +1753,9 @@ namespace MovieRental.DAL.Migrations
 
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("GoogleMapsUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -1830,8 +1770,7 @@ namespace MovieRental.DAL.Migrations
                     b.Property<bool>("IsFeatured")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
+                    b.Property<string>("Languages")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Price")
@@ -1841,6 +1780,9 @@ namespace MovieRental.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Venue")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -1874,6 +1816,10 @@ namespace MovieRental.DAL.Migrations
                     b.Property<int>("LanguageId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1891,7 +1837,8 @@ namespace MovieRental.DAL.Migrations
 
                     b.HasIndex("LanguageId");
 
-                    b.HasIndex("SportId");
+                    b.HasIndex("SportId", "LanguageId")
+                        .IsUnique();
 
                     b.ToTable("SportTranslations");
                 });
@@ -1936,6 +1883,36 @@ namespace MovieRental.DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserWatchlists");
+                });
+
+            modelBuilder.Entity("SportPlayers", b =>
+                {
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SportId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PersonId", "SportId");
+
+                    b.HasIndex("SportId");
+
+                    b.ToTable("SportPlayers");
+                });
+
+            modelBuilder.Entity("EventArtists", b =>
+                {
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Person", null)
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1989,68 +1966,12 @@ namespace MovieRental.DAL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.ActorTranslation", b =>
-                {
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Actor", "Actor")
-                        .WithMany("ActorTranslations")
-                        .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Language", "Language")
-                        .WithMany()
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Actor");
-
-                    b.Navigation("Language");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.CollectionMovie", b =>
-                {
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Collection", "Collection")
-                        .WithMany("CollectionMovies")
-                        .HasForeignKey("CollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Movie", "Movie")
-                        .WithMany("CollectionMovies")
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Collection");
-
-                    b.Navigation("Movie");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.CollectionTranslation", b =>
-                {
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Collection", "Collection")
-                        .WithMany("CollectionTranslations")
-                        .HasForeignKey("CollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Language", "Language")
-                        .WithMany()
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Collection");
-
-                    b.Navigation("Language");
-                });
-
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Event", b =>
                 {
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Currency", "Currency")
                         .WithMany()
-                        .HasForeignKey("CurrencyId");
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Currency");
                 });
@@ -2066,7 +1987,7 @@ namespace MovieRental.DAL.Migrations
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Language", "Language")
                         .WithMany()
                         .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Event");
@@ -2098,13 +2019,13 @@ namespace MovieRental.DAL.Migrations
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Language", "Language")
                         .WithMany()
                         .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Currency");
@@ -2112,40 +2033,13 @@ namespace MovieRental.DAL.Migrations
                     b.Navigation("Language");
                 });
 
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieActor", b =>
-                {
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Actor", "Actor")
-                        .WithMany()
-                        .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Actor", null)
-                        .WithMany("MovieActors")
-                        .HasForeignKey("ActorId1");
-
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Movie", "Movie")
-                        .WithMany("MovieActors")
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Actor");
-
-                    b.Navigation("Movie");
-                });
-
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieGenre", b =>
                 {
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Genre", "Genre")
-                        .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Genre", null)
                         .WithMany("MovieGenres")
-                        .HasForeignKey("GenreId1");
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Movie", "Movie")
                         .WithMany("MovieGenres")
@@ -2169,6 +2063,25 @@ namespace MovieRental.DAL.Migrations
                     b.Navigation("Movie");
                 });
 
+            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MoviePerson", b =>
+                {
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Movie", "Movie")
+                        .WithMany("MoviePersons")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
+
+                    b.Navigation("Person");
+                });
+
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieSocialLink", b =>
                 {
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Movie", "Movie")
@@ -2178,25 +2091,6 @@ namespace MovieRental.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Movie");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieTabTranslation", b =>
-                {
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Language", "Language")
-                        .WithMany()
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.MovieTab", "MovieTab")
-                        .WithMany("MovieTabTranslations")
-                        .HasForeignKey("MovieTabId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Language");
-
-                    b.Navigation("MovieTab");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieTranslation", b =>
@@ -2304,6 +2198,25 @@ namespace MovieRental.DAL.Migrations
                     b.Navigation("Language");
 
                     b.Navigation("Offer");
+                });
+
+            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.PersonTranslation", b =>
+                {
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Person", "Person")
+                        .WithMany("PersonTranslations")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Language");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Rental", b =>
@@ -2438,7 +2351,8 @@ namespace MovieRental.DAL.Migrations
                 {
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Currency", "Currency")
                         .WithMany()
-                        .HasForeignKey("CurrencyId");
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Currency");
                 });
@@ -2448,7 +2362,7 @@ namespace MovieRental.DAL.Migrations
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Language", "Language")
                         .WithMany()
                         .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Sport", "Sport")
@@ -2481,11 +2395,19 @@ namespace MovieRental.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Actor", b =>
+            modelBuilder.Entity("SportPlayers", b =>
                 {
-                    b.Navigation("ActorTranslations");
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Person", null)
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("MovieActors");
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Sport", null)
+                        .WithMany()
+                        .HasForeignKey("SportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.AppUser", b =>
@@ -2499,13 +2421,6 @@ namespace MovieRental.DAL.Migrations
                     b.Navigation("SearchHistories");
 
                     b.Navigation("Watchlists");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Collection", b =>
-                {
-                    b.Navigation("CollectionMovies");
-
-                    b.Navigation("CollectionTranslations");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Event", b =>
@@ -2522,13 +2437,11 @@ namespace MovieRental.DAL.Migrations
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Movie", b =>
                 {
-                    b.Navigation("CollectionMovies");
-
-                    b.Navigation("MovieActors");
-
                     b.Navigation("MovieGenres");
 
                     b.Navigation("MovieImages");
+
+                    b.Navigation("MoviePersons");
 
                     b.Navigation("MovieSocialLinks");
 
@@ -2541,11 +2454,6 @@ namespace MovieRental.DAL.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("UserWatchlists");
-                });
-
-            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieTab", b =>
-                {
-                    b.Navigation("MovieTabTranslations");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.MovieVideo", b =>
@@ -2561,6 +2469,11 @@ namespace MovieRental.DAL.Migrations
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Offer", b =>
                 {
                     b.Navigation("OfferTranslations");
+                });
+
+            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Person", b =>
+                {
+                    b.Navigation("PersonTranslations");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Review", b =>

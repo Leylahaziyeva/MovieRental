@@ -18,6 +18,9 @@
         "resources": {
           "az/MovieRental.MVC.resources.dll": {
             "locale": "az"
+          },
+          "en-us/MovieRental.MVC.resources.dll": {
+            "locale": "en-us"
           }
         }
       },

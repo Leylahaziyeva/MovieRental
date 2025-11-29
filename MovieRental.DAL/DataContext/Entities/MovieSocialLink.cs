@@ -3,10 +3,10 @@
     public class MovieSocialLink : TimeStample
     {
         public int MovieId { get; set; }
-        public virtual Movie Movie { get; set; } = null!;
+        public Movie? Movie { get; set; }
 
         public required string Platform { get; set; }  // "Facebook", "Twitter", "YouTube", "Instagram", "Snapchat"
-        public required string Url { get; set; }       // Full URL to social media page
+        public required string Url { get; set; }       
         public string? IconClass { get; set; }         // "fab fa-facebook-f", "fab fa-twitter"
 
         public int DisplayOrder { get; set; }

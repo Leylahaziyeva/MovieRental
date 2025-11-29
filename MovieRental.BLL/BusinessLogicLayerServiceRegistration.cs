@@ -33,22 +33,24 @@ namespace MovieRental.BLL
             services.AddScoped(typeof(ICrudService<,,,>), typeof(CrudManager<,,,>));
 
             services.AddSingleton<StringLocalizerManager>();
+
             services.AddScoped<ICloudinaryService, CloudinaryManager>();
             services.AddScoped<ICookieService, CookieManager>();
-            
-
             services.AddScoped<ILanguageService, LanguageManager>();
             services.AddScoped<ICurrencyService, CurrencyManager>();
+
             services.AddScoped<IHomeService, HomeManager>();
+            services.AddScoped<IHeaderService, HeaderManager>();
             services.AddScoped<ISearchHistoryService, SearchHistoryManager>();
             services.AddScoped<ISliderService, SliderManager>();
+            services.AddScoped<IPersonService, PersonManager>();
+            services.AddScoped<IPersonTranslationService, PersonTranslationManager>();
             services.AddScoped<IOfferService, OfferManager>();
-            services.AddScoped<ISportService, SportManager>();
-            services.AddScoped<IEventService, EventManager>();
+            //services.AddScoped<IGenreService, GenreManager>();
             services.AddScoped<IMovieService, MovieManager>();
+            services.AddScoped<IEventService, EventManager>();
+            services.AddScoped<ISportService, SportManager>();
             services.AddScoped<IFooterService, FooterManager>();
-            services.AddScoped<IHeaderService, HeaderManager>();
-          
 
             //services.AddScoped<IProductTranslationService, ProductTranslationManager>();
             //services.AddScoped<IProductImageService, ProductImageManager>();

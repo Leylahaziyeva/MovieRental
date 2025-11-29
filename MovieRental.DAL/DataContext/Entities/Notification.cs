@@ -4,7 +4,7 @@
     {
         //(bell icon with counter)
         public required string UserId { get; set; }
-        public AppUser User { get; set; } = null!;
+        public AppUser? User { get; set; }
   
         public string? ImageUrl { get; set; }
         public string? ActionUrl { get; set; }
@@ -13,7 +13,7 @@
         public bool IsRead { get; set; } = false;
         public DateTime NotificationDate { get; set; }
 
-        public virtual ICollection<NotificationTranslation> NotificationTranslations { get; set; } = new List<NotificationTranslation>();
+        public virtual ICollection<NotificationTranslation> NotificationTranslations { get; set; } = [];
     }
 
     public class NotificationTranslation : TimeStample
@@ -22,9 +22,9 @@
         public required string Message { get; set; }
 
         public int NotificationId { get; set; }
-        public virtual Notification Notification { get; set; } = null!;
+        public Notification? Notification { get; set; } 
 
         public int LanguageId { get; set; }
-        public virtual Language Language { get; set; } = null!;
+        public Language? Language { get; set; } 
     }
 }

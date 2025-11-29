@@ -6,6 +6,7 @@ C:\Users\lenovo\source\repos\MovieRental\MovieRental.DAL\obj\Debug\net8.0\MovieR
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.DAL\obj\Debug\net8.0\MovieRental.DAL.AssemblyInfoInputs.cache
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.DAL\obj\Debug\net8.0\MovieRental.DAL.AssemblyInfo.cs
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.DAL\obj\Debug\net8.0\MovieRental.DAL.csproj.CoreCompileInputs.cache
+C:\Users\lenovo\source\repos\MovieRental\MovieRental.DAL\obj\Debug\net8.0\MovieRental.DAL.sourcelink.json
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.DAL\obj\Debug\net8.0\MovieRental.DAL.dll
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.DAL\obj\Debug\net8.0\refint\MovieRental.DAL.dll
 C:\Users\lenovo\source\repos\MovieRental\MovieRental.DAL\obj\Debug\net8.0\MovieRental.DAL.pdb
