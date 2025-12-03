@@ -10,5 +10,6 @@ namespace MovieRental.BLL.Services.Contracts
         Task<EventFilterResultViewModel> GetFilteredEventsAsync(EventFilterViewModel filter);
         Task<bool> AddArtistsToEventAsync(int eventId, List<int> artistIds);
         Task<bool> RemoveArtistFromEventAsync(int eventId, int artistId);
+        Task<(IEnumerable<EventViewModel> Events, int TotalCount)> GetEventsPagedAsync(EventFilterViewModel filter);
     }
 }

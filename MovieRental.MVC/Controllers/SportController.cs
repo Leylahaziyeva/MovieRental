@@ -17,8 +17,6 @@ namespace MovieRental.MVC.Controllers
             _personService = personService;
             _currencyService = currencyService;
         }
-
-        /// Sport list səhifəsi
         public async Task<IActionResult> Index(string? location, string? category, string? language, DateTime? startDate, DateTime? endDate)
         {
             IEnumerable<SportViewModel> sports;
@@ -49,8 +47,7 @@ namespace MovieRental.MVC.Controllers
             return View(sports);
         }
 
-        /// GET: /Sport/Detail/5z
-        public async Task<IActionResult> Detail(int id)
+        public async Task<IActionResult> Details(int id)
         {
             var sport = await _sportService.GetSportDetailAsync(id);
 
@@ -62,7 +59,6 @@ namespace MovieRental.MVC.Controllers
             return View(sport);
         }
 
-        /// GET: /Sport/Create
         public async Task<IActionResult> Create()
         {
             var currencies = await _currencyService.GetAllAsync();
@@ -175,7 +171,7 @@ namespace MovieRental.MVC.Controllers
                 }
 
                 TempData["Success"] = "Sport event successfully updated!";
-                return RedirectToAction(nameof(Detail), new { id });
+                return RedirectToAction(nameof(Details), new { id });
             }
             catch (Exception ex)
             {
@@ -227,12 +223,12 @@ namespace MovieRental.MVC.Controllers
                     TempData["Success"] = "Players successfully added!";
                 }
 
-                return RedirectToAction(nameof(Detail), new { id = sportId });
+                return RedirectToAction(nameof(Details), new { id = sportId });
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error: {ex.Message}";
-                return RedirectToAction(nameof(Detail), new { id = sportId });
+                return RedirectToAction(nameof(Details), new { id = sportId });
             }
         }
 
@@ -254,12 +250,12 @@ namespace MovieRental.MVC.Controllers
                     TempData["Success"] = "Player successfully removed!";
                 }
 
-                return RedirectToAction(nameof(Detail), new { id = sportId });
+                return RedirectToAction(nameof(Details), new { id = sportId });
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error: {ex.Message}";
-                return RedirectToAction(nameof(Detail), new { id = sportId });
+                return RedirectToAction(nameof(Details), new { id = sportId });
             }
         }
 
@@ -275,6 +271,17 @@ namespace MovieRental.MVC.Controllers
         {
             var sports = await _sportService.GetFeaturedSportsAsync(count);
             return Json(sports);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LoadMoreSports(int page = 1, int pageSize = 12, string? location = null, string? category = null)
+        {
+            var (sports, totalCount) = await _sportService.GetSportsPagedAsync(page, pageSize, location, category);
+
+            if (!sports.Any())
+                return Content(string.Empty);
+
+            return PartialView("_SportCardsPartial", sports); 
         }
     }
 }

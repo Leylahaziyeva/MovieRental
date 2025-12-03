@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using MovieRental.BLL.Services.Contracts;
 using MovieRental.BLL.ViewModels.Sport;
+using MovieRental.BLL.ViewModels.Person;
 using MovieRental.DAL.DataContext.Entities;
 using MovieRental.DAL.Repositories.Contracts;
 using System.Linq.Expressions;
@@ -15,6 +16,7 @@ namespace MovieRental.BLL.Services.Implementations
         private readonly ICookieService _cookieService;
         private readonly ICurrencyService _currencyService;
         private readonly IRepositoryAsync<Person> _personRepository;
+        private readonly IPersonService _personService;
 
         public SportManager(
             IRepositoryAsync<Sport> repository,
@@ -22,18 +24,20 @@ namespace MovieRental.BLL.Services.Implementations
             ICloudinaryService cloudinaryService,
             ICookieService cookieService,
             ICurrencyService currencyService,
-            IRepositoryAsync<Person> personRepository) : base(repository, mapper)
+            IRepositoryAsync<Person> personRepository,
+            IPersonService personService) 
+            : base(repository, mapper)
         {
             _cloudinaryService = cloudinaryService;
             _cookieService = cookieService;
             _currencyService = currencyService;
             _personRepository = personRepository;
+            _personService = personService; 
         }
 
         public override async Task<SportViewModel?> GetByIdAsync(int id)
         {
             var languageId = await _cookieService.GetLanguageIdAsync();
-            var currency = await _cookieService.GetCurrencyAsync();
 
             var sport = await Repository.GetAsync(
                 predicate: x => x.Id == id,
@@ -56,6 +60,30 @@ namespace MovieRental.BLL.Services.Implementations
                 viewModel.Description = translation.Description;
                 viewModel.Location = translation.Location;
             }
+            else
+            {
+                viewModel.Name = $"[No translation for language {languageId}]";
+                viewModel.Description = string.Empty;
+                viewModel.Location = string.Empty;
+            }
+
+            if (sport.Players?.Any() == true)
+            {
+                viewModel.Players = new List<PersonViewModel>();
+                foreach (var player in sport.Players)
+                {
+                    var personViewModel = Mapper.Map<PersonViewModel>(player);
+
+                    var personTranslation = player.PersonTranslations?.FirstOrDefault();
+                    if (personTranslation != null)
+                    {
+                        personViewModel.Name = personTranslation.Name;
+                        personViewModel.Biography = personTranslation.Biography;
+                    }
+
+                    viewModel.Players.Add(personViewModel);
+                }
+            }
 
             if (sport.Price.HasValue && sport.Currency != null)
             {
@@ -72,7 +100,6 @@ namespace MovieRental.BLL.Services.Implementations
             bool AsNoTracking = false)
         {
             var languageId = await _cookieService.GetLanguageIdAsync();
-            var currency = await _cookieService.GetCurrencyAsync();
 
             Func<IQueryable<Sport>, IIncludableQueryable<Sport, object>> includeWithTranslations = query =>
             {
@@ -86,6 +113,11 @@ namespace MovieRental.BLL.Services.Implementations
             };
 
             var sports = await Repository.GetAllAsync(predicate, orderBy, includeWithTranslations, AsNoTracking);
+            return await MapToViewModelsAsync(sports.ToList(), languageId);
+        }
+
+        private Task<IEnumerable<SportViewModel>> MapToViewModelsAsync(IList<Sport> sports, int languageId)
+        {
             var viewModels = new List<SportViewModel>();
 
             foreach (var sport in sports)
@@ -100,6 +132,22 @@ namespace MovieRental.BLL.Services.Implementations
                     viewModel.Location = translation.Location;
                 }
 
+                if (sport.Players?.Any() == true)
+                {
+                    viewModel.Players = new List<PersonViewModel>();
+                    foreach (var player in sport.Players)
+                    {
+                        var personViewModel = Mapper.Map<PersonViewModel>(player);
+                        var personTranslation = player.PersonTranslations?.FirstOrDefault();
+                        if (personTranslation != null)
+                        {
+                            personViewModel.Name = personTranslation.Name;
+                            personViewModel.Biography = personTranslation.Biography;
+                        }
+                        viewModel.Players.Add(personViewModel);
+                    }
+                }
+
                 if (sport.Price.HasValue && sport.Currency != null)
                 {
                     viewModel.FormattedPrice = $"{sport.Currency.Symbol}{sport.Price.Value:N2}";
@@ -108,7 +156,27 @@ namespace MovieRental.BLL.Services.Implementations
                 viewModels.Add(viewModel);
             }
 
-            return viewModels;
+            return Task.FromResult<IEnumerable<SportViewModel>>(viewModels);
+        }
+
+        public async Task<IEnumerable<SportViewModel>> GetSportsByLocationAsync(string location)
+        {
+            var languageId = await _cookieService.GetLanguageIdAsync();
+
+            var sports = await Repository.GetAllAsync(
+                predicate: x => x.IsActive && x.SportTranslations.Any(st =>
+                    st.LanguageId == languageId &&
+                    st.Location.Contains(location)),
+                orderBy: query => query.OrderBy(x => x.EventDate),
+                include: query => query
+                    .Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
+                    .Include(s => s.Currency)
+                    .Include(s => s.Players)
+                        .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
+                AsNoTracking: true
+            );
+
+            return await MapToViewModelsAsync(sports.ToList(), languageId);
         }
 
         public override async Task<SportViewModel> CreateAsync(SportCreateViewModel createViewModel)
@@ -221,24 +289,6 @@ namespace MovieRental.BLL.Services.Implementations
             );
         }
 
-        public async Task<IEnumerable<SportViewModel>> GetSportsByLocationAsync(string location)
-        {
-            var languageId = await _cookieService.GetLanguageIdAsync();
-
-            var sports = await Repository.GetAllAsync(
-                predicate: x => x.IsActive && x.SportTranslations.Any(st =>
-                    st.LanguageId == languageId &&
-                    st.Location.Contains(location)),
-                orderBy: query => query.OrderBy(x => x.EventDate),
-                include: query => query
-                    .Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
-                    .Include(s => s.Currency)!,
-                AsNoTracking: true
-            );
-
-            return await MapToViewModelsAsync(sports);
-        }
-
         public async Task<IEnumerable<SportViewModel>> GetSportsByCategoryAsync(string category)
         {
             return await GetAllAsync(
@@ -295,32 +345,77 @@ namespace MovieRental.BLL.Services.Implementations
             return false;
         }
 
-        private async Task<IEnumerable<SportViewModel>> MapToViewModelsAsync(IList<Sport> sports)
+        public async Task<(IEnumerable<SportViewModel> Sports, int TotalCount)> GetSportsPagedAsync(int page = 1, int pageSize = 12, string? location = null, string? category = null)
         {
             var languageId = await _cookieService.GetLanguageIdAsync();
-            var viewModels = new List<SportViewModel>();
 
-            foreach (var sport in sports)
+            Expression<Func<Sport, bool>> predicate = x => x.IsActive && x.EventDate > DateTime.Now;
+
+            if (!string.IsNullOrEmpty(location))
             {
-                var viewModel = Mapper.Map<SportViewModel>(sport);
-
-                var translation = sport.SportTranslations?.FirstOrDefault();
-                if (translation != null)
-                {
-                    viewModel.Name = translation.Name;
-                    viewModel.Description = translation.Description;
-                    viewModel.Location = translation.Location;
-                }
-
-                if (sport.Price.HasValue && sport.Currency != null)
-                {
-                    viewModel.FormattedPrice = $"{sport.Currency.Symbol}{sport.Price.Value:N2}";
-                }
-
-                viewModels.Add(viewModel);
+                predicate = predicate.And(x => x.SportTranslations.Any(st =>
+                    st.LanguageId == languageId &&
+                    st.Location.Contains(location)));
             }
 
-            return viewModels;
+            if (!string.IsNullOrEmpty(category))
+            {
+                predicate = predicate.And(x => x.Categories != null && x.Categories.Contains(category));
+            }
+
+            Func<IQueryable<Sport>, IIncludableQueryable<Sport, object>> include = query =>
+                query.Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
+                     .Include(s => s.Currency).Include(s => s.Players).ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
+
+            var (items, totalCount) = await Repository.GetPagedAsync(
+                predicate: predicate,
+                orderBy: query => query.OrderBy(x => x.EventDate),
+                include: include,
+                page: page,
+                pageSize: pageSize,
+                AsNoTracking: true
+            );
+
+            var sports = await MapToViewModelsAsync(items, languageId);
+
+            return (sports, totalCount);
+        }
+    }
+
+    public static class ExpressionExtensions
+    {
+        public static Expression<Func<T, bool>> And<T>(
+            this Expression<Func<T, bool>> expr1,
+            Expression<Func<T, bool>> expr2)
+        {
+            var parameter = Expression.Parameter(typeof(T));
+
+            var leftVisitor = new ReplaceExpressionVisitor(expr1.Parameters[0], parameter);
+            var left = leftVisitor.Visit(expr1.Body);
+
+            var rightVisitor = new ReplaceExpressionVisitor(expr2.Parameters[0], parameter);
+            var right = rightVisitor.Visit(expr2.Body);
+
+            return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(left!, right!), parameter);
+        }
+
+        private class ReplaceExpressionVisitor : ExpressionVisitor
+        {
+            private readonly Expression _oldValue;
+            private readonly Expression _newValue;
+
+            public ReplaceExpressionVisitor(Expression oldValue, Expression newValue)
+            {
+                _oldValue = oldValue;
+                _newValue = newValue;
+            }
+
+            public override Expression? Visit(Expression? node)
+            {
+                if (node == _oldValue)
+                    return _newValue;
+                return base.Visit(node);
+            }
         }
     }
 }

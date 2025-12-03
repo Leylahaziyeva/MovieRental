@@ -299,36 +299,117 @@ namespace MovieRental.DAL.DataContext
 
             #region Sport Configuration
 
+            modelBuilder.Entity<Sport>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+
+                entity.Property(s => s.ImageUrl)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(s => s.CoverImageUrl)
+                    .HasMaxLength(500);
+
+                entity.Property(s => s.Venue)
+                    .HasMaxLength(200);
+
+                entity.Property(s => s.GoogleMapsUrl)
+                    .HasMaxLength(500);
+
+                entity.Property(s => s.ContactPhone)
+                    .HasMaxLength(20);
+
+                entity.Property(s => s.ContactEmail)
+                    .HasMaxLength(100);
+
+                entity.Property(s => s.Categories)
+                    .HasMaxLength(500); 
+
+                entity.Property(s => s.Languages)
+                    .HasMaxLength(200); 
+
+                entity.Property(s => s.AgeRestriction)
+                    .HasMaxLength(10); 
+                entity.Property(s => s.Price)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(s => s.IsActive)
+                    .HasDefaultValue(true);
+
+                entity.Property(s => s.IsFeatured)
+                    .HasDefaultValue(false);
+
+                entity.HasIndex(s => s.EventDate);
+                entity.HasIndex(s => s.IsActive);
+                entity.HasIndex(s => s.IsFeatured);
+                entity.HasIndex(s => s.IsDeleted);
+
+                entity.HasQueryFilter(s => !s.IsDeleted);
+            });
+
             modelBuilder.Entity<Sport>()
                 .HasMany(s => s.Players)
                 .WithMany()
                 .UsingEntity<Dictionary<string, object>>(
                     "SportPlayers",
-                    j => j.HasOne<Person>().WithMany().HasForeignKey("PersonId").OnDelete(DeleteBehavior.Cascade),
-                    j => j.HasOne<Sport>().WithMany().HasForeignKey("SportId").OnDelete(DeleteBehavior.Cascade)
+                    j => j.HasOne<Person>()
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade), 
+                    j => j.HasOne<Sport>()
+                        .WithMany()
+                        .HasForeignKey("SportId")
+                        .OnDelete(DeleteBehavior.Cascade), 
+                    j =>
+                    {
+                        j.HasKey("SportId", "PersonId");
+                        j.HasIndex("PersonId");
+                        j.HasIndex("SportId");
+                    }
                 );
 
             modelBuilder.Entity<Sport>()
                 .HasOne(s => s.Currency)
                 .WithMany()
                 .HasForeignKey(s => s.CurrencyId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.SetNull); 
 
             modelBuilder.Entity<Sport>()
                 .HasMany(s => s.SportTranslations)
                 .WithOne(st => st.Sport)
                 .HasForeignKey(st => st.SportId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade); 
+
+            modelBuilder.Entity<SportTranslation>(entity =>
+            {
+                entity.HasKey(st => st.Id);
+
+                entity.Property(st => st.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(st => st.Description)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+
+                entity.Property(st => st.Location)
+                    .IsRequired()
+                    .HasMaxLength(300);
+
+                entity.HasIndex(st => new { st.SportId, st.LanguageId })
+                    .IsUnique();
+
+                entity.HasIndex(st => st.LanguageId);
+
+
+                entity.HasQueryFilter(st => !st.IsDeleted);
+            });
 
             modelBuilder.Entity<SportTranslation>()
                 .HasOne(st => st.Language)
                 .WithMany()
                 .HasForeignKey(st => st.LanguageId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<SportTranslation>()
-                .HasIndex(st => new { st.SportId, st.LanguageId })
-                .IsUnique();
+                .OnDelete(DeleteBehavior.Restrict); 
 
             #endregion
 

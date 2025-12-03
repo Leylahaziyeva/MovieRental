@@ -20,14 +20,27 @@ namespace MovieRental.BLL.Mapping
                 .ForMember(dest => dest.CurrencyCode, opt => opt.MapFrom(src =>
                     src.Currency != null ? src.Currency.IsoCode : null))
                 .ForMember(dest => dest.CurrencySymbol, opt => opt.MapFrom(src =>
-                    src.Currency != null ? src.Currency.Symbol : null));
+                    src.Currency != null ? src.Currency.Symbol : null))
+                .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.Currency));
 
             CreateMap<OfferCreateViewModel, Offer>()
-                .ForMember(dest => dest.OfferTranslations, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.OfferTranslations, opt => opt.Ignore())
+                .ForMember(dest => dest.Currency, opt => opt.Ignore());
 
             CreateMap<OfferUpdateViewModel, Offer>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ImageUrl, opt => opt.Condition(src => src.ImageFile == null))
+                .ForMember(dest => dest.LogoUrl, opt => opt.Condition(src => src.LogoFile == null))
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.OfferTranslations, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
+                .ForMember(dest => dest.Currency, opt => opt.Ignore());
+
+            CreateMap<OfferTranslation, OfferTranslationViewModel>()
+                .ForMember(dest => dest.Language, opt => opt.MapFrom(src => src.Language));
         }
     }
 }

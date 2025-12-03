@@ -14,7 +14,6 @@
 
         public bool IsApproved { get; set; }
 
-        // Support for nested replies
         public int? ParentReviewId { get; set; }
         public Review? ParentReview { get; set; }
         public List<Review> Replies { get; set; } = [];

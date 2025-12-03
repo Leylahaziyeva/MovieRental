@@ -7,5 +7,7 @@ namespace MovieRental.BLL.Services.Contracts
     {
         Task<IEnumerable<OfferViewModel>> GetActiveOffersAsync(int languageId);
         Task<OfferViewModel?> GetOfferByIdWithTranslationsAsync(int id, int languageId);
+        Task<IEnumerable<OfferViewModel>> GetAllOffersAsync(int languageId);
+        Task<bool> IsOfferValidAsync(int id);
     }
 }

@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using MovieRental.BLL.Services.Contracts;
 using MovieRental.BLL.ViewModels.Event;
+using MovieRental.BLL.ViewModels.Person;
 using MovieRental.DAL.DataContext.Entities;
 using MovieRental.DAL.Repositories.Contracts;
+using System.Linq.Expressions;
 
 namespace MovieRental.BLL.Services.Implementations
 {
@@ -317,6 +320,106 @@ namespace MovieRental.BLL.Services.Implementations
             }
 
             return false;
+        }
+
+        public async Task<(IEnumerable<EventViewModel> Events, int TotalCount)> GetEventsPagedAsync(EventFilterViewModel filter)
+        {
+            var languageId = await _cookieService.GetLanguageIdAsync();
+
+            Expression<Func<Event, bool>> predicate = x => x.IsActive;
+
+            if (!string.IsNullOrEmpty(filter.SearchQuery))
+            {
+                predicate = predicate.And(x => x.EventTranslations.Any(et =>
+                    et.LanguageId == languageId &&
+                    et.Name.Contains(filter.SearchQuery)));
+            }
+
+            if (!string.IsNullOrEmpty(filter.Location))
+            {
+                predicate = predicate.And(x => x.EventTranslations.Any(et =>
+                    et.LanguageId == languageId &&
+                    et.Location.Contains(filter.Location)));
+            }
+
+            if (filter.FromDate.HasValue)
+            {
+                predicate = predicate.And(x => x.EventDate >= filter.FromDate.Value);
+            }
+
+            if (filter.ToDate.HasValue)
+            {
+                predicate = predicate.And(x => x.EventDate <= filter.ToDate.Value);
+            }
+
+            if (filter.MaxPrice.HasValue)
+            {
+                predicate = predicate.And(x => x.Price <= filter.MaxPrice.Value);
+            }
+
+            Func<IQueryable<Event>, IIncludableQueryable<Event, object>> include = query =>
+                query.Include(e => e.EventTranslations.Where(et => et.LanguageId == languageId))
+                     .Include(e => e.Currency)
+                     .Include(e => e.Artists)!
+                         .ThenInclude(a => a.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
+
+            var (items, totalCount) = await Repository.GetPagedAsync(
+                predicate: predicate,
+                orderBy: query => query.OrderBy(x => x.EventDate),
+                include: include,
+                page: filter.Page,
+                pageSize: filter.PageSize,
+                AsNoTracking: true
+            );
+
+            var events = await MapToViewModelsAsync(items, languageId);
+
+            return (events, totalCount);
+        }
+
+        // Replace the MapToViewModelsAsync method (starting at line 380) with this:
+
+        private Task<IEnumerable<EventViewModel>> MapToViewModelsAsync(IList<Event> events, int languageId)
+        {
+            var viewModels = new List<EventViewModel>();
+
+            foreach (var eventEntity in events)
+            {
+                var viewModel = Mapper.Map<EventViewModel>(eventEntity);
+
+                var translation = eventEntity.EventTranslations?.FirstOrDefault();
+                if (translation != null)
+                {
+                    viewModel.Name = translation.Name;
+                    viewModel.Description = translation.Description;
+                    viewModel.Location = translation.Location;
+                }
+
+                if (eventEntity.Artists?.Any() == true)
+                {
+                    viewModel.Artists = new List<PersonViewModel>();
+                    foreach (var artist in eventEntity.Artists)
+                    {
+                        var personViewModel = Mapper.Map<PersonViewModel>(artist);
+                        var personTranslation = artist.PersonTranslations?.FirstOrDefault();
+                        if (personTranslation != null)
+                        {
+                            personViewModel.Name = personTranslation.Name;
+                            personViewModel.Biography = personTranslation.Biography;
+                        }
+                        viewModel.Artists.Add(personViewModel);
+                    }
+                }
+
+                if (eventEntity.Price.HasValue && eventEntity.Currency != null)
+                {
+                    viewModel.FormattedPrice = $"{eventEntity.Currency.Symbol}{eventEntity.Price.Value:N2}";
+                }
+
+                viewModels.Add(viewModel);
+            }
+
+            return Task.FromResult<IEnumerable<EventViewModel>>(viewModels);
         }
     }
 }

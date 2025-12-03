@@ -1,0 +1,347 @@
+﻿@model MovieDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Title ?? localizer.GetValue("MovieDetails");
+}
+
+<div class="cover-pic">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="position-absolute bg-white shadow-sm-sm rounded text-center p-2 mt-4 love-box">
+                    <h6 class="text-gray-900 mb-0 font-weight-bold">
+                        <i class="fas fa-heart text-danger"></i> @Model.LovePercentage%
+                    </h6>
+                    <small class="text-muted">@Model.VotesCount.ToString("N0")</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <img src="~/img/@Model.CoverImageUrl" class="img-fluid" alt="@Model.Title">
+</div>
+
+<div class="container">
+    <div class="row mb-4 pb-2 list-bp">
+        <!-- Left Sidebar -->
+        <div class="col-xl-3 col-lg-3">
+            <div class="bg-white p-3 widget shadow-sm rounded mb-4">
+                <img src="~/img/@Model.PosterImageUrl" class="img-fluid rounded" alt="@Model.Title">
+                
+                @if (!string.IsNullOrEmpty(Model.DirectorNames))
+                {
+                    <h1 class="h6 mb-0 mt-3 font-weight-bold text-gray-900">@localizer.GetValue("Director")</h1>
+                    <p>@Model.DirectorNames</p>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.WriterNames))
+                {
+                    <h1 class="h6 mb-0 mt-3 font-weight-bold text-gray-900">@localizer.GetValue("Writers")</h1>
+                    <p>@Model.WriterNames</p>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.CastNames))
+                {
+                    <h1 class="h6 mb-0 mt-3 font-weight-bold text-gray-900">@localizer.GetValue("Cast")</h1>
+                    <p>@Model.CastNames</p>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Plot))
+                {
+                    <h1 class="h6 mb-0 mt-3 font-weight-bold text-gray-900">@localizer.GetValue("Plot")</h1>
+                    <p class="mb-0">@(Model.Plot.Length > 200 ? Model.Plot.Substring(0, 200) + "..." : Model.Plot)</p>
+                }
+            </div>
+        </div>
+
+        <div class="col-xl-9 col-lg-9">
+            <!-- Movie Header -->
+            <div class="bg-white info-header shadow-sm rounded mb-4">
+                <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+                    <div>
+                        <h3 class="mb-0 mt-0 font-weight-bold">
+                            @Model.Title <small>@Model.Year</small>
+                        </h3>
+                        <p class="mb-0 text-gray-800">
+                            <small class="text-muted">
+                                <i class="fas fa-film fa-fw fa-sm mr-1"></i>
+                                @if (Model.Genres.Any())
+                                {
+                                    @string.Join(" / ", Model.Genres.Select(g => g.Name))
+                                }
+                                @if (!string.IsNullOrEmpty(Model.Format))
+                                {
+                                    <text> / @Model.Format</text>
+                                }
+                            </small>
+                        </p>
+                    </div>
+                    <div>
+                        <a href="#" class="d-sm-inline-block btn btn-primary shadow-sm-sm">
+                            <i class="fas fa-share-alt"></i>
+                        </a>
+                        <a href="#" class="d-sm-inline-block btn btn-danger shadow-sm-sm">
+                            @localizer.GetValue("AddToWatchlist") <i class="fas fa-plus fa-sm ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center justify-content-between py-3 px-3">
+                    <div>
+                        @if (Model.Budget.HasValue)
+                        {
+                            <p class="mb-0 text-gray-900">
+                                <i class="fas fa-money-bill fa-sm fa-fw mr-1"></i> @localizer.GetValue("Budget") - 
+                                <span class="text-white rounded px-2 py-1 bg-info">
+                                    @Model.Currency?.Symbol@Model.Budget.Value.ToString("N0")
+                                </span>
+                            </p>
+                        }
+                        @if (Model.IsAvailableForRent)
+                        {
+                            <p class="mb-0 text-gray-900 mt-2">
+                                <i class="fas fa-ticket-alt fa-sm fa-fw mr-1"></i> @localizer.GetValue("RentalPrice") - 
+                                <span class="text-white rounded px-2 py-1 bg-success">
+                                    @Model.FormattedPrice
+                                </span>
+                                <small class="text-muted ml-2">(@Model.RentalDurationDays @localizer.GetValue("Days"))</small>
+                            </p>
+                        }
+                    </div>
+                    
+                    @if (Model.SocialLinks.Any())
+                    {
+                        <div>
+                            @foreach (var link in Model.SocialLinks.OrderBy(l => l.Id))
+                            {
+                                <a href="@link.Url" target="_blank" class="btn btn-sm btn-circle 
+                                   @(link.Platform.ToLower() switch {
+                                       "facebook" => "btn-primary",
+                                       "youtube" => "btn-danger",
+                                       "twitter" => "btn-info",
+                                       "snapchat" => "btn-warning",
+                                       "instagram" => "btn-danger",
+                                       _ => "btn-secondary"
+                                   })">
+                                    <i class="@(link.IconClass ?? "fab fa-" + link.Platform.ToLower())"></i>
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="bg-white p-3 widget shadow-sm rounded mb-4">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">
+                            @localizer.GetValue("Summary")
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">
+                            @localizer.GetValue("Cast")
+                        </a>
+                    </li>
+                    @if (Model.Videos.Any())
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" id="videos-tab" data-toggle="tab" href="#videos" role="tab" aria-controls="videos" aria-selected="false">
+                                @localizer.GetValue("Videos")
+                            </a>
+                        </li>
+                    }
+                    @if (Model.Images.Any())
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" id="images-tab" data-toggle="tab" href="#images" role="tab" aria-controls="images" aria-selected="false">
+                                @localizer.GetValue("Images")
+                            </a>
+                        </li>
+                    }
+                    <li class="nav-item">
+                        <a class="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">
+                            @localizer.GetValue("Reviews")
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="myTabContent">
+                    <!-- Summary Tab -->
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <div class="mt-3">
+                            @if (!string.IsNullOrEmpty(Model.Plot))
+                            {
+                                <h6 class="mt-0 mb-3">@Model.Title</h6>
+                                @foreach (var paragraph in Model.Plot.Split(new[] { "\n\n", "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    <p>@paragraph</p>
+                                }
+                            }
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <h6 class="font-weight-bold">@localizer.GetValue("MovieInformation")</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>@localizer.GetValue("ReleaseDate"):</strong> @Model.ReleaseDate.ToString("MMMM dd, yyyy")</li>
+                                        <li><strong>@localizer.GetValue("Duration"):</strong> @Model.Duration @localizer.GetValue("Minutes")</li>
+                                        <li><strong>@localizer.GetValue("Language"):</strong> @Model.LanguageName</li>
+                                        @if (!string.IsNullOrEmpty(Model.Format))
+                                        {
+                                            <li><strong>@localizer.GetValue("Format"):</strong> @Model.Format</li>
+                                        }
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    @if (Model.Genres.Any())
+                                    {
+                                        <h6 class="font-weight-bold">@localizer.GetValue("Genres")</h6>
+                                        <div>
+                                            @foreach (var genre in Model.Genres)
+                                            {
+                                                <span class="badge badge-primary mr-1 mb-1">@genre.Name</span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cast Tab -->
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="row mt-3">
+                            @if (Model.Actors.Any())
+                            {
+                                <div class="col-xl-4 col-lg-4">
+                                    <h5 class="h6 mt-0 mb-3 font-weight-bold text-gray-900">@localizer.GetValue("Cast").ToUpper()</h5>
+                                    @foreach (var actor in Model.Actors)
+                                    {
+                                        <div class="artist-list mb-3">
+                                            <a class="d-flex align-items-center" href="#">
+                                                <div class="dropdown-list-image mr-3">
+                                                    <img class="rounded-circle" src="~/img/@(actor.ProfileImageUrl ?? "/img/default-avatar.png")" alt="@actor.Name">
+                                                    <div class="status-indicator bg-success"></div>
+                                                </div>
+                                                <div class="font-weight-bold">
+                                                    <div class="text-truncate">@actor.Name</div>
+                                                    <div class="small text-gray-600">@localizer.GetValue("Acting")</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            @if (Model.Directors.Any())
+                            {
+                                <div class="col-xl-4 col-lg-4">
+                                    <h5 class="h6 mt-0 mb-3 font-weight-bold text-gray-900">@localizer.GetValue("Directors").ToUpper()</h5>
+                                    @foreach (var director in Model.Directors)
+                                    {
+                                        <div class="artist-list mb-3">
+                                            <a class="d-flex align-items-center" href="#">
+                                                <div class="dropdown-list-image mr-3">
+                                                    <img class="rounded-circle" src="~/img/@(director.ProfileImageUrl ?? "/img/default-avatar.png")" alt="@director.Name">
+                                                    <div class="status-indicator bg-success"></div>
+                                                </div>
+                                                <div class="font-weight-bold">
+                                                    <div class="text-truncate">@director.Name</div>
+                                                    <div class="small text-gray-600">@localizer.GetValue("Directing")</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            @if (Model.Writers.Any())
+                            {
+                                <div class="col-xl-4 col-lg-4">
+                                    <h5 class="h6 mt-0 mb-3 font-weight-bold text-gray-900">@localizer.GetValue("Writers").ToUpper()</h5>
+                                    @foreach (var writer in Model.Writers)
+                                    {
+                                        <div class="artist-list mb-3">
+                                            <a class="d-flex align-items-center" href="#">
+                                                <div class="dropdown-list-image mr-3">
+                                                    <img class="rounded-circle" src="~/img/@(writer.ProfileImageUrl ?? "/img/default-avatar.png")" alt="@writer.Name">
+                                                    <div class="status-indicator bg-success"></div>
+                                                </div>
+                                                <div class="font-weight-bold">
+                                                    <div class="text-truncate">@writer.Name</div>
+                                                    <div class="small text-gray-600">@localizer.GetValue("Writing")</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Videos Tab -->
+                    @if (Model.Videos.Any())
+                    {
+                        <div class="tab-pane fade" id="videos" role="tabpanel" aria-labelledby="videos-tab">
+                            <div class="row mt-3">
+                                @foreach (var video in Model.Videos)
+                                {
+                                    <div class="col-xl-6 col-lg-6 mb-4">
+                                        <h6 class="font-weight-bold">@video.Title</h6>
+                                        @if (!string.IsNullOrEmpty(video.Description))
+                                        {
+                                            <p class="small text-muted">@video.Description</p>
+                                        }
+                                        <div class="embed-responsive embed-responsive-16by9">
+                                            <video class="embed-responsive-item" controls>
+                                                <source src="~/img/@video.VideoUrl" type="video/mp4">
+                                                @localizer.GetValue("BrowserNotSupportVideo")
+                                            </video>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Images Tab -->
+                    @if (Model.Images.Any())
+                    {
+                        <div class="tab-pane fade" id="images" role="tabpanel" aria-labelledby="images-tab">
+                            <div class="row mt-3">
+                                @foreach (var image in Model.Images)
+                                {
+                                    <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
+                                        <img src="~/img/@image.ImageUrl" class="img-fluid rounded shadow-sm" alt="@localizer.GetValue("MovieImage")">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Reviews Tab -->
+                    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                        <div class="card-body p-3 mt-3">
+                            <p class="text-center text-muted">@localizer.GetValue("ReviewsWillBeDisplayedHere")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            var hash = window.location.hash;
+            if (hash) {
+                $('.nav-tabs a[href="' + hash + '"]').tab('show');
+            }
+            
+            $('.nav-tabs a').on('shown.bs.tab', function(e) {
+                window.location.hash = e.target.hash;
+            });
+        });
+    </script>
+}

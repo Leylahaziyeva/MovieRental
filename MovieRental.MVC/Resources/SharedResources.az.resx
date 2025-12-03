@@ -117,7 +117,706 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ApplyFilters" xml:space="preserve">
+    <value>Tətbiq Et</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Kateqoriya</value>
+  </data>
+  <data name="DateRange" xml:space="preserve">
+    <value>Tarix Aralığı</value>
+  </data>
+  <data name="EnterLocation" xml:space="preserve">
+    <value>Məkanı daxil edin...</value>
+  </data>
+  <data name="Events" xml:space="preserve">
+    <value>Tədbirlər</value>
+  </data>
+  <data name="FilterBy" xml:space="preserve">
+    <value>Filterlə</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>Başlanğıc</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>Janr</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Məkan</value>
+  </data>
+  <data name="MaxPrice" xml:space="preserve">
+    <value>Maksimum Qiymət</value>
+  </data>
+  <data name="NoEventsFound" xml:space="preserve">
+    <value>Heç bir tədbir tapılmadı</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Əvvəlki</value>
+  </data>
+  <data name="ResetFilters" xml:space="preserve">
+    <value>Filterləri Sıfırla</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Axtar</value>
+  </data>
+  <data name="SearchEvents" xml:space="preserve">
+    <value>Tədbir axtar...</value>
+  </data>
+  <data name="SearchGenre" xml:space="preserve">
+    <value>Janr Axtar...</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>Son</value>
+  </data>
+  <data name="TryDifferentFilters" xml:space="preserve">
+    <value>Zəhmət olmasa başqa filterlər sınayın</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Növbəti</value>
+  </data>
+  <data name="Showing" xml:space="preserve">
+    <value>Göstərilir</value>
+  </data>
+  <data name="FromDate" xml:space="preserve">
+    <value>Başlanğıc Tarixi</value>
+  </data>
+  <data name="ToDate" xml:space="preserve">
+    <value>Son Tarix</value>
+  </data>
+  <data name="of" xml:space="preserve">
+    <value>/</value>
+  </data>
+  <data name="ShowingTo" xml:space="preserve">
+    <value>-</value>
+  </data>
+  <data name="EventDetails" xml:space="preserve">
+    <value>Tədbir Təfərrüatları</value>
+  </data>
+  <data name="AddToWatchlist" xml:space="preserve">
+    <value>İzləmə siyahısına əlavə et</value>
+  </data>
+  <data name="at" xml:space="preserve">
+    <value>saat</value>
+  </data>
+  <data name="Artists" xml:space="preserve">
+    <value>Artistlər</value>
+  </data>
+  <data name="Summary" xml:space="preserve">
+    <value>Xülasə</value>
+  </data>
+  <data name="DateAndTime" xml:space="preserve">
+    <value>Tarix və Vaxt</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Qiymət</value>
+  </data>
+  <data name="FreeEvent" xml:space="preserve">
+    <value>Pulsuz Tədbir</value>
+  </data>
+  <data name="DaysUntilEvent" xml:space="preserve">
+    <value>gün qalıb</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Vaxt</value>
+  </data>
+  <data name="Venue" xml:space="preserve">
+    <value>Məkan</value>
+  </data>
+  <data name="Map" xml:space="preserve">
+    <value>Xəritə</value>
+  </data>
+  <data name="WhatToExpect" xml:space="preserve">
+    <value>Nə Gözləyə Bilərsiniz?</value>
+  </data>
+  <data name="NoAdditionalInfo" xml:space="preserve">
+    <value>Əlavə məlumat yoxdur.</value>
+  </data>
+  <data name="PriceTicketInfo" xml:space="preserve">
+    <value>Qiymət və Bilet Məlumatı</value>
+  </data>
+  <data name="TicketPurchaseInfo" xml:space="preserve">
+    <value>Biletləri əldə etmək üçün bizimlə əlaqə saxlayın.</value>
+  </data>
+  <data name="FreeEventInfo" xml:space="preserve">
+    <value>Bu tədbir pulsuz və hamı üçün açıqdır. Qeydiyyat tələb olunmur.</value>
+  </data>
+  <data name="LocationParking" xml:space="preserve">
+    <value>Məkan və Dayanacaq</value>
+  </data>
+  <data name="ParkingInfo" xml:space="preserve">
+    <value>Məkan ətrafında dayanacaq yerləri mövcuddur.</value>
+  </data>
+  <data name="ViewAll" xml:space="preserve">
+    <value>Hamısına Bax</value>
+  </data>
+  <data name="NoEventsAvailable" xml:space="preserve">
+    <value>Hal-hazırda heç bir tədbir mövcud deyil</value>
+  </data>
+  <data name="Free" xml:space="preserve">
+    <value>Pulsuz</value>
+  </data>
+  <data name="Watchlist" xml:space="preserve">
+    <value>İzləmə Siyahım</value>
+  </data>
+  <data name="EventsIn" xml:space="preserve">
+    <value>Tədbirlər</value>
+  </data>
+  <data name="EventsInCategory" xml:space="preserve">
+    <value>Kateqoriyasında Tədbirlər</value>
+  </data>
+  <data name="NoEventsInThisLocation" xml:space="preserve">
+    <value>Bu məkanda heç bir tədbir tapılmadı</value>
+  </data>
+  <data name="SearchResults" xml:space="preserve">
+    <value>Axtarış Nəticələri</value>
+  </data>
+  <data name="RelatedEvents" xml:space="preserve">
+    <value>Əlaqəli Tədbirlər</value>
+  </data>
+  <data name="UpcomingEvents" xml:space="preserve">
+    <value>Gələcək Tədbirlər</value>
+  </data>
+  <data name="LoadMore" xml:space="preserve">
+    <value>Daha Çox Yüklə</value>
+  </data>
+  <data name="NoUpcomingEvents" xml:space="preserve">
+    <value>Heç bir gələcək tədbir yoxdur</value>
+  </data>
+  <data name="PastEvents" xml:space="preserve">
+    <value>Keçmiş Tədbirlər</value>
+  </data>
+  <data name="EventCategories" xml:space="preserve">
+    <value>Tədbir Kateqoriyaları</value>
+  </data>
+  <data name="PopularEvents" xml:space="preserve">
+    <value>Populyar Tədbirlər</value>
+  </data>
+  <data name="NearbyEvents" xml:space="preserve">
+    <value>Yaxınlıqdakı Tədbirlər</value>
+  </data>
+  <data name="ThisWeekend" xml:space="preserve">
+    <value>Bu Həftəsonu</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Bugün</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Sabah</value>
+  </data>
+  <data name="ThisWeek" xml:space="preserve">
+    <value>Bu Həftə</value>
+  </data>
+  <data name="ThisMonth" xml:space="preserve">
+    <value>Bu Ay</value>
+  </data>
+  <data name="Actor" xml:space="preserve">
+    <value>Aktyor</value>
+  </data>
+  <data name="Artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="Sportsman" xml:space="preserve">
+    <value>İdmançı</value>
+  </data>
+  <data name="Featured" xml:space="preserve">
+    <value>Seçilmiş</value>
+  </data>
+  <data name="Offers" xml:space="preserve">
+    <value>Təkliflər</value>
+  </data>
   <data name="Movies" xml:space="preserve">
-    <value>Filmler</value>
+    <value>Filmlər</value>
+  </data>
+  <data name="People" xml:space="preserve">
+    <value>Şəxslər</value>
+  </data>
+  <data name="Sports" xml:space="preserve">
+    <value>İdman</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>Haqqında</value>
+  </data>
+  <data name="Pages" xml:space="preserve">
+    <value>Səhifələr</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Əlaqə</value>
+  </data>
+  <data name="OtherPages" xml:space="preserve">
+    <value>Başqa Səhifələr</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Qeydiyyat</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Giriş</value>
+  </data>
+  <data name="ForgotPassword" xml:space="preserve">
+    <value>Şifrəni unutmusunuz?</value>
+  </data>
+  <data name="ResetPassword" xml:space="preserve">
+    <value>Şifrəni sıfırla</value>
+  </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>Hesabdan çıxış</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="404Page" xml:space="preserve">
+    <value>404 Xəta</value>
+  </data>
+  <data name="NEW" xml:space="preserve">
+    <value>YENİ</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Hesabdan çıxış</value>
+  </data>
+  <data name="AccountSettings" xml:space="preserve">
+    <value>Parametrlər</value>
+  </data>
+  <data name="YourLists" xml:space="preserve">
+    <value>Siyahılar</value>
+  </data>
+  <data name="ShowAllAlerts" xml:space="preserve">
+    <value>Bildirişlər</value>
+  </data>
+  <data name="Guest" xml:space="preserve">
+    <value>Qonaq </value>
+  </data>
+  <data name="SearchForMoviesEventsSportsActivities..." xml:space="preserve">
+    <value>Filmlər, tədbirlər, idman və fəaliyyətlər üzrə axtarış…</value>
+  </data>
+  <data name="TryAdjustingFilters" xml:space="preserve">
+    <value>Filterləri və ya axtarış kriteriyalarını dəyişdirin</value>
+  </data>
+  <data name="NoMoviesFound" xml:space="preserve">
+    <value>Film tapılmadı</value>
+  </data>
+  <data name="MoviePagination" xml:space="preserve">
+    <value>Film səhifələməsi</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Yüklənir...</value>
+  </data>
+  <data name="ErrorLoadingMovies" xml:space="preserve">
+    <value>Filmlər yüklənərkən xəta baş verdi. Yenidən cəhd edin.</value>
+  </data>
+  <data name="PriceLowToHigh" xml:space="preserve">
+    <value>Qiymət (Aşağıdan Yuxarı)</value>
+  </data>
+  <data name="PriceHighToLow" xml:space="preserve">
+    <value>Qiymət (Yuxarıdan Aşağı)</value>
+  </data>
+  <data name="Latest" xml:space="preserve">
+    <value>Ən Yeni</value>
+  </data>
+  <data name="Rating" xml:space="preserve">
+    <value>Reytinq</value>
+  </data>
+  <data name="Relevance" xml:space="preserve">
+    <value>Uyğunluq</value>
+  </data>
+  <data name="SortBy" xml:space="preserve">
+    <value>Sırala</value>
+  </data>
+  <data name="StartTypingToSearch" xml:space="preserve">
+    <value>Axtarmaq üçün yazmağa başlayın...</value>
+  </data>
+  <data name="AllGenres" xml:space="preserve">
+    <value>Bütün Janrlar</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Dil Seçin</value>
+  </data>
+  <data name="AllLanguages" xml:space="preserve">
+    <value>Bütün Dillər</value>
+  </data>
+  <data name="Format" xml:space="preserve">
+    <value>Format</value>
+  </data>
+  <data name="AllFormats" xml:space="preserve">
+    <value>Bütün Formatlar</value>
+  </data>
+  <data name="ReleaseYear" xml:space="preserve">
+    <value>Buraxılış İli</value>
+  </data>
+  <data name="AllYears" xml:space="preserve">
+    <value>Bütün İllər</value>
+  </data>
+  <data name="EnterYear" xml:space="preserve">
+    <value>İl daxil edin...</value>
+  </data>
+  <data name="NotAvailable" xml:space="preserve">
+    <value>Mövcud Deyil</value>
+  </data>
+  <data name="MovieDetails" xml:space="preserve">
+    <value>Film Detalları</value>
+  </data>
+  <data name="Directors" xml:space="preserve">
+    <value>Rejissorlar</value>
+  </data>
+  <data name="Director" xml:space="preserve">
+    <value>Rejissor</value>
+  </data>
+  <data name="Writers" xml:space="preserve">
+    <value>Ssenaristlər</value>
+  </data>
+  <data name="Cast" xml:space="preserve">
+    <value>Aktyor Heyəti</value>
+  </data>
+  <data name="Videos" xml:space="preserve">
+    <value>Videolar</value>
+  </data>
+  <data name="Images" xml:space="preserve">
+    <value>Şəkillər</value>
+  </data>
+  <data name="Plot" xml:space="preserve">
+    <value>Süjet</value>
+  </data>
+  <data name="Reviews" xml:space="preserve">
+    <value>Rəylər</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>gün</value>
+  </data>
+  <data name="Budget" xml:space="preserve">
+    <value>BÜDCƏ</value>
+  </data>
+  <data name="RentalPrice" xml:space="preserve">
+    <value>KİRAYƏ QİYMƏTİ</value>
+  </data>
+  <data name="BrowserNotSupportVideo" xml:space="preserve">
+    <value>Brauzeriniz video formatını dəstəkləmir.</value>
+  </data>
+  <data name="MovieImage" xml:space="preserve">
+    <value>Film Şəkli</value>
+  </data>
+  <data name="ReviewsWillBeDisplayedHere" xml:space="preserve">
+    <value>Rəylər burada göstəriləcək.</value>
+  </data>
+  <data name="MovieInformation" xml:space="preserve">
+    <value>Film Məlumatları</value>
+  </data>
+  <data name="ReleaseDate" xml:space="preserve">
+    <value>Buraxılış Tarixi</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>Janrlar</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>dəqiqə</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Müddət</value>
+  </data>
+  <data name="Acting" xml:space="preserve">
+    <value>Aktyorluq</value>
+  </data>
+  <data name="Directing" xml:space="preserve">
+    <value>Rejissorluq</value>
+  </data>
+  <data name="Writing" xml:space="preserve">
+    <value>Ssenaristlik</value>
+  </data>
+  <data name="NoOffersAvailable" xml:space="preserve">
+    <value>Hal-hazırda heç bir təklif yoxdur</value>
+  </data>
+  <data name="ValidTill" xml:space="preserve">
+    <value>Etibarlıdır</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>ENDİRİM</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Qənaət</value>
+  </data>
+  <data name="Expired" xml:space="preserve">
+    <value>Müddəti bitib</value>
+  </data>
+  <data name="DaysLeft" xml:space="preserve">
+    <value>gün qalıb</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Təsvir</value>
+  </data>
+  <data name="OfferDetails" xml:space="preserve">
+    <value>Təklif Detalları</value>
+  </data>
+  <data name="Discount" xml:space="preserve">
+    <value>Endirim</value>
+  </data>
+  <data name="ValidFrom" xml:space="preserve">
+    <value>Başlama Tarixi</value>
+  </data>
+  <data name="TimeRemaining" xml:space="preserve">
+    <value>Qalan Müddət</value>
+  </data>
+  <data name="LastDay" xml:space="preserve">
+    <value>Son Gün!</value>
+  </data>
+  <data name="OfferExpired" xml:space="preserve">
+    <value>Bu təklifin müddəti bitib</value>
+  </data>
+  <data name="BackToOffers" xml:space="preserve">
+    <value>Təkliflərə Qayıt</value>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
+  <data name="Movie" xml:space="preserve">
+    <value>Film</value>
+  </data>
+  <data name="Event" xml:space="preserve">
+    <value>Tədbir</value>
+  </data>
+  <data name="NoSportsAvailable" xml:space="preserve">
+    <value>İdman hadisəsi mövcud deyil</value>
+  </data>
+  <data name="NoSportsFound" xml:space="preserve">
+    <value>İdman hadisəsi tapılmadı</value>
+  </data>
+  <data name="BookNow" xml:space="preserve">
+    <value>İndi sifariş et</value>
+  </data>
+  <data name="CreateAnAccount" xml:space="preserve">
+    <value>Hesab Yaradın!</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>İstifadəçi adı</value>
+  </data>
+  <data name="FirsName" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Soyad</value>
+  </data>
+  <data name="EmailAddress" xml:space="preserve">
+    <value>Email ünvanı</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Şifrə</value>
+  </data>
+  <data name="ConfirmPassword" xml:space="preserve">
+    <value>Şifrəni təsdiqləyin</value>
+  </data>
+  <data name="IAgreeToTermsAndConditions" xml:space="preserve">
+    <value>Şərtlər və qaydalarla razıyam</value>
+  </data>
+  <data name="RegisterAccount" xml:space="preserve">
+    <value>Qeydiyyatdan keç</value>
+  </data>
+  <data name="RegisterWithGoogle" xml:space="preserve">
+    <value>Google ilə qeydiyyat</value>
+  </data>
+  <data name="RegisterWithFacebook" xml:space="preserve">
+    <value>Facebook ilə qeydiyyat</value>
+  </data>
+  <data name="WelcomeBack" xml:space="preserve">
+    <value>Xoş gəlmisiniz!</value>
+  </data>
+  <data name="EnterEmailAddress" xml:space="preserve">
+    <value>Email ünvanınızı daxil edin...</value>
+  </data>
+  <data name="RememberMe" xml:space="preserve">
+    <value>Məni xatırla</value>
+  </data>
+  <data name="LoginWithGoogle" xml:space="preserve">
+    <value>Google ilə daxil ol</value>
+  </data>
+  <data name="LoginWithFacebook" xml:space="preserve">
+    <value>Facebook ilə daxil ol</value>
+  </data>
+  <data name="AlreadyHaveAccount" xml:space="preserve">
+    <value>Artıq hesabınız var? Daxil olun!</value>
+  </data>
+  <data name="ForgotYourPassword" xml:space="preserve">
+    <value>Şifrənizi Unutmusunuz?</value>
+  </data>
+  <data name="ForgotPasswordDescription" xml:space="preserve">
+    <value>Problem yoxdur! Email ünvanınızı daxil edin və biz sizə şifrəni yeniləmək üçün link göndərəcəyik!</value>
+  </data>
+  <data name="ResetYourPassword" xml:space="preserve">
+    <value>Şifrənizi Yeniləyin</value>
+  </data>
+  <data name="ResetPasswordDescription" xml:space="preserve">
+    <value>Email və yeni şifrənizi daxil edərək hesab şifrənizi yeniləyin.</value>
+  </data>
+  <data name="NewPassword" xml:space="preserve">
+    <value>Yeni şifrə</value>
+  </data>
+  <data name="ConfirmNewPassword" xml:space="preserve">
+    <value>Yeni şifrəni təsdiqləyin</value>
+  </data>
+  <data name="ChangePassword" xml:space="preserve">
+    <value>Şifrəni dəyişdir</value>
+  </data>
+  <data name="ChangeYourPassword" xml:space="preserve">
+    <value>Şifrənizi Dəyişdirin</value>
+  </data>
+  <data name="ChangePasswordDescription" xml:space="preserve">
+    <value>Cari şifrənizi daxil edin və hesab təhlükəsizliyini yeniləmək üçün yeni şifrə seçin.</value>
+  </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Cari şifrə</value>
+  </data>
+  <data name="BackToProfile" xml:space="preserve">
+    <value>Profilə qayıt</value>
+  </data>
+  <data name="BackToHome" xml:space="preserve">
+    <value>Back to Home</value>
+  </data>
+  <data name="BackToLogin" xml:space="preserve">
+    <value>Girişə qayıt</value>
+  </data>
+  <data name="GoToLogin" xml:space="preserve">
+    <value>Giriş səhifəsinə keç</value>
+  </data>
+  <data name="CheckYourEmail" xml:space="preserve">
+    <value>Email-inizi yoxlayın!</value>
+  </data>
+  <data name="ForgotPasswordConfirmationMessage" xml:space="preserve">
+    <value>Şifrə yeniləmə linki email ünvanınıza göndərildi. Zəhmət olmasa gələnlər qutunuzu yoxlayın.</value>
+  </data>
+  <data name="PasswordResetSuccessful" xml:space="preserve">
+    <value>Şifrə uğurla yeniləndi!</value>
+  </data>
+  <data name="ResetPasswordConfirmationMessage" xml:space="preserve">
+    <value>Şifrəniz uğurla yeniləndi. İndi yeni şifrənizlə daxil ola bilərsiniz.</value>
+  </data>
+  <data name="RegistrationSuccessful" xml:space="preserve">
+    <value>Qeydiyyat uğurlu oldu! Zəhmət olmasa daxil olun.</value>
+  </data>
+  <data name="LogoutSuccessful" xml:space="preserve">
+    <value>Uğurla çıxdınız.</value>
+  </data>
+  <data name="PasswordResetEmailSent" xml:space="preserve">
+    <value>Şifrə yeniləmə email-i göndərildi.</value>
+  </data>
+  <data name="PasswordChangedSuccessfully" xml:space="preserve">
+    <value>Şifrə uğurla dəyişdirildi!</value>
+  </data>
+  <data name="ProfileUpdatedSuccessfully" xml:space="preserve">
+    <value>Profil uğurla yeniləndi!</value>
+  </data>
+  <data name="AccountLockedOut" xml:space="preserve">
+    <value>Çoxlu uğursuz giriş cəhdi səbəbindən hesabınız bloklanıb.</value>
+  </data>
+  <data name="InvalidLoginAttempt" xml:space="preserve">
+    <value>Yanlış giriş cəhdi. Zəhmət olmasa email və şifrənizi yoxlayın.</value>
+  </data>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Giriş Qadağandır</value>
+  </data>
+  <data name="AccessDeniedDescription" xml:space="preserve">
+    <value>Bu səhifəyə daxil olmaq icazəniz yoxdur. Bu sahə yalnız səlahiyyətli istifadəçilər üçün nəzərdə tutulub.</value>
+  </data>
+  <data name="AccessDeniedInfo" xml:space="preserve">
+    <value>Əgər hesab edirsiniz ki, icazəniz olmalıdır, zəhmət olmasa administratorla əlaqə saxlayın və ya fərqli hesabla daxil olun.</value>
+  </data>
+  <data name="GoToHome" xml:space="preserve">
+    <value>Ana səhifəyə keç</value>
+  </data>
+  <data name="LoginWithDifferentAccount" xml:space="preserve">
+    <value>Fərqli hesabla daxil ol</value>
+  </data>
+  <data name="BackToIndex" xml:space="preserve">
+    <value>← Əsas səhifəyə qayıt</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Axtar...</value>
+  </data>
+  <data name="Football" xml:space="preserve">
+    <value>Futbol</value>
+  </data>
+  <data name="Basketball" xml:space="preserve">
+    <value>Basketbol</value>
+  </data>
+  <data name="Tennis" xml:space="preserve">
+    <value>Tennis</value>
+  </data>
+  <data name="SeeAll" xml:space="preserve">
+    <value>Hamısını gör</value>
+  </data>
+  <data name="Azerbaijani" xml:space="preserve">
+    <value>Azərbaycan</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>İngilis</value>
+  </data>
+  <data name="SportDetail" xml:space="preserve">
+    <value>İdman təfərrüatı</value>
+  </data>
+  <data name="Players" xml:space="preserve">
+    <value>Oyunçular</value>
+  </data>
+  <data name="Player" xml:space="preserve">
+    <value>Oyunçu</value>
+  </data>
+  <data name="NoPlayersAvailable" xml:space="preserve">
+    <value>Oyunçu mövcud deyil</value>
+  </data>
+  <data name="FAQ" xml:space="preserve">
+    <value>Tez-tez verilən suallar</value>
+  </data>
+  <data name="NoDescriptionAvailable" xml:space="preserve">
+    <value>Təsvir mövcud deyil</value>
+  </data>
+  <data name="TicketPrice" xml:space="preserve">
+    <value>Bilet qiyməti</value>
+  </data>
+  <data name="EventStartsIn" xml:space="preserve">
+    <value>Tədbir başlayır</value>
+  </data>
+  <data name="EventHasPassed" xml:space="preserve">
+    <value>Tədbir bitib</value>
+  </data>
+  <data name="HowToBuyTickets" xml:space="preserve">
+    <value>Biletləri necə əldə edək?</value>
+  </data>
+  <data name="TicketPurchaseInstructions" xml:space="preserve">
+    <value>Bilet almaq üçün təlimat</value>
+  </data>
+  <data name="RefundPolicy" xml:space="preserve">
+    <value>Geri qaytarma qaydaları</value>
+  </data>
+  <data name="RefundPolicyDescription" xml:space="preserve">
+    <value>Geri qaytarma qaydaları haqqında</value>
+  </data>
+  <data name="PersonalInfo" xml:space="preserve">
+    <value>Şəxsi Məlumat</value>
+  </data>
+  <data name="KnownFor" xml:space="preserve">
+    <value>Məşhur Olduğu Sahə</value>
+  </data>
+  <data name="Gender" xml:space="preserve">
+    <value>Cins</value>
+  </data>
+  <data name="KnownCredits" xml:space="preserve">
+    <value>Tanınan Layihələr</value>
+  </data>
+  <data name="DateOfBirth" xml:space="preserve">
+    <value>Doğum Tarixi</value>
+  </data>
+  <data name="Biography" xml:space="preserve">
+    <value>Bioqrafiya</value>
+  </data>
+  <data name="PopularPeople" xml:space="preserve">
+    <value>Məşhur İnsanlar</value>
+  </data>
+  <data name="ListOrder" xml:space="preserve">
+    <value>Siyahı Nizamı</value>
+  </data>
+  <data name="DateAdded" xml:space="preserve">
+    <value>Əlavə Edilmə Tarixi</value>
+  </data>
+  <data name="NoMorePeople" xml:space="preserve">
+    <value>Yüklənəcək başqa insan yoxdur</value>
+  </data>
+  <data name="ErrorLoadingData" xml:space="preserve">
+    <value>Məlumat yüklənərkən səhv baş verdi. Zəhmət olmasa, yenidən cəhd edin.</value>
   </data>
 </root>

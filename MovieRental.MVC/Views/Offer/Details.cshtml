@@ -1,0 +1,110 @@
+﻿@model OfferViewModel
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Title">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                        {
+                            <img src="@Model.LogoUrl" class="rounded-circle mr-3" style="width: 60px; height: 60px;" alt="@Model.Title">
+                        }
+                        <div>
+                            <h3 class="mb-0">@Model.Title</h3>
+                            @if (!Model.IsValid)
+                            {
+                                <span class="badge badge-secondary">@localizer.GetValue("Expired")</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-success">@localizer.GetValue("Active")</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>@localizer.GetValue("Description")</h5>
+                        <p class="text-muted">@Model.Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offer Details Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">@localizer.GetValue("OfferDetails")</h5>
+                    <hr>
+
+                    <!-- Discount Info -->
+                    @if (Model.DiscountPercentage.HasValue)
+                    {
+                        <div class="mb-3">
+                            <strong>@localizer.GetValue("Discount"):</strong>
+                            <div class="badge badge-danger badge-lg">
+                                @Model.DiscountPercentage% @localizer.GetValue("Off")
+                            </div>
+                        </div>
+                    }
+                    else if (Model.DiscountAmount.HasValue && !string.IsNullOrEmpty(Model.CurrencySymbol))
+                    {
+                        <div class="mb-3">
+                            <strong>@localizer.GetValue("Discount"):</strong>
+                            <div class="badge badge-danger badge-lg">
+                                @localizer.GetValue("Save") @Model.CurrencySymbol@Model.DiscountAmount
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Validity Period -->
+                    <div class="mb-3">
+                        <strong>@localizer.GetValue("ValidFrom"):</strong>
+                        <p class="mb-0">@Model.ValidFrom.ToString("dd MMMM yyyy HH:mm")</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>@localizer.GetValue("ValidTill"):</strong>
+                        <p class="mb-0">@Model.ValidTo.ToString("dd MMMM yyyy HH:mm")</p>
+                    </div>
+
+                    <!-- Days Remaining -->
+                    @if (Model.IsValid)
+                    {
+                        <div class="mb-3">
+                            <strong>@localizer.GetValue("TimeRemaining"):</strong>
+                            @if (Model.DaysRemaining > 0)
+                            {
+                                <p class="mb-0 text-danger font-weight-bold">
+                                    @Model.DaysRemaining @localizer.GetValue("DaysLeft")
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="mb-0 text-warning font-weight-bold">
+                                    @localizer.GetValue("LastDay")
+                                </p>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            @localizer.GetValue("OfferExpired")
+                        </div>
+                    }
+
+                    <hr>
+
+                    <!-- Action Buttons -->
+                    <a asp-controller="Offer" asp-action="Index" class="btn btn-outline-primary btn-block">
+                        <i class="fas fa-arrow-left"></i> @localizer.GetValue("BackToOffers")
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

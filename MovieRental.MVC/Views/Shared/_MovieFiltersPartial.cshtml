@@ -1,0 +1,257 @@
+﻿@model MovieFilterViewModel
+
+
+<form asp-action="Index" method="get">
+    <input type="hidden" asp-for="CurrentLanguageId" />
+    <input type="hidden" asp-for="PageSize" />
+    
+    <div id="accordion">
+        <!-- Sort Filter -->
+        <div class="filters-card border-bottom p-3">
+            <div class="filters-card-header" id="headingSort">
+                <h6 class="mb-0">
+                    <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseSort" aria-expanded="false" aria-controls="collapseSort">
+                        @localizer.GetValue("SortBy") <i class="fas fa-angle-down float-right"></i>
+                    </a>
+                </h6>
+            </div>
+            <div id="collapseSort" class="collapse" aria-labelledby="headingSort" data-parent="#accordion">
+                <div class="filters-card-body card-shop-filters">
+                    <div class="custom-control custom-radio">
+                        <input type="radio" class="custom-control-input" id="sort_relevance" name="Sort" value="" @(string.IsNullOrEmpty(Model.Sort) ? "checked" : "")>
+                        <label class="custom-control-label" for="sort_relevance">@localizer.GetValue("Relevance")</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" class="custom-control-input" id="sort_price_asc" name="Sort" value="price_asc" @(Model.Sort == "price_asc" ? "checked" : "")>
+                        <label class="custom-control-label" for="sort_price_asc">@localizer.GetValue("PriceLowToHigh")</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" class="custom-control-input" id="sort_price_desc" name="Sort" value="price_desc" @(Model.Sort == "price_desc" ? "checked" : "")>
+                        <label class="custom-control-label" for="sort_price_desc">@localizer.GetValue("PriceHighToLow")</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" class="custom-control-input" id="sort_rating" name="Sort" value="rating" @(Model.Sort == "rating" ? "checked" : "")>
+                        <label class="custom-control-label" for="sort_rating">@localizer.GetValue("Rating")</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" class="custom-control-input" id="sort_latest" name="Sort" value="latest" @(Model.Sort == "latest" ? "checked" : "")>
+                        <label class="custom-control-label" for="sort_latest">@localizer.GetValue("Latest")</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Genre Filter -->
+        <div class="filters-card border-bottom p-3">
+            <div class="filters-card-header" id="headingGenre">
+                <h6 class="mb-0">
+                    <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseGenre" aria-expanded="true" aria-controls="collapseGenre">
+                        @localizer.GetValue("Genre") <i class="fas fa-angle-down float-right"></i>
+                    </a>
+                </h6>
+            </div>
+            <div id="collapseGenre" class="collapse show" aria-labelledby="headingGenre" data-parent="#accordion">
+                <div class="filters-card-body card-shop-filters">
+                    <form class="filters-search mb-3">
+                        <div class="form-group mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="genreSearch" placeholder="@localizer.GetValue("StartTypingToSearch")">
+                        </div>
+                    </form>
+                    
+                    @if (ViewBag.Genres != null)
+                    {
+                        <div class="genre-list">
+                            @foreach (var genre in ViewBag.Genres)
+                            {
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input genre-checkbox" 
+                                           id="genre_@genre.Id" 
+                                           name="Genre" 
+                                           value="@genre.Name"
+                                           @(Model.Genre == genre.Name ? "checked" : "")>
+                                    <label class="custom-control-label" for="genre_@genre.Id">
+                                        @genre.Name
+                                    </label>
+                                </div>
+                            }
+                            <div class="custom-control custom-radio mt-2">
+                                <input type="radio" class="custom-control-input" 
+                                       id="genre_all" 
+                                       name="Genre" 
+                                       value=""
+                                       @(string.IsNullOrEmpty(Model.Genre) ? "checked" : "")>
+                                <label class="custom-control-label text-muted" for="genre_all">
+                                    <small>@localizer.GetValue("AllGenres")</small>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Language Filter -->
+        <div class="filters-card border-bottom p-3">
+            <div class="filters-card-header" id="headingLanguage">
+                <h6 class="mb-0">
+                    <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseLanguage" aria-expanded="true" aria-controls="collapseLanguage">
+                        @localizer.GetValue("SelectLanguage") <i class="fas fa-angle-down float-right"></i>
+                    </a>
+                </h6>
+            </div>
+            <div id="collapseLanguage" class="collapse show" aria-labelledby="headingLanguage" data-parent="#accordion">
+                <div class="filters-card-body card-shop-filters">
+                    @if (ViewBag.Languages != null)
+                    {
+                        @foreach (var language in ViewBag.Languages)
+                        {
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" 
+                                       id="lang_@language.Id" 
+                                       name="Language" 
+                                       value="@language.Name"
+                                       @(Model.Language == language.Name ? "checked" : "")>
+                                <label class="custom-control-label" for="lang_@language.Id">
+                                    @language.Name
+                                </label>
+                            </div>
+                        }
+                        <div class="custom-control custom-radio mt-2">
+                            <input type="radio" class="custom-control-input" 
+                                   id="lang_all" 
+                                   name="Language" 
+                                   value=""
+                                   @(string.IsNullOrEmpty(Model.Language) ? "checked" : "")>
+                            <label class="custom-control-label text-muted" for="lang_all">
+                                <small>@localizer.GetValue("AllLanguages")</small>
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Format Filter -->
+        <div class="filters-card border-bottom p-3">
+            <div class="filters-card-header" id="headingFormat">
+                <h6 class="mb-0">
+                    <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseFormat" aria-expanded="false" aria-controls="collapseFormat">
+                        @localizer.GetValue("Format") <i class="fas fa-angle-down float-right"></i>
+                    </a>
+                </h6>
+            </div>
+            <div id="collapseFormat" class="collapse" aria-labelledby="headingFormat" data-parent="#accordion">
+                <div class="filters-card-body card-shop-filters">
+                    @if (ViewBag.Formats != null)
+                    {
+                        @foreach (var format in ViewBag.Formats)
+                        {
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" 
+                                       id="format_@format" 
+                                       name="Format" 
+                                       value="@format"
+                                       @(Model.Format == format ? "checked" : "")>
+                                <label class="custom-control-label" for="format_@format">@format</label>
+                            </div>
+                        }
+                        <div class="custom-control custom-radio mt-2">
+                            <input type="radio" class="custom-control-input" 
+                                   id="format_all" 
+                                   name="Format" 
+                                   value=""
+                                   @(string.IsNullOrEmpty(Model.Format) ? "checked" : "")>
+                            <label class="custom-control-label text-muted" for="format_all">
+                                <small>@localizer.GetValue("AllFormats")</small>
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Year Filter -->
+        <div class="filters-card border-bottom p-3">
+            <div class="filters-card-header" id="headingYear">
+                <h6 class="mb-0">
+                    <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseYear" aria-expanded="false" aria-controls="collapseYear">
+                        @localizer.GetValue("ReleaseYear") <i class="fas fa-angle-down float-right"></i>
+                    </a>
+                </h6>
+            </div>
+            <div id="collapseYear" class="collapse" aria-labelledby="headingYear" data-parent="#accordion">
+                <div class="filters-card-body card-shop-filters">
+                    @if (ViewBag.Years != null)
+                    {
+                        <select class="form-control mb-2" name="Year">
+                            <option value="">@localizer.GetValue("AllYears")</option>
+                            @foreach (var year in ViewBag.Years)
+                            {
+                                <option value="@year" selected="@(Model.Year == year ? "selected" : null)">
+                                    @year
+                                </option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <div class="form-group mb-0">
+                            <input type="number" class="form-control" name="Year" 
+                                   placeholder="@localizer.GetValue("EnterYear")" 
+                                   value="@Model.Year" 
+                                   min="1900" 
+                                   max="@(DateTime.Now.Year + 5)">
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Filter -->
+        <div class="filters-card border-bottom p-3">
+            <div class="filters-card-header" id="headingPrice">
+                <h6 class="mb-0">
+                    <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapsePrice" aria-expanded="false" aria-controls="collapsePrice">
+                        @localizer.GetValue("MaxPrice") <i class="fas fa-angle-down float-right"></i>
+                    </a>
+                </h6>
+            </div>
+            <div id="collapsePrice" class="collapse" aria-labelledby="headingPrice" data-parent="#accordion">
+                <div class="filters-card-body card-shop-filters">
+                    <div class="form-group mb-0">
+                        <input type="number" class="form-control" name="MaxPrice" 
+                               placeholder="@localizer.GetValue("MaxPrice")" 
+                               value="@Model.MaxPrice" 
+                               step="0.01" 
+                               min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-3">
+        <button type="submit" class="btn btn-primary btn-block">
+            <i class="fas fa-filter mr-2"></i>@localizer.GetValue("ApplyFilters")
+        </button>
+    </div>
+</form>
+
+<script>
+    document.getElementById('genreSearch')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const checkboxes = document.querySelectorAll('.genre-checkbox');
+        
+        checkboxes.forEach(function(checkbox) {
+            const label = checkbox.nextElementSibling.textContent.toLowerCase();
+            const parent = checkbox.closest('.custom-control');
+            
+            if (label.includes(searchTerm)) {
+                parent.style.display = 'block';
+            } else {
+                parent.style.display = 'none';
+            }
+        });
+    });
+</script>

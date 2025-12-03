@@ -1,0 +1,93 @@
+﻿@model IEnumerable<OfferViewModel>
+
+@{
+    ViewData["Title"] = localizer.GetValue("Offers");
+}
+
+<div class="container">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mt-5 mb-3 overflow-hidden">
+        <h1 class="h5 mb-0 float-left">@localizer.GetValue("Offers")</h1>
+        <a asp-action="Index" class="float-right d-sm-inline-block btn btn-sm btn-primary shadow-sm-sm">
+            @localizer.GetValue("ResetFilters") <i class="fas fa-times fa-sm text-white-50"></i>
+        </a>
+    </div>
+
+    <!-- Offers Grid -->
+    <div class="row" id="offersContainer">
+        @if (Model != null && Model.Any())
+        {
+            <partial name="_OfferCardsPartial" model="Model" />
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-tags fa-3x text-muted"></i>
+                <h5 class="text-muted mt-3">@localizer.GetValue("NoOffersAvailable")</h5>
+            </div>
+        }
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="text-center mt-4 mb-5" id="loadingSpinner" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">@localizer.GetValue("Loading")</span>
+        </div>
+    </div>
+
+    <!-- End Message -->
+    <div class="text-center mt-4 mb-5" id="endMessage" style="display: none;">
+        <p class="text-muted">@localizer.GetValue("NoMoreOffers")</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentPage = 1;
+        let isLoading = false;
+        let hasMorePages = true;
+        const pageSize = 8;
+
+        $(window).scroll(function() {
+            if (isLoading || !hasMorePages) return;
+
+            if ($(window).scrollTop() + $(window).height() > $(document).height() - 500) {
+                loadMoreOffers();
+            }
+        });
+
+        function loadMoreOffers() {
+            if (isLoading || !hasMorePages) return;
+
+            isLoading = true;
+            currentPage++;
+
+            $('#loadingSpinner').show();
+
+            $.ajax({
+                url: '@Url.Action("LoadMoreOffers")',
+                type: 'GET',
+                data: {
+                    page: currentPage,
+                    pageSize: pageSize
+                },
+                success: function(data) {
+                    if (data.trim() === '') {
+                        hasMorePages = false;
+                        $('#endMessage').show();
+                    } else {
+                        $('#offersContainer').append(data);
+                    }
+
+                    $('#loadingSpinner').hide();
+                    isLoading = false;
+                },
+                error: function() {
+                    $('#loadingSpinner').hide();
+                    isLoading = false;
+                    alert('@localizer.GetValue("ErrorLoadingOffers")');
+                }
+            });
+        }
+    </script>
+}

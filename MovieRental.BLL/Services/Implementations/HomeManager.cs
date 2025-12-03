@@ -33,44 +33,23 @@ namespace MovieRental.BLL.Services.Implementations
             var language = await _cookieService.GetLanguageAsync();
             int languageId = language?.Id ?? 1;
 
-            var slidersTask = _sliderService.GetAllActiveSlidersAsync(languageId);
-            var offersTask = _offerService.GetActiveOffersAsync(languageId);
+            var sliders = await _sliderService.GetAllActiveSlidersAsync(languageId);
+            var offers = await _offerService.GetActiveOffersAsync(languageId);
 
-            var featuredMoviesTask = _movieService.GetFeaturedMoviesAsync(languageId, 4);
-            var latestMoviesTask = _movieService.GetLatestMoviesAsync(languageId, 4);
-            var popularMoviesTask = _movieService.GetPopularMoviesAsync(languageId, 4);
-            var upcomingMoviesTask = _movieService.GetUpcomingMoviesAsync(languageId, 4);
+            var featuredMovies = await _movieService.GetFeaturedMoviesAsync(languageId, 4);
+            var latestMovies = await _movieService.GetLatestMoviesAsync(languageId, 4);
+            var popularMovies = await _movieService.GetPopularMoviesAsync(languageId, 4);
+            var upcomingMovies = await _movieService.GetUpcomingMoviesAsync(languageId, 4);
 
-
-            var upcomingEventsTask = _eventService.GetUpcomingEventsAsync(languageId);
-            var featuredSportsTask = _sportService.GetFeaturedSportsAsync(4);
-
-            await Task.WhenAll(
-                slidersTask,
-                offersTask,
-                featuredMoviesTask,
-                latestMoviesTask,
-                popularMoviesTask,
-                upcomingMoviesTask,
-                upcomingEventsTask,
-                featuredSportsTask
-            );
-
-            var sliders = await slidersTask;
-            var offers = await offersTask;
-            var featuredMovies = await featuredMoviesTask;
-            var latestMovies = await latestMoviesTask;
-            var popularMovies = await popularMoviesTask;
-            var upcomingMovies = await upcomingMoviesTask;
-            var upcomingEvents = await upcomingEventsTask;
-            var featuredSports = await featuredSportsTask;
+            var upcomingEvents = await _eventService.GetUpcomingEventsAsync(languageId);
+            var featuredSports = await _sportService.GetFeaturedSportsAsync(4);
 
             var featuredEventsList = upcomingEvents
                 .Where(e => e.IsFeatured)
                 .Take(4)
                 .ToList();
 
-            var homeViewModel = new HomeViewModel
+            return new HomeViewModel
             {
                 Sliders = sliders.ToList(),
                 Offers = offers.Take(4).ToList(),
@@ -81,8 +60,6 @@ namespace MovieRental.BLL.Services.Implementations
                 Events = featuredEventsList,
                 Sports = featuredSports.ToList()
             };
-
-            return homeViewModel;
         }
     }
 }

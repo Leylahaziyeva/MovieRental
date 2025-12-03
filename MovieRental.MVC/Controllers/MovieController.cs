@@ -4,12 +4,12 @@ using MovieRental.BLL.ViewModels.Movie;
 
 namespace MovieRental.UI.Controllers
 {
-    public class MoviesController : Controller
+    public class MovieController : Controller
     {
         private readonly IMovieService _movieService;
         private readonly ICookieService _cookieService;
 
-        public MoviesController(IMovieService movieService, ICookieService cookieService)
+        public MovieController(IMovieService movieService, ICookieService cookieService)
         {
             _movieService = movieService;
             _cookieService = cookieService;
@@ -172,7 +172,7 @@ namespace MovieRental.UI.Controllers
             filter.CurrentLanguageId = languageId;
 
             var result = await _movieService.GetFilteredMoviesAsync(filter);
-            return PartialView("_MovieCardsPartial", result.Movies);    //_MovieCardsPartial yaradilmalidir
+            return PartialView("_MovieCardsPartial", result.Movies);   
         }
     }
 }

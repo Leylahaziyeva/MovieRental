@@ -24,13 +24,37 @@ namespace MovieRental.MVC.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
+            if (id <= 0)
+                return BadRequest();
+
             var currentLanguageId = await _cookieService.GetLanguageIdAsync();
             var offer = await _offerService.GetOfferByIdWithTranslationsAsync(id, currentLanguageId);
 
             if (offer == null)
                 return NotFound();
 
+            if (!offer.IsValid)
+            {
+                TempData["Warning"] = "This offer has expired.";
+            }
+
             return View(offer);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LoadMoreOffers(int page = 1, int pageSize = 8)
+        {
+            var currentLanguageId = await _cookieService.GetLanguageIdAsync();
+            var allOffers = await _offerService.GetActiveOffersAsync(currentLanguageId);
+
+            var pagedOffers = allOffers
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize);
+
+            if (!pagedOffers.Any())
+                return Content(string.Empty);
+
+            return PartialView("_OfferCardsPartial", pagedOffers); 
         }
     }
 }

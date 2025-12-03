@@ -1,0 +1,231 @@
+﻿@model IEnumerable<SportViewModel>
+@inject StringLocalizerManager localizer
+
+@{
+    ViewData["Title"] = localizer.GetValue("Sports");
+}
+
+<div class="container">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mt-5 mb-3 overflow-hidden">
+        <h1 class="h5 mb-0 float-left">@localizer.GetValue("Sports")</h1>
+        <a asp-action="Index" class="float-right d-sm-inline-block btn btn-sm btn-primary shadow-sm-sm">
+            @localizer.GetValue("ResetFilters") <i class="fas fa-times fa-sm text-white-50"></i>
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-xl-3 col-lg-4">
+            <!-- Mobile Filters -->
+            <div class="filters mobile-filters shadow-sm rounded bg-white mb-4 d-none d-block d-md-none">
+                <div class="border-bottom">
+                    <a class="h6 font-weight-bold text-dark d-block m-0 p-3" data-toggle="collapse"
+                       href="#mobile-filters" role="button" aria-expanded="false" aria-controls="mobile-filters">
+                        @localizer.GetValue("FilterBy") <i class="fas fa-angle-down float-right mt-1"></i>
+                    </a>
+                </div>
+                <div id="mobile-filters" class="filters-body collapse multi-collapse">
+                    <!-- Mobile filter content can be added here -->
+                </div>
+            </div>
+
+            <!-- Desktop Filters -->
+            <div class="filters shadow-sm rounded bg-white mb-3 d-none d-sm-none d-md-block">
+                <div class="filters-header border-bottom p-3">
+                    <h6 class="m-0 text-dark">@localizer.GetValue("FilterBy")</h6>
+                </div>
+                <div class="filters-body">
+                    <div id="accordion">
+                        <!-- Category Filter -->
+                        <div class="filters-card border-bottom p-3">
+                            <div class="filters-card-header" id="headingCategory">
+                                <h6 class="mb-0">
+                                    <a href="#" class="btn-link" data-toggle="collapse"
+                                       data-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
+                                        @localizer.GetValue("Category")
+                                        <i class="fas fa-angle-down float-right"></i>
+                                    </a>
+                                </h6>
+                            </div>
+                            <div id="collapseCategory" class="collapse show" aria-labelledby="headingCategory" data-parent="#accordion">
+                                <div class="filters-card-body card-shop-filters">
+                                    <form class="filters-search mb-3">
+                                        <div class="form-group">
+                                            <i class="fas fa-search"></i>
+                                            <input type="text" class="form-control" placeholder="@localizer.GetValue("SearchPlaceholder")">
+                                        </div>
+                                    </form>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="football">
+                                        <label class="custom-control-label" for="football">
+                                            Football <small class="text-black-50">156</small>
+                                        </label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="basketball">
+                                        <label class="custom-control-label" for="basketball">
+                                            Basketball <small class="text-black-50">120</small>
+                                        </label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="tennis">
+                                        <label class="custom-control-label" for="tennis">
+                                            Tennis <small class="text-black-50">130</small>
+                                        </label>
+                                    </div>
+                                    <div class="mt-2"><a href="#" class="link">@localizer.GetValue("SeeAll")</a></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Language Filter -->
+                        <div class="filters-card border-bottom p-3">
+                            <div class="filters-card-header" id="headingLanguage">
+                                <h6 class="mb-0">
+                                    <a href="#" class="btn-link" data-toggle="collapse"
+                                       data-target="#collapseLanguage" aria-expanded="true" aria-controls="collapseLanguage">
+                                        @localizer.GetValue("SelectLanguage") <i class="fas fa-angle-down float-right"></i>
+                                    </a>
+                                </h6>
+                            </div>
+                            <div id="collapseLanguage" class="collapse show" aria-labelledby="headingLanguage" data-parent="#accordion">
+                                <div class="filters-card-body card-shop-filters">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="azLang">
+                                        <label class="custom-control-label" for="azLang">
+                                            Azerbaijani <small class="text-black-50">230</small>
+                                        </label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="enLang">
+                                        <label class="custom-control-label" for="enLang">
+                                            English <small class="text-black-50">95</small>
+                                        </label>
+                                    </div>
+                                    <div class="mt-2"><a href="#" class="link">@localizer.GetValue("SeeAll")</a></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Filter -->
+                        <div class="filters-card border-bottom p-3">
+                            <div class="filters-card-header" id="headingLocation">
+                                <h6 class="mb-0">
+                                    <a href="#" class="btn-link" data-toggle="collapse"
+                                       data-target="#collapseLocation" aria-expanded="false" aria-controls="collapseLocation">
+                                        @localizer.GetValue("Location") <i class="fas fa-angle-down float-right"></i>
+                                    </a>
+                                </h6>
+                            </div>
+                            <div id="collapseLocation" class="collapse" aria-labelledby="headingLocation" data-parent="#accordion">
+                                <div class="filters-card-body card-shop-filters">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="baku">
+                                        <label class="custom-control-label" for="baku">
+                                            Baku <small class="text-black-50">50</small>
+                                        </label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="ganja">
+                                        <label class="custom-control-label" for="ganja">
+                                            Ganja <small class="text-black-50">32</small>
+                                        </label>
+                                    </div>
+                                    <div class="mt-2"><a href="#" class="link">@localizer.GetValue("SeeAll")</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advertisement -->
+            <div class="d-none d-sm-none d-lg-block">
+                <img class="img-fluid rounded mt-3" src="https://via.placeholder.com/255x615" alt="Advertisement">
+            </div>
+        </div>
+
+        <!-- Sports List -->
+        <div class="col-xl-9 col-lg-8">
+            <div class="row list-bp" id="sportsContainer">
+                @if (Model != null && Model.Any())
+                {
+                    <partial name="_SportCardsPartial" model="Model" />
+                }
+                else
+                {
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-info-circle fa-3x text-muted"></i>
+                        <h5 class="text-muted mt-3">@localizer.GetValue("NoSportsFound")</h5>
+                    </div>
+                }
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="text-center mt-4 mb-5" id="loadingSpinner" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">@localizer.GetValue("Loading")</span>
+                </div>
+            </div>
+
+            <!-- End Message -->
+            <div class="text-center mt-4 mb-5" id="endMessage" style="display: none;">
+                <p class="text-muted">@localizer.GetValue("NoMoreSports")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentPage = 1;
+        let isLoading = false;
+        let hasMorePages = true;
+        const pageSize = 12;
+
+        $(window).scroll(function() {
+            if (isLoading || !hasMorePages) return;
+
+            if ($(window).scrollTop() + $(window).height() > $(document).height() - 500) {
+                loadMoreSports();
+            }
+        });
+
+        function loadMoreSports() {
+            if (isLoading || !hasMorePages) return;
+
+            isLoading = true;
+            currentPage++;
+
+            $('#loadingSpinner').show();
+
+            $.ajax({
+                url: '@Url.Action("LoadMoreSports")',
+                type: 'GET',
+                data: {
+                    page: currentPage,
+                    pageSize: pageSize,
+                    location: '@ViewData["Location"]',
+                    category: '@ViewData["Category"]'
+                },
+                success: function(data) {
+                    if (data.trim() === '') {
+                        hasMorePages = false;
+                        $('#endMessage').show();
+                    } else {
+                        $('#sportsContainer').append(data);
+                    }
+
+                    $('#loadingSpinner').hide();
+                    isLoading = false;
+                },
+                error: function() {
+                    $('#loadingSpinner').hide();
+                    isLoading = false;
+                    alert('@localizer.GetValue("ErrorLoadingSports")');
+                }
+            });
+        }
+    </script>
+}

@@ -3,11 +3,14 @@ using MovieRental.DAL.DataContext.Entities;
 
 namespace MovieRental.BLL.Services.Contracts
 {
-    namespace MovieRental.BLL.Services.Contracts
+    public interface IGenreService : ICrudService<Genre, GenreViewModel, GenreCreateViewModel, GenreUpdateViewModel>
     {
-        public interface IGenreService : ICrudService<Genre, GenreViewModel, GenreCreateViewModel, GenreUpdateViewModel>
-        {
-   
-        }
+        Task<IEnumerable<GenreViewModel>> GetAllActiveAsync(int languageId);
+        Task<IEnumerable<GenreViewModel>> SearchByNameAsync(string searchTerm, int languageId);
+        Task<IEnumerable<GenreViewModel>> GetPopularGenresAsync(int languageId, int count = 10);
+        Task<bool> TranslationExistsAsync(int genreId, int languageId);
+        Task<bool> AddTranslationAsync(int genreId, GenreTranslationCreateViewModel translation);
+        Task<bool> UpdateTranslationAsync(int translationId, GenreTranslationUpdateViewModel translation);
+        Task<bool> DeleteTranslationAsync(int translationId);
     }
 }

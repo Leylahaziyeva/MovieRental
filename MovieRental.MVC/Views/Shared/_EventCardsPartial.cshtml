@@ -1,0 +1,61 @@
+﻿@model IEnumerable<EventViewModel>
+@inject StringLocalizerManager localizer
+
+@foreach (var eventItem in Model)
+{
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card e-card shadow-sm border-0">
+            <a asp-controller="Event" asp-action="Details" asp-route-id="@eventItem.Id">
+                <div class="m-card-cover">
+                    <img src="~/img/@eventItem.ImageUrl" class="card-img-top" alt="@eventItem.Name">
+
+                    @if (eventItem.IsFeatured)
+                    {
+                        <div class="position-absolute m-2" style="top: 0; right: 0;">
+                            <span class="badge badge-danger bg-gradient-danger">
+                                <i class="fas fa-star"></i> @localizer.GetValue("Featured")
+                            </span>
+                        </div>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col-2 auto py-3 pl-3">
+                            <div class="bg-white rounded text-center">
+                                <h6 class="text-danger mb-0 font-weight-bold">@eventItem.EventDay</h6>
+                                <small class="text-muted">@eventItem.EventMonth</small>
+                            </div>
+                        </div>
+                        <div class="col-10 p-3">
+                            <p class="card-text text-gray-900 mb-1 font-weight-bold">@eventItem.Name</p>
+                            <p class="card-text mb-1">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt fa-sm mr-1"></i> @eventItem.Location
+                                </small>
+                            </p>
+
+                            @if (eventItem.Price.HasValue && eventItem.Price > 0)
+                            {
+                                <p class="card-text mb-0">
+                                    <small class="text-success font-weight-bold">
+                                        <i class="fas fa-ticket-alt fa-sm mr-1"></i>
+                                        @eventItem.FormattedPrice
+                                    </small>
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="card-text mb-0">
+                                    <small class="text-success font-weight-bold">
+                                        <i class="fas fa-gift fa-sm mr-1"></i>
+                                        @localizer.GetValue("Free")
+                                    </small>
+                                </p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+}

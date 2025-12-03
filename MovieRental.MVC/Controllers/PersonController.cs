@@ -213,5 +213,27 @@ namespace MovieRental.UI.Controllers
 
             return Json(results);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> LoadMorePeople(PersonType? filterByType, string? searchQuery, string? sortBy, int page = 1, int pageSize = 12)
+        {
+            var allPersons = await _personService.GetAllAsync(
+                predicate: p =>
+                    (!filterByType.HasValue || p.PersonType == filterByType.Value) &&
+                    (string.IsNullOrEmpty(searchQuery) ||
+                     p.PersonTranslations!.Any(pt => pt.Name.Contains(searchQuery))),
+                orderBy: sortBy == "DateAdded"
+                    ? query => query.OrderByDescending(p => p.CreatedAt)
+                    : query => query.OrderByDescending(p => p.KnownCredits),
+                AsNoTracking: true
+            );
+
+            var persons = allPersons
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return PartialView("_PeopleCardPartial", persons);
+        }
     }
 }

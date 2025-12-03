@@ -330,5 +330,17 @@ namespace MovieRental.MVC.Controllers
             var featured = events.Where(e => e.IsFeatured).Take(count);
             return Json(featured);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> LoadMoreEvents([FromQuery] EventFilterViewModel filter)
+        {
+            filter.CurrentLanguageId = await _cookieService.GetLanguageIdAsync();
+            var (events, totalCount) = await _eventService.GetEventsPagedAsync(filter);
+
+            if (!events.Any())
+                return Content(string.Empty);
+
+            return PartialView("_EventCardsPartial", events); 
+        }
     }
 }

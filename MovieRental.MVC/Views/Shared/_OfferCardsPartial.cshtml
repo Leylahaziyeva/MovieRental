@@ -1,0 +1,52 @@
+﻿@model IEnumerable<OfferViewModel>
+
+@foreach (var offer in Model)
+{
+    <div class="col-xl-3 col-md-4 mb-4">
+        <div class="card offer-card shadow-sm border-0">
+            <a asp-controller="Offer" asp-action="Details" asp-route-id="@offer.Id">
+                <div class="m-card-cover">
+                    <img src="~/img/@offer.ImageUrl" class="card-img-top" alt="@offer.Title">
+                </div>
+                <div class="card-body p-3">
+                    @if (!string.IsNullOrEmpty(offer.LogoUrl))
+                    {
+                        <img src="@offer.LogoUrl" class="rounded-circle" alt="@offer.Title" style="width: 50px; height: 50px;">
+                    }
+                    <p class="card-text text-gray-900 mt-3 mb-1">@offer.Title</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt fa-sm mr-1"></i>
+                            @localizer.GetValue("ValidTill")
+                            <span class="text-gray-700">@offer.ValidTo.ToString("dd MMM yyyy")</span>
+                        </small>
+                    </p>
+                    @if (offer.DiscountPercentage.HasValue)
+                    {
+                        <div class="badge badge-danger mt-2">
+                            @offer.DiscountPercentage% @localizer.GetValue("Off")
+                        </div>
+                    }
+                    else if (offer.DiscountAmount.HasValue && !string.IsNullOrEmpty(offer.CurrencySymbol))
+                    {
+                        <div class="badge badge-danger mt-2">
+                            @localizer.GetValue("Save") @offer.CurrencySymbol@offer.DiscountAmount
+                        </div>
+                    }
+                    @if (!offer.IsValid)
+                    {
+                        <div class="badge badge-secondary mt-2">
+                            @localizer.GetValue("Expired")
+                        </div>
+                    }
+                    else if (offer.DaysRemaining <= 3)
+                    {
+                        <div class="badge badge-warning mt-2">
+                            @offer.DaysRemaining @localizer.GetValue("DaysLeft")
+                        </div>
+                    }
+                </div>
+            </a>
+        </div>
+    </div>
+}

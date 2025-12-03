@@ -14,5 +14,10 @@ namespace MovieRental.BLL.Services.Contracts
         Task<SportViewModel?> GetSportDetailAsync(int id);
         Task<bool> AddPlayersToSportAsync(int sportId, List<int> playerIds);
         Task<bool> RemovePlayerFromSportAsync(int sportId, int playerId);
+        Task<(IEnumerable<SportViewModel> Sports, int TotalCount)> GetSportsPagedAsync(
+        int page = 1,
+        int pageSize = 12,
+        string? location = null,
+        string? category = null);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MovieRental.BLL.ViewModels.Account;
 using MovieRental.BLL.ViewModels.Currency;
 using MovieRental.BLL.ViewModels.Language;
 using MovieRental.DAL.DataContext.Entities;

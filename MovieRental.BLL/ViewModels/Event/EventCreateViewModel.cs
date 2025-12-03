@@ -5,9 +5,9 @@ namespace MovieRental.BLL.ViewModels.Event
 {
     public class EventCreateViewModel
     {
-        public required string Name { get; set; } //added name here
-        public required string Description { get; set; } //added descr here
-        public required string Location { get; set; } // added locat here
+        public required string Name { get; set; } 
+        public required string Description { get; set; } 
+        public required string Location { get; set; } 
         public required IFormFile ImageFile { get; set; } 
         public string? ImageUrl { get; set; }
 

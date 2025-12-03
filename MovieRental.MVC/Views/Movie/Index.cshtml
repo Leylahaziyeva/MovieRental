@@ -1,0 +1,210 @@
+﻿@model MoviesListViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<div class="container">
+    <div class="d-sm-flex align-items-center justify-content-between mt-5 mb-3 overflow-hidden">
+        <h1 class="h5 mb-0 float-left">@Model.PageTitle</h1>
+        <a asp-action="Index" class="float-right d-sm-inline-block btn btn-sm btn-primary shadow-sm-sm">
+            @localizer.GetValue("ResetFilters") <i class="fas fa-times fa-sm text-white-50"></i>
+        </a>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-xl-3 col-lg-4">
+            <!-- Mobile Filters -->
+            <div class="filters mobile-filters shadow-sm rounded bg-white mb-4 d-none d-block d-md-none">
+                <div class="border-bottom">
+                    <a class="h6 font-weight-bold text-dark d-block m-0 p-3" data-toggle="collapse" href="#mobile-filters" role="button" aria-expanded="false" aria-controls="mobile-filters">
+                        @localizer.GetValue("FilterBy") <i class="fas fa-angle-down float-right mt-1"></i>
+                    </a>
+                </div>
+                <div id="mobile-filters" class="filters-body collapse multi-collapse">
+                    @await Html.PartialAsync("_MovieFiltersPartial", Model.Filter)
+                </div>
+            </div>
+
+            <!-- Desktop Filters -->
+            <div class="filters shadow-sm rounded bg-white mb-3 d-none d-sm-none d-md-block">
+                <div class="filters-header border-bottom p-3">
+                    <h6 class="m-0 text-dark">@localizer.GetValue("FilterBy")</h6>
+                </div>
+                <div class="filters-body">
+                    @await Html.PartialAsync("_MovieFiltersPartial", Model.Filter)
+                </div>
+            </div>
+
+            <div class="d-none d-sm-none d-lg-block">
+                <img class="img-fluid rounded mt-3" src="https://via.placeholder.com/255x397" title="#">
+            </div>
+        </div>
+
+        <!-- Movies Grid -->
+        <div class="col-xl-9 col-lg-8">
+            <div class="row list-bp" id="moviesContainer">
+                @if (Model.Movies.Any())
+                {
+                    @await Html.PartialAsync("_MovieCardsPartial", Model.Movies)
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle fa-2x mb-3"></i>
+                            <h5>@localizer.GetValue("NoMoviesFound")</h5>
+                            <p>@localizer.GetValue("TryAdjustingFilters")</p>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="@localizer.GetValue("MoviePagination")" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.Filter.Page - 1)"
+                               asp-route-genre="@Model.Filter.Genre"
+                               asp-route-language="@Model.Filter.Language"
+                               asp-route-format="@Model.Filter.Format"
+                               asp-route-sort="@Model.Filter.Sort"
+                               asp-route-year="@Model.Filter.Year"
+                               asp-route-maxPrice="@Model.Filter.MaxPrice"
+                               asp-route-searchQuery="@Model.Filter.SearchQuery">
+                                @localizer.GetValue("Previous")
+                            </a>
+                        </li>
+
+                        @{
+                            var startPage = Math.Max(1, Model.Filter.Page - 2);
+                            var endPage = Math.Min(Model.TotalPages, Model.Filter.Page + 2);
+                        }
+
+                        @if (startPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="Index" asp-route-page="1"
+                                   asp-route-genre="@Model.Filter.Genre"
+                                   asp-route-language="@Model.Filter.Language"
+                                   asp-route-format="@Model.Filter.Format"
+                                   asp-route-sort="@Model.Filter.Sort"
+                                   asp-route-year="@Model.Filter.Year"
+                                   asp-route-maxPrice="@Model.Filter.MaxPrice"
+                                   asp-route-searchQuery="@Model.Filter.SearchQuery">1</a>
+                            </li>
+                            @if (startPage > 2)
+                            {
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            }
+                        }
+
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+                            <li class="page-item @(i == Model.Filter.Page ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@i"
+                                   asp-route-genre="@Model.Filter.Genre"
+                                   asp-route-language="@Model.Filter.Language"
+                                   asp-route-format="@Model.Filter.Format"
+                                   asp-route-sort="@Model.Filter.Sort"
+                                   asp-route-year="@Model.Filter.Year"
+                                   asp-route-maxPrice="@Model.Filter.MaxPrice"
+                                   asp-route-searchQuery="@Model.Filter.SearchQuery">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        @if (endPage < Model.TotalPages)
+                        {
+                            @if (endPage < Model.TotalPages - 1)
+                            {
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            }
+                            <li class="page-item">
+                                <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
+                                   asp-route-genre="@Model.Filter.Genre"
+                                   asp-route-language="@Model.Filter.Language"
+                                   asp-route-format="@Model.Filter.Format"
+                                   asp-route-sort="@Model.Filter.Sort"
+                                   asp-route-year="@Model.Filter.Year"
+                                   asp-route-maxPrice="@Model.Filter.MaxPrice"
+                                   asp-route-searchQuery="@Model.Filter.SearchQuery">@Model.TotalPages</a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.Filter.Page + 1)"
+                               asp-route-genre="@Model.Filter.Genre"
+                               asp-route-language="@Model.Filter.Language"
+                               asp-route-format="@Model.Filter.Format"
+                               asp-route-sort="@Model.Filter.Sort"
+                               asp-route-year="@Model.Filter.Year"
+                               asp-route-maxPrice="@Model.Filter.MaxPrice"
+                               asp-route-searchQuery="@Model.Filter.SearchQuery">
+                                @localizer.GetValue("Next")
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+
+            @if (Model.Movies.Any() && Model.HasNextPage)
+            {
+                <div class="text-center mt-4 mb-5 col-12">
+                    <button class="btn btn-primary" id="loadMore" data-page="@(Model.Filter.Page + 1)">
+                        @localizer.GetValue("LoadMore") <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#loadMore').click(function() {
+            var btn = $(this);
+            var nextPage = btn.data('page');
+
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm mr-2"></span>@localizer.GetValue("Loading")...');
+
+            $.ajax({
+                url: '@Url.Action("LoadMore")',
+                type: 'GET',
+                data: {
+                    page: nextPage,
+                    genre: '@Model.Filter.Genre',
+                    language: '@Model.Filter.Language',
+                    format: '@Model.Filter.Format',
+                    sort: '@Model.Filter.Sort',
+                    year: '@Model.Filter.Year',
+                    maxPrice: '@Model.Filter.MaxPrice',
+                    searchQuery: '@Model.Filter.SearchQuery',
+                    currentLanguageId: '@Model.Filter.CurrentLanguageId'
+                },
+                success: function(data) {
+                    $('#moviesContainer').append(data);
+                    btn.data('page', nextPage + 1);
+                    btn.prop('disabled', false).html('@localizer.GetValue("LoadMore") <i class="fas fa-chevron-down ml-2"></i>');
+
+                    if (nextPage >= @Model.TotalPages) {
+                        btn.parent().hide();
+                    }
+                },
+                error: function() {
+                    btn.prop('disabled', false).html('@localizer.GetValue("LoadMore") <i class="fas fa-chevron-down ml-2"></i>');
+                    alert('@localizer.GetValue("ErrorLoadingMovies")');
+                }
+            });
+        });
+    </script>
+}
+

@@ -1,0 +1,32 @@
+﻿@model IEnumerable<SportViewModel>
+
+@foreach (var sport in Model)
+{
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card e-card shadow-sm border-0">
+            <a asp-controller="Sport" asp-action="Details" asp-route-id="@sport.Id">
+                <div class="m-card-cover">
+                    <img src="~/img/@sport.ImageUrl" class="card-img-top" alt="@sport.Name">
+                </div>
+                <div class="card-body p-0">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col-2 auto py-3 pl-3">
+                            <div class="bg-white rounded text-center">
+                                <h6 class="text-danger mb-0 font-weight-bold">@sport.EventDate.Day</h6>
+                                <small class="text-muted">@sport.EventDate.ToString("MMM").ToUpper()</small>
+                            </div>
+                        </div>
+                        <div class="col-10 p-3">
+                            <p class="card-text text-gray-900 mb-1">@sport.Name</p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt fa-sm ml-1"></i> @sport.Location
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+}

@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\lenovo\\source\\repos\\MovieRental\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{389ED907-15E5-43AD-B0BD-A8FC13A72DD3}|MovieRental.MVC\\MovieRental.MVC.csproj|c:\\users\\lenovo\\source\\repos\\movierental\\movierental.mvc\\controllers\\personcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{389ED907-15E5-43AD-B0BD-A8FC13A72DD3}|MovieRental.MVC\\MovieRental.MVC.csproj|solutionrelative:movierental.mvc\\controllers\\personcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{389ED907-15E5-43AD-B0BD-A8FC13A72DD3}|MovieRental.MVC\\MovieRental.MVC.csproj|c:\\users\\lenovo\\source\\repos\\movierental\\movierental.mvc\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{389ED907-15E5-43AD-B0BD-A8FC13A72DD3}|MovieRental.MVC\\MovieRental.MVC.csproj|solutionrelative:movierental.mvc\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5A6C522E-DC07-4CB7-95B4-C65A0F6BEC46}|MovieRental.BLL\\MovieRental.BLL.csproj|c:\\users\\lenovo\\source\\repos\\movierental\\movierental.bll\\businesslogiclayerserviceregistration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -28,7 +28,7 @@
               "RelativeDocumentMoniker": "MovieRental.BLL\\BusinessLogicLayerServiceRegistration.cs",
               "ToolTip": "C:\\Users\\lenovo\\source\\repos\\MovieRental\\MovieRental.BLL\\BusinessLogicLayerServiceRegistration.cs",
               "RelativeToolTip": "MovieRental.BLL\\BusinessLogicLayerServiceRegistration.cs",
-              "ViewState": "AgIAAB8AAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAAADIAAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-29T09:26:15.866Z",
               "IsPinned": true,
@@ -37,14 +37,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "PersonController.cs",
-              "DocumentMoniker": "C:\\Users\\lenovo\\source\\repos\\MovieRental\\MovieRental.MVC\\Controllers\\PersonController.cs",
-              "RelativeDocumentMoniker": "MovieRental.MVC\\Controllers\\PersonController.cs",
-              "ToolTip": "C:\\Users\\lenovo\\source\\repos\\MovieRental\\MovieRental.MVC\\Controllers\\PersonController.cs",
-              "RelativeToolTip": "MovieRental.MVC\\Controllers\\PersonController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAApAAAAAAAAAA==",
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "C:\\Users\\lenovo\\source\\repos\\MovieRental\\MovieRental.MVC\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "MovieRental.MVC\\Controllers\\AccountController.cs",
+              "ToolTip": "C:\\Users\\lenovo\\source\\repos\\MovieRental\\MovieRental.MVC\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "MovieRental.MVC\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAUwEsBAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T09:28:24.993Z",
+              "WhenOpened": "2025-12-03T10:04:53.801Z",
               "IsPinned": true,
               "EditorCaption": ""
             },

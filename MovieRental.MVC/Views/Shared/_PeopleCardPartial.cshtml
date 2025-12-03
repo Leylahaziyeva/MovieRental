@@ -1,0 +1,29 @@
+﻿@model List<PersonViewModel>
+
+@foreach (var person in Model)
+{
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card p-card shadow-sm border-0 text-center">
+            <a asp-action="Details" asp-route-id="@person.Id">
+                <div class="people-item">
+                    <div class="people-item-cover">
+                        <img src="@person.CoverImageUrl" class="card-img" alt="@person.Name">
+                    </div>
+                    <div class="people-item-body p-4">
+                        <img src="@person.ProfileImageUrl" class="card-img people-pic" alt="@person.Name">
+                        <h5 class="card-title text-gray-900 mt-3">@person.Name</h5>
+                        <p class="card-text">@(person.Biography?.Substring(0, Math.Min(150, person.Biography?.Length ?? 0)))...</p>
+                        <p class="card-text">
+                            <small>
+                                <span class="text-muted font-weight-bold">
+                                    <i class="fas fa-film fa-sm ml-1"></i> @person.PersonTypeDisplay
+                                </span> -
+                                <span class="text-link">@person.KnownFor</span>
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+}
