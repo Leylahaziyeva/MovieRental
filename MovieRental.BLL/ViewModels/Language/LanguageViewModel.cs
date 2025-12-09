@@ -5,16 +5,13 @@
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? IsoCode { get; set; }
-        public string? ImageUrl { get; set; } 
+        public string? ImageUrl { get; set; }
     }
-
-    public class LanguageCreateViewModel
+    public class LanguageTranslationViewModel
     {
-
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public int TranslationLanguageId { get; set; }
     }
 
-    public class LanguageUpdateViewModel
-    {
-
-    }
 }

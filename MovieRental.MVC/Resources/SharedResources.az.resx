@@ -256,7 +256,7 @@
     <value>Pulsuz</value>
   </data>
   <data name="Watchlist" xml:space="preserve">
-    <value>İzləmə Siyahım</value>
+    <value>İzləmə Siyahısı</value>
   </data>
   <data name="EventsIn" xml:space="preserve">
     <value>Tədbirlər</value>
@@ -376,10 +376,10 @@
     <value>Parametrlər</value>
   </data>
   <data name="YourLists" xml:space="preserve">
-    <value>Siyahılar</value>
+    <value>Siyahılarınız</value>
   </data>
   <data name="ShowAllAlerts" xml:space="preserve">
-    <value>Bildirişlər</value>
+    <value>Bütün bildirişləri göstər</value>
   </data>
   <data name="Guest" xml:space="preserve">
     <value>Qonaq </value>
@@ -588,9 +588,6 @@
   <data name="Username" xml:space="preserve">
     <value>İstifadəçi adı</value>
   </data>
-  <data name="FirsName" xml:space="preserve">
-    <value>Ad</value>
-  </data>
   <data name="LastName" xml:space="preserve">
     <value>Soyad</value>
   </data>
@@ -667,10 +664,10 @@
     <value>Profilə qayıt</value>
   </data>
   <data name="BackToHome" xml:space="preserve">
-    <value>Back to Home</value>
+    <value>Ana səhifəyə qayıt</value>
   </data>
   <data name="BackToLogin" xml:space="preserve">
-    <value>Girişə qayıt</value>
+    <value>Giriş səhifəsinə qayıt</value>
   </data>
   <data name="GoToLogin" xml:space="preserve">
     <value>Giriş səhifəsinə keç</value>
@@ -685,7 +682,7 @@
     <value>Şifrə uğurla yeniləndi!</value>
   </data>
   <data name="ResetPasswordConfirmationMessage" xml:space="preserve">
-    <value>Şifrəniz uğurla yeniləndi. İndi yeni şifrənizlə daxil ola bilərsiniz.</value>
+    <value>Şifrə sıfırlandı.</value>
   </data>
   <data name="RegistrationSuccessful" xml:space="preserve">
     <value>Qeydiyyat uğurlu oldu! Zəhmət olmasa daxil olun.</value>
@@ -818,5 +815,215 @@
   </data>
   <data name="ErrorLoadingData" xml:space="preserve">
     <value>Məlumat yüklənərkən səhv baş verdi. Zəhmət olmasa, yenidən cəhd edin.</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>Ad</value>
+  </data>
+  <data name="YouMustAgreeToTerms" xml:space="preserve">
+    <value>Davam etmək üçün şərtləri qəbul etməlisiniz!</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>Email tələb olunur</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Şifrə tələb olunur</value>
+  </data>
+  <data name="UsernameRequired" xml:space="preserve">
+    <value>İstifadəçi adı tələb olunur</value>
+  </data>
+  <data name="FirstNameRequired" xml:space="preserve">
+    <value>Ad tələb olunur</value>
+  </data>
+  <data name="LastNameRequired" xml:space="preserve">
+    <value>Soyad tələb olunur</value>
+  </data>
+  <data name="PasswordMinLength" xml:space="preserve">
+    <value>Şifrə ən azı 6 simvol olmalıdır</value>
+  </data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve">
+    <value>Şifrələr uyğun gəlmir</value>
+  </data>
+  <data name="InvalidEmailFormat" xml:space="preserve">
+    <value>Email formatı düzgün deyil</value>
+  </data>
+  <data name="UsernameLengthError" xml:space="preserve">
+    <value>İstifadəçi adı 3 ilə 50 simvol arasında olmalıdır</value>
+  </data>
+  <data name="CurrentPasswordRequired" xml:space="preserve">
+    <value>Cari şifrə tələb olunur</value>
+  </data>
+  <data name="NewPasswordRequired" xml:space="preserve">
+    <value>Yeni şifrə tələb olunur</value>
+  </data>
+  <data name="ConfirmPasswordRequired" xml:space="preserve">
+    <value>Şifrənin təsdiqini daxil edin</value>
+  </data>
+  <data name="ResetCodeRequired" xml:space="preserve">
+    <value>Sıfırlama kodu tələb olunur</value>
+  </data>
+  <data name="ResetCode" xml:space="preserve">
+    <value>Sıfırlama kodu</value>
+  </data>
+  <data name="SignIn" xml:space="preserve">
+    <value>Daxil ol</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>Hesab</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Tənzimləmələr</value>
+  </data>
+  <data name="MyAccount" xml:space="preserve">
+    <value>Mənim hesabım</value>
+  </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Dəyişiklikləri yadda saxla</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Ana səhifə</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="items" xml:space="preserve">
+    <value>element</value>
+  </data>
+  <data name="NoMoviesInWatchlist" xml:space="preserve">
+    <value>İzləmə siyahınızda film yoxdur</value>
+  </data>
+  <data name="NewList" xml:space="preserve">
+    <value>Yeni siyahı</value>
+  </data>
+  <data name="NoListsCreated" xml:space="preserve">
+    <value>Hələ heç bir siyahı yaratmamısınız.</value>
+  </data>
+  <data name="Company" xml:space="preserve">
+    <value>Şirkət</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Ünvan</value>
+  </data>
+  <data name="PhoneNumber" xml:space="preserve">
+    <value>Əlaqə nömrəsi</value>
+  </data>
+  <data name="ProfileImage" xml:space="preserve">
+    <value>Profil Şəkli</value>
+  </data>
+  <data name="PleaseFillAllFields" xml:space="preserve">
+    <value>Bütün sahələri doldurun.</value>
+  </data>
+  <data name="ScrollToLoadMore" xml:space="preserve">
+    <value>Daha çox yükləmək üçün sürüşdürün</value>
+  </data>
+  <data name="CreateList" xml:space="preserve">
+    <value>Siyahı Yarat</value>
+  </data>
+  <data name="EditList" xml:space="preserve">
+    <value>Siyahını Redaktə Et</value>
+  </data>
+  <data name="DeleteList" xml:space="preserve">
+    <value>Siyahını Sil</value>
+  </data>
+  <data name="ListName" xml:space="preserve">
+    <value>Sıyahı Adı</value>
+  </data>
+  <data name="Public" xml:space="preserve">
+    <value>Açıq</value>
+  </data>
+  <data name="Private" xml:space="preserve">
+    <value>Gizli</value>
+  </data>
+  <data name="AddToList" xml:space="preserve">
+    <value>Siyahıya əlavə et</value>
+  </data>
+  <data name="RemoveFromList" xml:space="preserve">
+    <value>Siyahıdan Sil</value>
+  </data>
+  <data name="ListDeletedSuccessfully" xml:space="preserve">
+    <value>Siyahı Uğurla Silindi!</value>
+  </data>
+  <data name="ListUpdatedSuccessfully" xml:space="preserve">
+    <value>Siyahı Uğurla Yeniləndi!</value>
+  </data>
+  <data name="ConfirmDeleteList" xml:space="preserve">
+    <value>Bu siyahını silmək istədiyinizdən əminsiniz?</value>
+  </data>
+  <data name="ListCreatedSuccessfully" xml:space="preserve">
+    <value>Siyahı Uğurla Yaradıldı!</value>
+  </data>
+  <data name="NoMoviesInList" xml:space="preserve">
+    <value>Bu siyahıda film yoxdur</value>
+  </data>
+  <data name="ViewList" xml:space="preserve">
+    <value>Siyahıya Bax</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>Daha çox</value>
+  </data>
+  <data name="PasswordResetEmailSentMessage" xml:space="preserve">
+    <value>Əgər hesabınız mövcuddursa, şifrə sıfırlama linki email ünvanınıza göndərildi.</value>
+  </data>
+  <data name="CheckSpamFolder" xml:space="preserve">
+    <value>Email gəlmədiyi təqdirdə spam qovluğunu yoxlayın</value>
+  </data>
+  <data name="ResendEmail" xml:space="preserve">
+    <value>Email yenidən göndər</value>
+  </data>
+  <data name="ForgotPasswordConfirmation" xml:space="preserve">
+    <value>Şifrə sıfırlama təsdiqi</value>
+  </data>
+  <data name="MakePublic" xml:space="preserve">
+    <value> İctimailəşdir</value>
+  </data>
+  <data name="Creating" xml:space="preserve">
+    <value>Yaradılır...</value>
+  </data>
+  <data name="Updating" xml:space="preserve">
+    <value>Yenilənir...</value>
+  </data>
+  <data name="PleaseEnterListName" xml:space="preserve">
+    <value>Zəhmət olmasa list adını daxil edin</value>
+  </data>
+  <data name="ErrorLoadingLists" xml:space="preserve">
+    <value>Listləri yükləyərkən xəta baş verdi</value>
+  </data>
+  <data name="PasswordResetSuccessMessage" xml:space="preserve">
+    <value> Şifrəniz uğurla yeniləndi!</value>
+  </data>
+  <data name="LoginNow" xml:space="preserve">
+    <value>Daxil ol</value>
+  </data>
+  <data name="ChooseFile" xml:space="preserve">
+    <value>Fayl Seç</value>
+  </data>
+  <data name="AddMoviesToGetStarted" xml:space="preserve">
+    <value>Başlamaq üçün film əlavə edin</value>
+  </data>
+  <data name="ConfirmRemoveMovie" xml:space="preserve">
+    <value>Bu filmi siyahıdan silmək istədiyinizə əminsiniz?</value>
+  </data>
+  <data name="SearchFunctionalityComingSoon" xml:space="preserve">
+    <value>Axtarış funksionallığı tezliklə əlavə olunacaq</value>
+  </data>
+  <data name="TypeMovieName" xml:space="preserve">
+    <value>Film adını yazın...</value>
+  </data>
+  <data name="SearchMovie" xml:space="preserve">
+    <value>Filmi axtar</value>
+  </data>
+  <data name="AddMovie" xml:space="preserve">
+    <value>Film əlavə et</value>
+  </data>
+  <data name="BackToLists" xml:space="preserve">
+    <value>Siyahılara qayıt</value>
+  </data>
+  <data name="MoviesInList" xml:space="preserve">
+    <value>Siyahıdakı filmlər</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Yaradılıb</value>
+  </data>
+  <data name="Alerts" xml:space="preserve">
+    <value>Bildirişlər</value>
   </data>
 </root>

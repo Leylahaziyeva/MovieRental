@@ -1,0 +1,108 @@
+﻿@model IEnumerable<UserListViewModel>
+
+@foreach (var list in Model)
+{
+    <div class="col-xl-3 col-md-6 mb-4" data-list-id="@list.Id">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body p-3">
+                <!-- List Header -->
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-1 text-dark">@list.Name</h5>
+                        <small class="text-muted">
+                            <i class="fas fa-film fa-sm"></i> @list.MovieCount @localizer.GetValue("Movies")
+                        </small>
+                    </div>
+                    @if (list.IsPublic)
+                    {
+                        <span class="badge badge-success badge-sm">
+                            <i class="fas fa-globe"></i> @localizer.GetValue("Public")
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-secondary badge-sm">
+                            <i class="fas fa-lock"></i> @localizer.GetValue("Private")
+                        </span>
+                    }
+                </div>
+
+                <!-- Description -->
+                @if (!string.IsNullOrEmpty(list.Description))
+                {
+                    <p class="card-text text-muted small mb-3" style="max-height: 40px; overflow: hidden;">
+                        @list.Description
+                    </p>
+                }
+
+                <!-- Movie Thumbnails (First 4) -->
+                @if (list.Movies.Any())
+                {
+                    <div class="row no-gutters mb-3">
+                        @foreach (var movie in list.Movies.Take(4))
+                        {
+                            <div class="col-6 p-1">
+                                <img src="@movie.PosterImageUrl"
+                                     class="img-fluid rounded"
+                                     alt="@movie.Title"
+                                     style="height: 100px; object-fit: cover; width: 100%;">
+                            </div>
+                        }
+                        @if (list.MovieCount > 4)
+                        {
+                            <div class="col-12 text-center mt-2">
+                                <small class="text-muted">+@(list.MovieCount - 4) @localizer.GetValue("More")</small>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 bg-light rounded mb-3">
+                        <i class="fas fa-film fa-2x text-muted mb-2"></i>
+                        <p class="text-muted small mb-0">@localizer.GetValue("NoMoviesInList")</p>
+                    </div>
+                }
+
+                <!-- Action Buttons -->
+                <div class="row">
+                    <div class="col-4 pr-1">
+                        <button type="button"
+                                class="btn btn-info btn-block btn-sm btn-view-list"
+                                data-list-id="@list.Id"
+                                title="@localizer.GetValue("ViewList")">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="col-4 px-1">
+                        <button type="button"
+                                class="btn btn-primary btn-block btn-sm btn-edit-list"
+                                data-list-id="@list.Id"
+                                data-list-name="@list.Name"
+                                data-list-description="@list.Description"
+                                data-list-public="@list.IsPublic.ToString().ToLower()"
+                                title="@localizer.GetValue("EditList")">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    <div class="col-4 pl-1">
+                        <button type="button"
+                                class="btn btn-danger btn-block btn-sm btn-delete-list"
+                                data-list-id="@list.Id"
+                                data-list-name="@list.Name"
+                                title="@localizer.GetValue("DeleteList")">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Created Date -->
+                <div class="text-center mt-2">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar fa-sm"></i> @list.CreatedAt.ToString("dd MMM yyyy")
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+}

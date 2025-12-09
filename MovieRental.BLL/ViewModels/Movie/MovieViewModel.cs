@@ -1,4 +1,5 @@
-﻿using MovieRental.BLL.ViewModels.Language;
+﻿using MovieRental.BLL.ViewModels.Genre;
+using MovieRental.BLL.ViewModels.Language;
 
 namespace MovieRental.BLL.ViewModels.Movie
 {
@@ -16,7 +17,7 @@ namespace MovieRental.BLL.ViewModels.Movie
         public int VotesCount { get; set; }
 
         public string? Format { get; set; }
-        public List<string> Genres { get; set; } = [];
+        public List<GenreViewModel> Genres { get; set; } = [];
 
         public bool IsFeatured { get; set; }
         public bool IsAvailableForRent { get; set; }

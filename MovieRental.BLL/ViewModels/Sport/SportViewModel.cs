@@ -21,11 +21,15 @@ namespace MovieRental.BLL.ViewModels.Sport
         public string? ContactEmail { get; set; }
         public string? Venue { get; set; }
         public string? GoogleMapsUrl { get; set; }
-        public string? Categories { get; set; }
-        public string? Languages { get; set; }
         public string? AgeRestriction { get; set; }
+
+        public string? Categories { get; set; }
+
+        public string? Languages { get; set; }
+
         public CurrencyViewModel? Currency { get; set; }
         public List<PersonViewModel>? Players { get; set; }
+
         public int DaysUntilEvent => (EventDate - DateTime.Now).Days;
         public bool IsUpcoming => EventDate > DateTime.Now;
         public string FormattedDate => EventDate.ToString("ddd, MMM dd, yyyy");

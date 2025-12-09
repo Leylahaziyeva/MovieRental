@@ -15,8 +15,15 @@
         public string? Venue { get; set; }
         public string? GoogleMapsUrl { get; set; }
         public string? AgeRestriction { get; set; }
+
         public int? CurrencyId { get; set; }
         public Currency? Currency { get; set; }
+
+        public int? EventCategoryId { get; set; }
+        public EventCategory? EventCategory { get; set; }
+
+        public int? LocationId { get; set; }
+        public Location? Location { get; set; }
 
         public List<EventTranslation> EventTranslations { get; set; } = [];
         public List<Person>? Artists { get; set; }
@@ -26,9 +33,6 @@
     {
         public required string Name { get; set; }
         public required string Description { get; set; }
-        public required string Location { get; set; }
-        public string? Categories { get; set; }        // "Classical, Rock, Sufi"
-        public string? Languages { get; set; }
 
         public int EventId { get; set; }
         public Event? Event { get; set; }

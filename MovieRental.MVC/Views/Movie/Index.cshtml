@@ -24,7 +24,8 @@
                     </a>
                 </div>
                 <div id="mobile-filters" class="filters-body collapse multi-collapse">
-                    @await Html.PartialAsync("_MovieFiltersPartial", Model.Filter)
+                    @await Html.PartialAsync("_FiltersPartial", Model.Filter)
+                    @* @await Html.PartialAsync("_MovieFiltersPartial", Model.Filter) *@
                 </div>
             </div>
 
@@ -34,12 +35,8 @@
                     <h6 class="m-0 text-dark">@localizer.GetValue("FilterBy")</h6>
                 </div>
                 <div class="filters-body">
-                    @await Html.PartialAsync("_MovieFiltersPartial", Model.Filter)
+                    @await Html.PartialAsync("_FiltersPartial", Model.Filter)
                 </div>
-            </div>
-
-            <div class="d-none d-sm-none d-lg-block">
-                <img class="img-fluid rounded mt-3" src="https://via.placeholder.com/255x397" title="#">
             </div>
         </div>
 
@@ -70,7 +67,7 @@
                         <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
                             <a class="page-link" asp-action="Index"
                                asp-route-page="@(Model.Filter.Page - 1)"
-                               asp-route-genre="@Model.Filter.Genre"
+                               asp-route-genre="@Model.Filter.GenreId"
                                asp-route-language="@Model.Filter.Language"
                                asp-route-format="@Model.Filter.Format"
                                asp-route-sort="@Model.Filter.Sort"
@@ -90,7 +87,7 @@
                         {
                             <li class="page-item">
                                 <a class="page-link" asp-action="Index" asp-route-page="1"
-                                   asp-route-genre="@Model.Filter.Genre"
+                                   asp-route-genre="@Model.Filter.GenreId"
                                    asp-route-language="@Model.Filter.Language"
                                    asp-route-format="@Model.Filter.Format"
                                    asp-route-sort="@Model.Filter.Sort"
@@ -109,7 +106,7 @@
                             <li class="page-item @(i == Model.Filter.Page ? "active" : "")">
                                 <a class="page-link" asp-action="Index"
                                    asp-route-page="@i"
-                                   asp-route-genre="@Model.Filter.Genre"
+                                   asp-route-genre="@Model.Filter.GenreId"
                                    asp-route-language="@Model.Filter.Language"
                                    asp-route-format="@Model.Filter.Format"
                                    asp-route-sort="@Model.Filter.Sort"
@@ -129,7 +126,7 @@
                             }
                             <li class="page-item">
                                 <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
-                                   asp-route-genre="@Model.Filter.Genre"
+                                   asp-route-genre="@Model.Filter.GenreId"
                                    asp-route-language="@Model.Filter.Language"
                                    asp-route-format="@Model.Filter.Format"
                                    asp-route-sort="@Model.Filter.Sort"
@@ -142,7 +139,7 @@
                         <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
                             <a class="page-link" asp-action="Index"
                                asp-route-page="@(Model.Filter.Page + 1)"
-                               asp-route-genre="@Model.Filter.Genre"
+                               asp-route-genre="@Model.Filter.GenreId"
                                asp-route-language="@Model.Filter.Language"
                                asp-route-format="@Model.Filter.Format"
                                asp-route-sort="@Model.Filter.Sort"
@@ -181,7 +178,7 @@
                 type: 'GET',
                 data: {
                     page: nextPage,
-                    genre: '@Model.Filter.Genre',
+                    genre: '@Model.Filter.GenreId',
                     language: '@Model.Filter.Language',
                     format: '@Model.Filter.Format',
                     sort: '@Model.Filter.Sort',

@@ -5,16 +5,14 @@ namespace MovieRental.BLL.ViewModels.Event
 {
     public class EventCreateViewModel
     {
-        public required string Name { get; set; } 
-        public required string Description { get; set; } 
-        public required string Location { get; set; } 
-        public required IFormFile ImageFile { get; set; } 
+        public required string Name { get; set; }
+        public required string Description { get; set; }
+        public required IFormFile ImageFile { get; set; }
         public string? ImageUrl { get; set; }
 
         public IFormFile? CoverImageFile { get; set; }
         public string? CoverImageUrl { get; set; }
-        public string? Categories { get; set; }
-        public string? Languages { get; set; }
+
         public DateTime EventDate { get; set; } = DateTime.Now.AddDays(7);
         public decimal? Price { get; set; }
         public int? CurrencyId { get; set; }
@@ -29,19 +27,21 @@ namespace MovieRental.BLL.ViewModels.Event
         public string? GoogleMapsUrl { get; set; }
         public string? AgeRestriction { get; set; }
 
+        public int? EventCategoryId { get; set; }
+        public List<SelectListItem>? EventCategoryList { get; set; }
+
+        public int? LocationId { get; set; }
+        public List<SelectListItem>? LocationList { get; set; }
+
         public List<int>? SelectedArtistIds { get; set; }
         public List<SelectListItem>? ArtistList { get; set; }
     }
 
     public class EventTranslationCreateViewModel
     {
-        public required string Name { get; set; } 
-        public required string Description { get; set; } 
-        public required string Location { get; set; } 
-        public string? Categories { get; set; }
-        public string? Languages { get; set; }
+        public required string Name { get; set; }
+        public required string Description { get; set; }
         public int EventId { get; set; }
-        public EventViewModel? Event { get; set; }
         public int LanguageId { get; set; }
         public List<SelectListItem>? LanguageList { get; set; }
     }

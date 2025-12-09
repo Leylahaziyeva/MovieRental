@@ -4,40 +4,37 @@ namespace MovieRental.BLL.ViewModels.Account
 {
     public class RegisterViewModel
     {
-        [Required(ErrorMessage = "Username is required")]
-        [StringLength(50, MinimumLength = 3)]
+        [Required(ErrorMessage = "UsernameRequired")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "UsernameLengthError")]
         [Display(Name = "Username")]
         public required string Username { get; set; }
 
-        [Required(ErrorMessage = "First name is required")]
-        [StringLength(50)]
-        [Display(Name = "First Name")]
+        [Required(ErrorMessage = "FirstNameRequired")]
+        [Display(Name = "FirstName")]
         public required string FirstName { get; set; }
 
-        [Required(ErrorMessage = "Last name is required")]
-        [StringLength(50)]
-        [Display(Name = "Last Name")]
+        [Required(ErrorMessage = "LastNameRequired")]
+        [Display(Name = "LastName")]
         public required string LastName { get; set; }
 
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
-        [Display(Name = "Email Address")]
+        [Required(ErrorMessage = "EmailRequired")]
+        [EmailAddress(ErrorMessage = "InvalidEmailFormat")]
+        [Display(Name = "Email")]
         public required string Email { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
-        [StringLength(100, MinimumLength = 6)]
+        [Required(ErrorMessage = "PasswordRequired")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "PasswordMinLength")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public required string Password { get; set; }
 
-        [Required(ErrorMessage = "Please confirm your password")]
+        [Required(ErrorMessage = "PasswordRequired")]
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm Password")]
-        [Compare("Password", ErrorMessage = "Passwords do not match.")]
+        [Compare("Password", ErrorMessage = "PasswordsDoNotMatch")]
+        [Display(Name = "ConfirmPassword")]
         public required string ConfirmPassword { get; set; }
 
-        [Required(ErrorMessage = "You must agree to the terms")]
-        [Display(Name = "I agree to Terms & Conditions")]
+        [Required(ErrorMessage = "YouMustAgreeToTerms")]
         public bool AgreeToTerms { get; set; }
     }
 }

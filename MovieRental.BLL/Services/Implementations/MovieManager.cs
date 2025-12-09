@@ -261,9 +261,9 @@ namespace MovieRental.BLL.Services.Implementations
                 query = query.Where(m => m.MovieTranslations.Any(t => t.Title.Contains(filter.SearchQuery))).ToList();
             }
 
-            if (!string.IsNullOrEmpty(filter.Genre))
+            if (filter.GenreId.HasValue && filter.GenreId.Value > 0)
             {
-                query = query.Where(m => m.MovieGenres.Any(mg => mg.Genre!.GenreTranslations.Any(gt => gt.Name == filter.Genre))).ToList();
+                query = query.Where(m => m.MovieGenres.Any(mg => mg.GenreId == filter.GenreId.Value)).ToList();
             }
 
             if (filter.Year.HasValue)

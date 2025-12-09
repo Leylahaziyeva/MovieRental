@@ -54,7 +54,7 @@
                                 <!-- First Name & Last Name -->
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <input type="text" asp-for ="FirstName"   @* bunu duzel placeholderde First Name ve ya Ad yazmaq evezine bu yazilir*@
+                                        <input type="text" asp-for ="FirstName"   
                                                class="form-control form-control-user"
                                                placeholder="@localizer.GetValue("FirstName")">
                                         <span asp-validation-for="FirstName" class="text-danger small"></span>
@@ -101,12 +101,13 @@
                                         <input type="checkbox"
                                                asp-for="AgreeToTerms"
                                                class="custom-control-input"
-                                               id="customCheck">
+                                               id="customCheck"
+                                               value="true">
                                         <label class="custom-control-label" for="customCheck">
                                             @localizer.GetValue("IAgreeToTermsAndConditions")
                                         </label>
                                     </div>
-                                    <span asp-validation-for="AgreeToTerms" class="text-danger small"></span>
+                                    <span asp-validation-for="AgreeToTerms" class="text-danger small d-block"></span>
                                 </div>
 
                                 <!-- Submit Button -->
@@ -144,13 +145,13 @@
         </div>
     </div>
 
-  @*   <!-- Bootstrap core JavaScript -->
+    <!-- Bootstrap core JavaScript -->
     <script src="~/vendor/jquery/jquery.min.js"></script>
     <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- Validation -->
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <!-- Custom scripts -->
-    <script src="~/js/osahan.js"></script> *@
+    <script src="~/js/osahan.js"></script>
 </body>
 </html>

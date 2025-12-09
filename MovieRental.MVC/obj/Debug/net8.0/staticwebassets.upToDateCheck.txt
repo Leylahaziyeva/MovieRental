@@ -47,6 +47,11 @@ wwwroot\img\s4.png
 wwwroot\img\slider1.jpg
 wwwroot\img\slider2.jpg
 wwwroot\img\slider3.jpg
+wwwroot\img\user\06f4143d-19ae-4fca-a063-0136d0ad7f1b.jpg
+wwwroot\img\user\30c9656e-acbf-40f6-86f5-92a03a8c2897.jpg
+wwwroot\img\user\53396dd4-eed6-400d-8b8a-a0906c30fdea.JPG
+wwwroot\img\user\5e9cbf02-bf8a-4fee-a4dc-e3ddbc24473c.jpg
+wwwroot\img\user\83cf0f48-dffd-48a0-82c6-653cfe4d366e.jpg
 wwwroot\js\contact_me.js
 wwwroot\js\jqBootstrapValidation.js
 wwwroot\js\osahan.js

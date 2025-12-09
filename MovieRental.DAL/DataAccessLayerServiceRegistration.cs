@@ -22,6 +22,12 @@ namespace MovieRental.DAL
             services.AddScoped<ILanguageRepository, LanguageRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             services.AddScoped<ISliderRepository, SliderRepository>();
+            services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IEventRepository, EventRepository>();
+            services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
+            services.AddScoped<ISportRepository, SportRepository>();
+            services.AddScoped<ISportTypeRepository, SportTypeRepository>();
+            services.AddScoped<ILocationRepository, LocationRepository>();
 
             services.AddScoped<DataInitializer>();
 

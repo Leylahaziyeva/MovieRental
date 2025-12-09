@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Mailing;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using MovieRental.BLL.Services.Contracts;
@@ -13,17 +15,23 @@ namespace MovieRental.BLL.Services.Implementations
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IMapper _mapper;
         private readonly ILogger<AccountManager> _logger;
+        private readonly IMailService _mailService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AccountManager(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             IMapper mapper,
-            ILogger<AccountManager> logger)
+            ILogger<AccountManager> logger,
+            IMailService mailService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
             _logger = logger;
+            _mailService = mailService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IdentityResult> RegisterAsync(RegisterViewModel model)
@@ -56,7 +64,7 @@ namespace MovieRental.BLL.Services.Implementations
                     Email = model.Email,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    EmailConfirmed = false, 
+                    EmailConfirmed = false,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -67,9 +75,33 @@ namespace MovieRental.BLL.Services.Implementations
                 {
                     _logger.LogInformation($"User {model.Username} registered successfully");
 
-                    // TODO: Send confirmation email
-                    // TODO: Add to default role (User)
-                    // await _userManager.AddToRoleAsync(user, "User");
+                    // Welcome email göndər
+                    try
+                    {
+                        var mail = new Mail
+                        {
+                            ToEmail = user.Email!,
+                            ToFullName = $"{user.FirstName} {user.LastName}",
+                            Subject = "Xoş gəlmisiniz - MovieRental",
+                            HtmlBody = $@"
+                                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                                    <h2 style='color: #333;'>Xoş gəldiniz {user.FirstName}!</h2>
+                                    <p>MovieRental-da qeydiyyatdan keçdiyiniz üçün təşəkkür edirik.</p>
+                                    <p>Hesabınız uğurla yaradıldı.</p>
+                                    <p><strong>İstifadəçi adı:</strong> {user.UserName}</p>
+                                    <p>Hörmətlə,<br>MovieRental Komandası</p>
+                                </div>
+                            ",
+                            TextBody = $"Xoş gəldiniz {user.FirstName}! MovieRental-da qeydiyyatdan keçdiyiniz üçün təşəkkür edirik."
+                        };
+
+                        _mailService.SendMail(mail);
+                        _logger.LogInformation($"Welcome email sent to {user.Email}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to send welcome email");
+                    }
                 }
 
                 return result;
@@ -107,7 +139,7 @@ namespace MovieRental.BLL.Services.Implementations
                     user.UserName!,
                     model.Password,
                     model.RememberMe,
-                    lockoutOnFailure: true 
+                    lockoutOnFailure: true
                 );
 
                 if (result.Succeeded)
@@ -128,7 +160,7 @@ namespace MovieRental.BLL.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during user login");
-                return SignInResult.Failed;
+                return Microsoft.AspNetCore.Identity.SignInResult.Failed;
             }
         }
 
@@ -159,10 +191,50 @@ namespace MovieRental.BLL.Services.Implementations
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-                // TODO: Send email with reset link
-                // Example: https://yoursite.com/account/reset-password?email={email}&token={token}
+                // Reset linki
+                var request = _httpContextAccessor.HttpContext?.Request;
+                if (request != null)
+                {
+                    var baseUrl = $"{request.Scheme}://{request.Host}";
+                    var resetLink = $"{baseUrl}/account/resetpassword?email={Uri.EscapeDataString(model.Email)}&code={Uri.EscapeDataString(token)}";
 
-                _logger.LogInformation($"Password reset token generated for {model.Email}");
+                    try
+                    {
+                        var mail = new Mail
+                        {
+                            ToEmail = user.Email!,
+                            ToFullName = $"{user.FirstName} {user.LastName}",
+                            Subject = "Şifrə sıfırlama sorğusu - MovieRental",
+                            HtmlBody = $@"
+                                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'>
+                                    <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;'>
+                                        <h1 style='color: white; margin: 0;'>MovieRental</h1>
+                                    </div>
+                                    <div style='background: #ffffff; padding: 30px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 10px 10px;'>
+                                        <h2 style='color: #333; margin-top: 0;'>Şifrənizi sıfırlayın</h2>
+                                        <p style='color: #666; line-height: 1.6;'>Salam <strong>{user.FirstName}</strong>,</p>
+                                        <p style='color: #666; line-height: 1.6;'>Şifrənizi sıfırlamaq üçün sorğu göndərdiniz. Aşağıdakı düyməyə klikləyərək yeni şifrə təyin edə bilərsiniz:</p>
+                                        <div style='text-align: center; margin: 30px 0;'>
+                                            <a href='{resetLink}' style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 40px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;'>Şifrəni sıfırla</a>
+                                        </div>
+                                        <p style='color: #999; font-size: 14px;'>Əgər bu sorğunu siz göndərməmisinizsə, bu emaili nəzərə almayın.</p>
+                                        <p style='color: #999; font-size: 14px;'>Bu link 24 saat ərzində etibarlıdır.</p>
+                                        <hr style='border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;'>
+                                        <p style='color: #999; font-size: 12px; text-align: center;'>© 2024 MovieRental</p>
+                                    </div>
+                                </div>
+                            ",
+                            TextBody = $"Şifrə sıfırlama linki: {resetLink}"
+                        };
+
+                        _mailService.SendMail(mail);
+                        _logger.LogInformation($"Password reset email sent to {user.Email}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to send password reset email");
+                    }
+                }
 
                 return IdentityResult.Success;
             }
@@ -236,7 +308,6 @@ namespace MovieRental.BLL.Services.Implementations
                 if (result.Succeeded)
                 {
                     _logger.LogInformation($"Password changed successfully for user {userId}");
-
                     await _signInManager.RefreshSignInAsync(user);
                 }
 
@@ -267,7 +338,11 @@ namespace MovieRental.BLL.Services.Implementations
                     UserName = user.UserName!,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    Email = user.Email!
+                    Email = user.Email!,
+                    Company = user.Company,
+                    Address = user.Address,
+                    PhoneNumber = user.PhoneNumber,
+                    ProfileImagePath = user.ProfileImage
                 };
             }
             catch (Exception ex)
@@ -295,7 +370,14 @@ namespace MovieRental.BLL.Services.Implementations
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 user.Email = model.Email;
-                user.UserName = model.UserName;
+                user.Company = model.Company;
+                user.Address = model.Address;
+                user.PhoneNumber = model.PhoneNumber;
+
+                if (!string.IsNullOrEmpty(model.ProfileImagePath))
+                {
+                    user.ProfileImage = model.ProfileImagePath;
+                }
 
                 var result = await _userManager.UpdateAsync(user);
 

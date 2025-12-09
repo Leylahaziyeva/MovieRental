@@ -1,0 +1,798 @@
+﻿@model AccountViewModel
+
+@{
+    ViewData["Title"] = localizer.GetValue("MyAccount");
+}
+
+<section class="py-4 bg-light inner-header border-bottom">
+    <div class="container">
+        <div class="row d-flex align-items-center">
+            <div class="col-lg-6 col-md-6">
+                <h4 class="mt-0 mb-0 text-dark">@localizer.GetValue("MyAccount")</h4>
+            </div>
+            <div class="col-lg-6 col-md-6 text-right">
+                <div class="breadcrumbs">
+                    <p class="mb-0">
+                        <a asp-controller="Home" asp-action="Index">
+                            <i class="icofont-ui-home"></i> @localizer.GetValue("Home")
+                        </a> / <span>@localizer.GetValue("MyAccount")</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container pt-5 mb-4 pb-2 list-bp">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-xl-3 col-lg-3">
+            <!-- User Card -->
+            <div class="bg-gradient-primary inner-profile text-white p-4 widget shadow-sm rounded mb-4 text-center">
+                <img class="img-profile rounded-circle" style="width: 100px; height: 100px; object-fit: cover;"
+                     src="~/img/user/@(string.IsNullOrEmpty(Model.ProfileImagePath) ? "default.png" : Model.ProfileImagePath)">
+                <h5 class="mb-1 mt-3">@Model.FirstName @Model.LastName</h5>
+                <p><span class="text-muted text-gray-500"><i class="fas fa-map-marker-alt fa-fw fa-sm mr-1"></i>@Model.Address</span></p>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-light btn-sm">
+                        @localizer.GetValue("SignOut")
+                    </button>
+                </form>
+            </div>
+            <!-- Navigation Menu -->
+            <div class="bg-white p-3 widget shadow-sm rounded mb-4">
+                <div class="nav nav-pills flex-column lavalamp" id="sidebar-1" role="tablist">
+                    <a class="nav-link active" data-toggle="tab" href="#sidebar-1-1" role="tab">
+                        <i class="fas fa-user-circle fa-sm fa-fw mr-2 text-gray-400"></i> @localizer.GetValue("Profile")
+                    </a>
+                    <a class="nav-link" data-toggle="tab" href="#sidebar-1-2" role="tab">
+                        <i class="fas fa-heart fa-sm fa-fw mr-2 text-gray-400"></i> @localizer.GetValue("Watchlist")
+                    </a>
+                    <a class="nav-link" data-toggle="tab" href="#sidebar-1-3" role="tab">
+                        <i class="fas fa-list-alt fa-sm fa-fw mr-2 text-gray-400"></i> @localizer.GetValue("YourLists")
+                    </a>
+                    <a class="nav-link" data-toggle="tab" href="#sidebar-1-4" role="tab">
+                        <i class="fas fa-cog fa-sm fa-fw mr-2 text-gray-400"></i> @localizer.GetValue("AccountSettings")
+                    </a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline w-100">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="nav-link text-left w-100 border-0 bg-transparent">
+                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> @localizer.GetValue("Logout")
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-xl-9 col-lg-9">
+            <div class="bg-white p-3 widget shadow-sm rounded mb-4">
+                <div class="tab-content" id="myTabContent">
+
+                    <!-- Profile Tab -->
+                    <div class="tab-pane fade show active" id="sidebar-1-1" role="tabpanel">
+                        <div class="d-sm-flex align-items-center justify-content-between mb-3">
+                            <h1 class="h5 mb-0 text-gray-900">@localizer.GetValue("Profile")</h1>
+                        </div>
+
+                        @if (TempData["Success"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                @TempData["Success"]
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        }
+
+                        <form asp-action="Update" asp-controller="Profile" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <div class="row gutter-1">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="FirstName">@localizer.GetValue("FirstName")</label>
+                                        <input asp-for="FirstName" type="text" class="form-control" placeholder="@localizer.GetValue("FirstName")">
+                                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="LastName">@localizer.GetValue("LastName")</label>
+                                        <input asp-for="LastName" type="text" class="form-control" placeholder="@localizer.GetValue("LastName")">
+                                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="UserName">@localizer.GetValue("Username")</label>
+                                        <input asp-for="UserName" type="text" class="form-control" placeholder="@localizer.GetValue("Username")">
+                                        <span asp-validation-for="UserName" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Company">@localizer.GetValue("Company")</label>
+                                        <input asp-for="Company" type="text" class="form-control">
+                                        <span asp-validation-for="Company" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Address">@localizer.GetValue("Address")</label>
+                                        <input asp-for="Address" type="text" class="form-control">
+                                        <span asp-validation-for="Address" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="PhoneNumber">@localizer.GetValue("Telephone")</label>
+                                        <input asp-for="PhoneNumber" type="text" class="form-control">
+                                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Email">@localizer.GetValue("Email")</label>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="@localizer.GetValue("Email")">
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>@localizer.GetValue("ProfileImage")</label>
+                                        <input type="file" asp-for="ProfileImageFile" class="form-control" accept="image/*" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary">@localizer.GetValue("SaveChanges")</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Watchlist Tab -->
+                    <div class="tab-pane fade" id="sidebar-1-2" role="tabpanel" style="max-height: 800px; overflow-y: auto;">
+                        <div class="d-sm-flex align-items-center justify-content-between mb-3 overflow-hidden">
+                            <h1 class="h5 mb-0 float-left">@localizer.GetValue("Watchlist")</h1>
+                            <span class="float-right text-muted small">@localizer.GetValue("ScrollToLoadMore")</span>
+                        </div>
+
+                        @Html.AntiForgeryToken()
+
+                        <div id="watchlist-container">
+                            <div class="row">
+                                <!-- Movies will be loaded here dynamically via AJAX -->
+                            </div>
+                        </div>
+
+                        <div class="text-center py-3" id="watchlist-loading" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">@localizer.GetValue("Loading")</span>
+                            </div>
+                        </div>
+
+                        <div class="text-center py-3" id="watchlist-empty" style="display: none;">
+                            <i class="fas fa-heart fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">@localizer.GetValue("NoMoviesInWatchlist")</p>
+                        </div>
+                    </div>
+
+                    <!-- Your Lists Tab -->
+                    <div class="tab-pane fade" id="sidebar-1-3" role="tabpanel" style="max-height: 800px; overflow-y: auto;">
+                        <div class="d-sm-flex align-items-center justify-content-between mb-3 overflow-hidden">
+                            <h1 class="h5 mb-0 float-left">@localizer.GetValue("YourLists")</h1>
+                            <button class="btn btn-sm btn-primary" id="btn-create-list">
+                                <i class="fas fa-plus"></i> @localizer.GetValue("NewList")
+                            </button>
+                        </div>
+
+                        <div id="user-lists-container">
+                            <div class="row">
+                                <!-- User lists will be loaded here -->
+                            </div>
+                        </div>
+
+                        <div class="text-center py-3" id="lists-loading" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">@localizer.GetValue("Loading")</span>
+                            </div>
+                        </div>
+
+                        <div class="text-center py-3" id="lists-empty" style="display: none;">
+                            <i class="fas fa-list-alt fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">@localizer.GetValue("NoListsCreated")</p>
+                        </div>
+                    </div>
+
+                    <!-- Account Settings Tab -->
+                    <div class="tab-pane fade" id="sidebar-1-4" role="tabpanel">
+                        <div class="d-sm-flex align-items-center justify-content-between mb-3">
+                            <h1 class="h5 mb-0 text-gray-900">@localizer.GetValue("AccountSettings")</h1>
+                        </div>
+
+                        @if (TempData["PasswordSuccess"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                @TempData["PasswordSuccess"]
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        }
+
+                        @if (TempData["Error"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                @TempData["Error"]
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        }
+
+                        <form asp-action="ChangePassword" asp-controller="Profile" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="row gutter-1">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="currentPassword">@localizer.GetValue("CurrentPassword")</label>
+                                        <input id="currentPassword" name="CurrentPassword" type="password" class="form-control" placeholder="@localizer.GetValue("Password")" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="newPassword">@localizer.GetValue("NewPassword")</label>
+                                        <input id="newPassword" name="NewPassword" type="password" class="form-control" placeholder="@localizer.GetValue("Password")" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="confirmPassword">@localizer.GetValue("ConfirmNewPassword")</label>
+                                        <input id="confirmPassword" name="ConfirmPassword" type="password" class="form-control" placeholder="@localizer.GetValue("Password")" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary">@localizer.GetValue("SaveChanges")</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+           const i18n = {
+            confirmRemoveFromWatchlist: '@Html.Raw(localizer.GetValue("ConfirmRemoveFromWatchlist"))',
+            confirmDeleteList: '@Html.Raw(localizer.GetValue("ConfirmDeleteList"))',
+            confirmRemoveMovie: '@Html.Raw(localizer.GetValue("ConfirmRemoveMovie"))',
+            errorOccurred: '@Html.Raw(localizer.GetValue("ErrorOccurred"))',
+            errorLoadingWatchlist: '@Html.Raw(localizer.GetValue("ErrorLoadingWatchlist"))',
+            errorLoadingLists: '@Html.Raw(localizer.GetValue("ErrorLoadingLists"))',
+            errorLoadingMore: '@Html.Raw(localizer.GetValue("ErrorLoadingMore"))',
+            pleaseEnterListName: '@Html.Raw(localizer.GetValue("PleaseEnterListName"))',
+            creating: '@Html.Raw(localizer.GetValue("Creating"))',
+            updating: '@Html.Raw(localizer.GetValue("Updating"))'
+        };
+
+        // Watchlist Variables
+        let watchlistPage = 1;
+        let watchlistLoading = false;
+        let watchlistHasMore = true;
+        let watchlistInitialized = false;
+
+        // User Lists Variables
+        let userListsPage = 1;
+        let userListsLoading = false;
+        let userListsHasMore = true;
+        let userListsInitialized = false;
+
+        $(document).ready(function() {
+            // Tab açılanda Watchlist yüklə
+            $('a[data-toggle="tab"][href="#sidebar-1-2"]').on('shown.bs.tab', function() {
+                if (!watchlistInitialized) {
+                    loadInitialWatchlist();
+                    watchlistInitialized = true;
+                }
+            });
+
+            // Tab açılanda User Lists yüklə
+            $('a[data-toggle="tab"][href="#sidebar-1-3"]').on('shown.bs.tab', function() {
+                if (!userListsInitialized) {
+                    loadInitialUserLists();
+                    userListsInitialized = true;
+                }
+            });
+
+            // Watchlist Infinity Scroll
+            $('#sidebar-1-2').on('scroll', function() {
+                if (watchlistLoading || !watchlistHasMore) return;
+
+                const element = $(this);
+                const scrollTop = element.scrollTop();
+                const scrollHeight = element[0].scrollHeight;
+                const clientHeight = element.height();
+
+                if (scrollTop + clientHeight >= scrollHeight - 100) {
+                    loadMoreWatchlist();
+                }
+            });
+
+            $('#sidebar-1-3').on('scroll', function() {
+                if (userListsLoading || !userListsHasMore) return;
+
+                const element = $(this);
+                const scrollTop = element.scrollTop();
+                const scrollHeight = element[0].scrollHeight;
+                const clientHeight = element.height();
+
+                if (scrollTop + clientHeight >= scrollHeight - 100) {
+                    loadMoreUserLists();
+                }
+            });
+        });
+
+        function loadInitialWatchlist() {
+            watchlistPage = 1;
+            watchlistHasMore = true;
+
+            $.ajax({
+                url: '@Url.Action("LoadMoreWatchlist", "Profile")',
+                type: 'GET',
+                data: { page: 1 },
+                beforeSend: function() {
+                    $('#watchlist-loading').show();
+                    $('#watchlist-empty').hide();
+                },
+                success: function(data) {
+                    $('#watchlist-loading').hide();
+
+                    if (!data || data.trim() === '') {
+                        $('#watchlist-empty').show();
+                        watchlistHasMore = false;
+                        return;
+                    }
+
+                    $('#watchlist-container .row').html(data);
+                },
+                error: function() {
+                    $('#watchlist-loading').hide();
+                   showNotification(i18n.errorOccurred, 'error');
+                }
+            });
+        }
+
+        function loadMoreWatchlist() {
+            watchlistLoading = true;
+            watchlistPage++;
+
+            $.ajax({
+                url: '@Url.Action("LoadMoreWatchlist", "Profile")',
+                type: 'GET',
+                data: { page: watchlistPage },
+                beforeSend: function() {
+                    $('#watchlist-loading').show();
+                },
+                success: function(data) {
+                    $('#watchlist-loading').hide();
+
+                    if (!data || data.trim() === '') {
+                        watchlistHasMore = false;
+                        return;
+                    }
+
+                    $('#watchlist-container .row').append(data);
+                    watchlistLoading = false;
+                },
+                error: function() {
+                    $('#watchlist-loading').hide();
+                    watchlistLoading = false;
+                    watchlistPage--;
+                    showNotification('@localizer.GetValue("ErrorLoadingMore")', 'error');
+                }
+            });
+        }
+
+        // Remove from Watchlist
+        $(document).on('click', '.btn-remove-watchlist', function(e) {
+            e.preventDefault();
+
+                     if (!confirm(i18n.confirmRemoveFromWatchlist)) {
+                     return;
+                    }
+
+            const button = $(this);
+            const movieId = button.data('movie-id');
+            const card = button.closest('.col-xl-3, .col-md-6');
+            const originalHtml = button.html();
+
+            $.ajax({
+                url: '@Url.Action("RemoveFromWatchlist", "Profile")',
+                type: 'POST',
+                data: {
+                    movieId: movieId,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                beforeSend: function() {
+                    button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        card.fadeOut(300, function() {
+                            $(this).remove();
+
+                            if ($('#watchlist-container .row').children().length === 0) {
+                                $('#watchlist-empty').show();
+                            }
+                        });
+
+                        showNotification(response.message, 'success');
+                    } else {
+                        button.prop('disabled', false).html(originalHtml);
+                        showNotification(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    button.prop('disabled', false).html(originalHtml);
+                    showNotification('@localizer.GetValue("ErrorOccurred")', 'error');
+                }
+            });
+        });
+
+        // ============= USER LISTS FUNCTIONS =============
+
+        function loadInitialUserLists() {
+            userListsPage = 1;
+            userListsHasMore = true;
+
+            $.ajax({
+                url: '@Url.Action("LoadMoreUserLists", "Profile")',
+                type: 'GET',
+                data: { page: 1 },
+                beforeSend: function() {
+                    $('#lists-loading').show();
+                    $('#lists-empty').hide();
+                },
+                success: function(data) {
+                    $('#lists-loading').hide();
+
+                    if (!data || data.trim() === '') {
+                        $('#lists-empty').show();
+                        userListsHasMore = false;
+                        return;
+                    }
+
+                    $('#user-lists-container .row').html(data);
+                },
+                error: function() {
+                    $('#lists-loading').hide();
+                    showNotification('@localizer.GetValue("ErrorLoadingLists")', 'error');
+                }
+            });
+        }
+
+        function loadMoreUserLists() {
+            userListsLoading = true;
+            userListsPage++;
+
+            $.ajax({
+                url: '@Url.Action("LoadMoreUserLists", "Profile")',
+                type: 'GET',
+                data: { page: userListsPage },
+                beforeSend: function() {
+                    $('#lists-loading').show();
+                },
+                success: function(data) {
+                    $('#lists-loading').hide();
+
+                    if (!data || data.trim() === '') {
+                        userListsHasMore = false;
+                        return;
+                    }
+
+                    $('#user-lists-container .row').append(data);
+                    userListsLoading = false;
+                },
+                error: function() {
+                    $('#lists-loading').hide();
+                    userListsLoading = false;
+                    userListsPage--;
+                    showNotification('@localizer.GetValue("ErrorLoadingMore")', 'error');
+                }
+            });
+        }
+
+        // Create New List
+        $('#btn-create-list').click(function() {
+            showCreateListModal();
+        });
+
+        // View List Details
+        $(document).on('click', '.btn-view-list', function() {
+            const listId = $(this).data('list-id');
+            viewListDetails(listId);
+        });
+
+        // Edit List
+        $(document).on('click', '.btn-edit-list', function() {
+            const listId = $(this).data('list-id');
+            const listName = $(this).data('list-name');
+            const listDescription = $(this).data('list-description');
+            const isPublic = $(this).data('list-public') === 'true';
+
+            showEditListModal(listId, listName, listDescription, isPublic);
+        });
+
+        // Delete List
+        $(document).on('click', '.btn-delete-list', function() {
+            const listId = $(this).data('list-id');
+            const listName = $(this).data('list-name');
+
+            deleteList(listId, listName);
+        });
+
+        function showCreateListModal() {
+            const modalHtml = `
+                <div class="modal fade" id="createListModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">@localizer.GetValue("CreateList")</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="createListForm">
+                                    <div class="form-group">
+                                        <label for="listName">@localizer.GetValue("ListName")</label>
+                                        <input type="text" class="form-control" id="listName" name="Name" required maxlength="200">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="listDescription">@localizer.GetValue("Description")</label>
+                                        <textarea class="form-control" id="listDescription" name="Description" rows="3" maxlength="1000"></textarea>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="listIsPublic" name="IsPublic">
+                                        <label class="form-check-label" for="listIsPublic">
+                                            @localizer.GetValue("MakePublic")
+                                        </label>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@localizer.GetValue("Cancel")</button>
+                                <button type="button" class="btn btn-primary" id="btnSaveList">@localizer.GetValue("CreateList")</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $('body').append(modalHtml);
+            $('#createListModal').modal('show');
+
+            $('#createListModal').on('hidden.bs.modal', function() {
+                $(this).remove();
+            });
+
+            $('#btnSaveList').click(function() {
+                createList();
+            });
+        }
+
+        function createList() {
+            const formData = {
+                Name: $('#listName').val().trim(),
+                Description: $('#listDescription').val().trim(),
+                IsPublic: $('#listIsPublic').is(':checked')
+            };
+
+            if (!formData.Name) {
+                showNotification('@localizer.GetValue("PleaseEnterListName")', 'error');
+                return;
+            }
+
+            const button = $('#btnSaveList');
+            const originalText = button.text();
+
+            $.ajax({
+                url: '@Url.Action("CreateList", "Profile")',
+                type: 'POST',
+                data: {
+                    ...formData,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                beforeSend: function() {
+                    button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> @localizer.GetValue("Creating")');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#createListModal').modal('hide');
+                        showNotification(response.message, 'success');
+
+                        // Reload lists
+                        loadInitialUserLists();
+                    } else {
+                        button.prop('disabled', false).text(originalText);
+                        showNotification(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    button.prop('disabled', false).text(originalText);
+                    showNotification('@localizer.GetValue("ErrorOccurred")', 'error');
+                }
+            });
+        }
+
+        function showEditListModal(listId, listName, listDescription, isPublic) {
+            const modalHtml = `
+                <div class="modal fade" id="editListModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">@localizer.GetValue("EditList")</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editListForm">
+                                    <input type="hidden" id="editListId" value="${listId}">
+                                    <div class="form-group">
+                                        <label for="editListName">@localizer.GetValue("ListName")</label>
+                                        <input type="text" class="form-control" id="editListName" name="Name" value="${listName}" required maxlength="200">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editListDescription">@localizer.GetValue("Description")</label>
+                                        <textarea class="form-control" id="editListDescription" name="Description" rows="3" maxlength="1000">${listDescription || ''}</textarea>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="editListIsPublic" name="IsPublic" ${isPublic ? 'checked' : ''}>
+                                        <label class="form-check-label" for="editListIsPublic">
+                                            @localizer.GetValue("MakePublic")
+                                        </label>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@localizer.GetValue("Cancel")</button>
+                                <button type="button" class="btn btn-primary" id="btnUpdateList">@localizer.GetValue("SaveChanges")</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $('body').append(modalHtml);
+            $('#editListModal').modal('show');
+
+            $('#editListModal').on('hidden.bs.modal', function() {
+                $(this).remove();
+            });
+
+            $('#btnUpdateList').click(function() {
+                updateList(listId);
+            });
+        }
+
+        function updateList(listId) {
+            const formData = {
+                Name: $('#editListName').val().trim(),
+                Description: $('#editListDescription').val().trim(),
+                IsPublic: $('#editListIsPublic').is(':checked')
+            };
+
+            if (!formData.Name) {
+                showNotification('@localizer.GetValue("PleaseEnterListName")', 'error');
+                return;
+            }
+
+            const button = $('#btnUpdateList');
+            const originalText = button.text();
+
+            $.ajax({
+                url: '@Url.Action("UpdateList", "Profile")',
+                type: 'POST',
+                data: {
+                    listId: listId,
+                    ...formData,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                beforeSend: function() {
+                    button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> @localizer.GetValue("Updating")');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#editListModal').modal('hide');
+                        showNotification(response.message, 'success');
+
+                        // Reload lists
+                        loadInitialUserLists();
+                    } else {
+                        button.prop('disabled', false).text(originalText);
+                        showNotification(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    button.prop('disabled', false).text(originalText);
+                    showNotification('@localizer.GetValue("ErrorOccurred")', 'error');
+                }
+            });
+        }
+
+        function deleteList(listId, listName) {
+             if (!confirm(`${i18n.confirmDeleteList}: "${listName}"?`)) {
+                  return;
+                 }
+
+            $.ajax({
+                url: '@Url.Action("DeleteList", "Profile")',
+                type: 'POST',
+                data: {
+                    listId: listId,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $(`[data-list-id="${listId}"]`).fadeOut(300, function() {
+                            $(this).remove();
+
+                            if ($('#user-lists-container .row').children().length === 0) {
+                                $('#lists-empty').show();
+                            }
+                        });
+
+                        showNotification(response.message, 'success');
+                    } else {
+                        showNotification(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showNotification('@localizer.GetValue("ErrorOccurred")', 'error');
+                }
+            });
+        }
+
+        function viewListDetails(listId) {
+            window.location.href = '@Url.Action("ListDetails", "Profile")' + '?id=' + listId;
+        }
+
+        // ============= HELPER FUNCTIONS =============
+
+        function showNotification(message, type) {
+            if (typeof toastr !== 'undefined') {
+                toastr[type](message);
+            } else {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const alert = `
+                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed"
+                         style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+                        ${message}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                `;
+                $('body').append(alert);
+
+                setTimeout(function() {
+                    $('.alert').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }, 3000);
+            }
+        }
+    </script>
+}

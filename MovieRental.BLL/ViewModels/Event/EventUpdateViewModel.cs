@@ -6,11 +6,8 @@ namespace MovieRental.BLL.ViewModels.Event
     public class EventUpdateViewModel
     {
         public int Id { get; set; }
-        public string? Name { get; set; } //added name here
-        public string? Description { get; set; } //added descr here
-        public string? Location { get; set; } //added locat here
-        public string? Categories { get; set; }
-        public string? Languages { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
 
         public IFormFile? ImageFile { get; set; }
         public string? ImageUrl { get; set; }
@@ -32,19 +29,21 @@ namespace MovieRental.BLL.ViewModels.Event
         public string? GoogleMapsUrl { get; set; }
         public string? AgeRestriction { get; set; }
 
+        public int? EventCategoryId { get; set; }
+        public List<SelectListItem>? EventCategoryList { get; set; }
+
+        public int? LocationId { get; set; }
+        public List<SelectListItem>? LocationList { get; set; }
+
         public List<int>? SelectedArtistIds { get; set; }
         public List<SelectListItem>? ArtistList { get; set; }
     }
     public class EventTranslationUpdateViewModel
     {
         public int Id { get; set; }
-        public required string Name { get; set; } 
-        public required string Description { get; set; } 
-        public required string Location { get; set; } 
-        public string? Categories { get; set; }
-        public string? Languages { get; set; }
+        public required string Name { get; set; }
+        public required string Description { get; set; }
         public int EventId { get; set; }
-        public EventViewModel? Event { get; set; }
         public int LanguageId { get; set; }
         public List<SelectListItem>? LanguageList { get; set; }
     }

@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using MovieRental.BLL.Services.Contracts;
 using MovieRental.BLL.ViewModels.Genre;
 using MovieRental.DAL.DataContext.Entities;
-using MovieRental.DAL.Repositories.Contracts;
 
 namespace MovieRental.BLL.Services.Implementations
 {
@@ -23,6 +22,8 @@ namespace MovieRental.BLL.Services.Implementations
             _mapper = mapper;
         }
 
+        #region Override Methods
+
         public override async Task<GenreViewModel> CreateAsync(GenreCreateViewModel createViewModel)
         {
             var genre = new Genre();
@@ -32,14 +33,17 @@ namespace MovieRental.BLL.Services.Implementations
             {
                 Name = createViewModel.Name,
                 GenreId = createdGenre.Id,
-                LanguageId = 1
+                LanguageId = createViewModel.DefaultLanguageId
             };
             await _translationRepository.AddAsync(mainTranslation);
 
-            if (createViewModel.Translations != null && createViewModel.Translations.Any())
+            if (createViewModel.Translations?.Any() == true)
             {
                 foreach (var translation in createViewModel.Translations)
                 {
+                    if (translation.LanguageId == createViewModel.DefaultLanguageId)
+                        continue;
+
                     var genreTranslation = new GenreTranslation
                     {
                         Name = translation.Name,
@@ -50,7 +54,12 @@ namespace MovieRental.BLL.Services.Implementations
                 }
             }
 
-            return _mapper.Map<GenreViewModel>(createdGenre);
+            var genreWithTranslations = await _genreRepository.GetAsync(
+                g => g.Id == createdGenre.Id,
+                include: q => q.Include(g => g.GenreTranslations)
+            );
+
+            return _mapper.Map<GenreViewModel>(genreWithTranslations);
         }
 
         public override async Task<bool> UpdateAsync(int id, GenreUpdateViewModel updateViewModel)
@@ -62,25 +71,51 @@ namespace MovieRental.BLL.Services.Implementations
 
             if (genre == null) return false;
 
+            var defaultTranslation = genre.GenreTranslations
+                .FirstOrDefault(t => t.LanguageId == updateViewModel.DefaultLanguageId && !t.IsDeleted);
 
-            if (updateViewModel.Translations != null)
+            if (defaultTranslation != null)
+            {
+                defaultTranslation.Name = updateViewModel.Name;
+                defaultTranslation.UpdatedAt = DateTime.UtcNow;
+                await _translationRepository.UpdateAsync(defaultTranslation);
+            }
+            else
+            {
+                var newDefaultTranslation = new GenreTranslation
+                {
+                    Name = updateViewModel.Name,
+                    GenreId = id,
+                    LanguageId = updateViewModel.DefaultLanguageId
+                };
+                await _translationRepository.AddAsync(newDefaultTranslation);
+            }
+
+            if (updateViewModel.Translations?.Any() == true)
             {
                 foreach (var translationVM in updateViewModel.Translations)
                 {
-                    var existingTranslation = genre.GenreTranslations
-                        .FirstOrDefault(t => t.LanguageId == translationVM.LanguageId);
+                    if (translationVM.LanguageId == updateViewModel.DefaultLanguageId)
+                        continue;
 
-                    if (existingTranslation != null)
+                    if (translationVM.Id > 0)
                     {
-                        existingTranslation.Name = translationVM.Name;
-                        await _translationRepository.UpdateAsync(existingTranslation);
+                        var existingTranslation = genre.GenreTranslations
+                            .FirstOrDefault(t => t.Id == translationVM.Id && !t.IsDeleted);
+
+                        if (existingTranslation != null)
+                        {
+                            existingTranslation.Name = translationVM.Name;
+                            existingTranslation.UpdatedAt = DateTime.UtcNow;
+                            await _translationRepository.UpdateAsync(existingTranslation);
+                        }
                     }
                     else
                     {
                         var newTranslation = new GenreTranslation
                         {
                             Name = translationVM.Name,
-                            GenreId = genre.Id,
+                            GenreId = id,
                             LanguageId = translationVM.LanguageId
                         };
                         await _translationRepository.AddAsync(newTranslation);
@@ -88,6 +123,7 @@ namespace MovieRental.BLL.Services.Implementations
                 }
             }
 
+            genre.UpdatedAt = DateTime.UtcNow;
             await _genreRepository.UpdateAsync(genre);
             return true;
         }
@@ -98,21 +134,75 @@ namespace MovieRental.BLL.Services.Implementations
             if (genre == null) return false;
 
             genre.IsDeleted = true;
-            genre.UpdatedAt = DateTime.Now;
+            genre.UpdatedAt = DateTime.UtcNow;
 
             await _genreRepository.UpdateAsync(genre);
             return true;
         }
 
+        public override async Task<GenreViewModel?> GetByIdAsync(int id)
+        {
+            var genre = await _genreRepository.GetAsync(
+                g => g.Id == id && !g.IsDeleted,
+                include: q => q.Include(g => g.GenreTranslations.Where(gt => !gt.IsDeleted)),
+                AsNoTracking: true
+            );
+
+            if (genre == null) return null;
+
+            return _mapper.Map<GenreViewModel>(genre);
+        }
+
+        #endregion
+
+        #region List & Filter Methods
+
         public async Task<IEnumerable<GenreViewModel>> GetAllActiveAsync(int languageId)
         {
             var genres = await _genreRepository.GetAllAsync(
                 predicate: g => !g.IsDeleted,
-                include: q => q.Include(g => g.GenreTranslations.Where(gt => gt.LanguageId == languageId)),
-                orderBy: q => q.OrderBy(g => g.GenreTranslations.First().Name)
+                include: q => q.Include(g => g.GenreTranslations.Where(gt => !gt.IsDeleted)),
+                AsNoTracking: true
             );
 
-            return _mapper.Map<IEnumerable<GenreViewModel>>(genres);
+            var filteredGenres = genres
+                .Where(g => g.GenreTranslations.Any(gt => gt.LanguageId == languageId))
+                .OrderBy(g => g.GenreTranslations
+                    .First(gt => gt.LanguageId == languageId).Name)
+                .ToList();
+
+            var viewModels = _mapper.Map<IEnumerable<GenreViewModel>>(filteredGenres);
+
+            foreach (var vm in viewModels)
+            {
+                var genre = filteredGenres.First(g => g.Id == vm.Id);
+                var translation = genre.GenreTranslations
+                    .FirstOrDefault(gt => gt.LanguageId == languageId);
+
+                vm.Name = translation?.Name ?? "N/A";
+            }
+
+            return viewModels;
+        }
+
+        public async Task<GenreViewModel?> GetByIdWithLanguageAsync(int id, int languageId)
+        {
+            var genre = await _genreRepository.GetAsync(
+                g => g.Id == id && !g.IsDeleted,
+                include: q => q.Include(g => g.GenreTranslations.Where(gt => !gt.IsDeleted)),
+                AsNoTracking: true
+            );
+
+            if (genre == null) return null;
+
+            var viewModel = _mapper.Map<GenreViewModel>(genre);
+
+            var translation = genre.GenreTranslations
+                .FirstOrDefault(gt => gt.LanguageId == languageId);
+
+            viewModel.Name = translation?.Name ?? "N/A";
+
+            return viewModel;
         }
 
         public async Task<IEnumerable<GenreViewModel>> SearchByNameAsync(string searchTerm, int languageId)
@@ -123,15 +213,31 @@ namespace MovieRental.BLL.Services.Implementations
             }
 
             var genres = await _genreRepository.GetAllAsync(
-                predicate: g => !g.IsDeleted &&
-                    g.GenreTranslations.Any(gt =>
-                        gt.LanguageId == languageId &&
-                        gt.Name.Contains(searchTerm)),
-                include: q => q.Include(g => g.GenreTranslations.Where(gt => gt.LanguageId == languageId)),
-                orderBy: q => q.OrderBy(g => g.GenreTranslations.First().Name)
+                predicate: g => !g.IsDeleted,
+                include: q => q.Include(g => g.GenreTranslations.Where(gt => !gt.IsDeleted)),
+                AsNoTracking: true
             );
 
-            return _mapper.Map<IEnumerable<GenreViewModel>>(genres);
+            var searchResults = genres
+                .Where(g => g.GenreTranslations.Any(gt =>
+                    gt.LanguageId == languageId &&
+                    gt.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
+                .OrderBy(g => g.GenreTranslations
+                    .First(gt => gt.LanguageId == languageId).Name)
+                .ToList();
+
+            var viewModels = _mapper.Map<IEnumerable<GenreViewModel>>(searchResults);
+
+            foreach (var vm in viewModels)
+            {
+                var genre = searchResults.First(g => g.Id == vm.Id);
+                var translation = genre.GenreTranslations
+                    .FirstOrDefault(gt => gt.LanguageId == languageId);
+
+                vm.Name = translation?.Name ?? "N/A";
+            }
+
+            return viewModels;
         }
 
         public async Task<IEnumerable<GenreViewModel>> GetPopularGenresAsync(int languageId, int count = 10)
@@ -139,13 +245,34 @@ namespace MovieRental.BLL.Services.Implementations
             var genres = await _genreRepository.GetAllAsync(
                 predicate: g => !g.IsDeleted,
                 include: q => q
-                    .Include(g => g.GenreTranslations.Where(gt => gt.LanguageId == languageId))
-                    .Include(g => g.MovieGenres),
-                orderBy: q => q.OrderByDescending(g => g.MovieGenres.Count)
+                    .Include(g => g.GenreTranslations.Where(gt => !gt.IsDeleted))
+                    .Include(g => g.MovieGenres.Where(mg => !mg.IsDeleted)),
+                AsNoTracking: true
             );
 
-            return _mapper.Map<IEnumerable<GenreViewModel>>(genres.Take(count));
+            var popularGenres = genres
+                .Where(g => g.GenreTranslations.Any(gt => gt.LanguageId == languageId))
+                .OrderByDescending(g => g.MovieGenres.Count)
+                .Take(count)
+                .ToList();
+
+            var viewModels = _mapper.Map<IEnumerable<GenreViewModel>>(popularGenres);
+
+            foreach (var vm in viewModels)
+            {
+                var genre = popularGenres.First(g => g.Id == vm.Id);
+                var translation = genre.GenreTranslations
+                    .FirstOrDefault(gt => gt.LanguageId == languageId);
+
+                vm.Name = translation?.Name ?? "N/A";
+            }
+
+            return viewModels;
         }
+
+        #endregion
+
+        #region Translation Management
 
         public async Task<bool> TranslationExistsAsync(int genreId, int languageId)
         {
@@ -157,7 +284,6 @@ namespace MovieRental.BLL.Services.Implementations
 
             return translation != null;
         }
-
 
         public async Task<bool> AddTranslationAsync(int genreId, GenreTranslationCreateViewModel translation)
         {
@@ -184,7 +310,7 @@ namespace MovieRental.BLL.Services.Implementations
             if (genreTranslation == null) return false;
 
             genreTranslation.Name = translation.Name;
-            genreTranslation.UpdatedAt = DateTime.Now;
+            genreTranslation.UpdatedAt = DateTime.UtcNow;
 
             await _translationRepository.UpdateAsync(genreTranslation);
             return true;
@@ -196,10 +322,37 @@ namespace MovieRental.BLL.Services.Implementations
             if (translation == null) return false;
 
             translation.IsDeleted = true;
-            translation.UpdatedAt = DateTime.Now;
+            translation.UpdatedAt = DateTime.UtcNow;
 
             await _translationRepository.UpdateAsync(translation);
             return true;
         }
+
+        #endregion
+
+        #region Stats & Utility Methods
+
+        public async Task<int> GetGenreMovieCountAsync(int genreId)
+        {
+            var genre = await _genreRepository.GetAsync(
+                g => g.Id == genreId && !g.IsDeleted,
+                include: q => q.Include(g => g.MovieGenres.Where(mg => !mg.IsDeleted)),
+                AsNoTracking: true
+            );
+
+            return genre?.MovieGenres.Count ?? 0;
+        }
+
+        public async Task<int> GetTotalGenresCountAsync()
+        {
+            var genres = await _genreRepository.GetAllAsync(
+                predicate: g => !g.IsDeleted,
+                AsNoTracking: true
+            );
+
+            return genres.Count();
+        }
+
+        #endregion
     }
 }

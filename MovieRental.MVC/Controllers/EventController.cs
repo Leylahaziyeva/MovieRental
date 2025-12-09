@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MovieRental.BLL.Services.Contracts;
+using MovieRental.BLL.Services.Implementations;
 using MovieRental.BLL.ViewModels.Event;
+using MovieRental.BLL.ViewModels.EventCategory;
+using MovieRental.BLL.ViewModels.Location;
 
 namespace MovieRental.MVC.Controllers
 {
@@ -11,23 +14,35 @@ namespace MovieRental.MVC.Controllers
         private readonly ICookieService _cookieService;
         private readonly ICurrencyService _currencyService;
         private readonly IPersonService _personService;
+        private readonly ILocationService _locationService;
+        private readonly IEventCategoryService _eventCategoryService;
 
         public EventController(
             IEventService eventService,
             ICookieService cookieService,
             ICurrencyService currencyService,
-            IPersonService personService)
+            IPersonService personService,
+            ILocationService locationService,
+            IEventCategoryService eventCategoryService)
         {
             _eventService = eventService;
             _cookieService = cookieService;
             _currencyService = currencyService;
             _personService = personService;
+            _locationService = locationService;
+            _eventCategoryService = eventCategoryService;
         }
+
+        #region Index & Details
 
         public async Task<IActionResult> Index(EventFilterViewModel filter)
         {
             var currentLanguageId = await _cookieService.GetLanguageIdAsync();
             filter.CurrentLanguageId = currentLanguageId;
+
+            var filterOptions = await _eventService.GetFilterOptionsAsync(currentLanguageId);
+            filter.Categories = filterOptions.Categories;
+            filter.Locations = filterOptions.Locations;
 
             var viewModel = await _eventService.GetFilteredEventsAsync(filter);
 
@@ -45,16 +60,22 @@ namespace MovieRental.MVC.Controllers
             return View(eventEntity);
         }
 
+        #endregion
+
+        #region Create
+
         public async Task<IActionResult> Create()
         {
+            var currentLanguageId = await _cookieService.GetLanguageIdAsync();
             var currencies = await _currencyService.GetAllAsync();
             var artists = await _personService.GetArtistsAsync();
+            var categories = await _eventCategoryService.GetCategoriesForFilterAsync(currentLanguageId);
+            var locations = await _locationService.GetLocationsForFilterAsync(currentLanguageId);
 
             var model = new EventCreateViewModel
             {
                 Name = string.Empty,
                 Description = string.Empty,
-                Location = string.Empty,
                 ImageFile = null!,
                 EventDate = DateTime.Now.AddDays(7),
                 CurrencyList = currencies.Select(c => new SelectListItem
@@ -66,6 +87,16 @@ namespace MovieRental.MVC.Controllers
                 {
                     Value = a.Id.ToString(),
                     Text = a.Name
+                }).ToList(),
+                EventCategoryList = categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToList(),
+                LocationList = locations.Select(l => new SelectListItem
+                {
+                    Value = l.Id.ToString(),
+                    Text = l.Name
                 }).ToList()
             };
 
@@ -73,26 +104,11 @@ namespace MovieRental.MVC.Controllers
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(EventCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                var currencies = await _currencyService.GetAllAsync();
-                var artists = await _personService.GetArtistsAsync();
-
-                model.CurrencyList = currencies.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.Name} ({c.Symbol})"
-                }).ToList();
-
-                model.ArtistList = artists.Select(a => new SelectListItem
-                {
-                    Value = a.Id.ToString(),
-                    Text = a.Name
-                }).ToList();
-
+                await PopulateCreateDropdownsAsync(model);
                 return View(model);
             }
 
@@ -105,25 +121,14 @@ namespace MovieRental.MVC.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Error creating event: {ex.Message}");
-
-                var currencies = await _currencyService.GetAllAsync();
-                var artists = await _personService.GetArtistsAsync();
-
-                model.CurrencyList = currencies.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.Name} ({c.Symbol})"
-                }).ToList();
-
-                model.ArtistList = artists.Select(a => new SelectListItem
-                {
-                    Value = a.Id.ToString(),
-                    Text = a.Name
-                }).ToList();
-
+                await PopulateCreateDropdownsAsync(model);
                 return View(model);
             }
         }
+
+        #endregion
+
+        #region Edit
 
         public async Task<IActionResult> Edit(int id)
         {
@@ -137,17 +142,16 @@ namespace MovieRental.MVC.Controllers
 
             var currencies = await _currencyService.GetAllAsync();
             var artists = await _personService.GetArtistsAsync();
+            var categories = await _eventCategoryService.GetCategoriesForFilterAsync(currentLanguageId);
+            var locations = await _locationService.GetLocationsForFilterAsync(currentLanguageId);
 
             var model = new EventUpdateViewModel
             {
                 Id = eventEntity.Id,
                 Name = eventEntity.Name,
                 Description = eventEntity.Description,
-                Location = eventEntity.Location,
                 ImageUrl = eventEntity.ImageUrl,
                 CoverImageUrl = eventEntity.CoverImageUrl,
-                Categories = eventEntity.Categories,
-                Languages = eventEntity.Languages,
                 EventDate = eventEntity.EventDate,
                 Price = eventEntity.Price,
                 IsActive = eventEntity.IsActive,
@@ -158,6 +162,8 @@ namespace MovieRental.MVC.Controllers
                 GoogleMapsUrl = eventEntity.GoogleMapsUrl,
                 AgeRestriction = eventEntity.AgeRestriction,
                 CurrencyId = eventEntity.Currency?.Id,
+                EventCategoryId = GetCategoryIdFromName(eventEntity.CategoryName, categories),
+                LocationId = GetLocationIdFromName(eventEntity.LocationName, locations),
                 SelectedArtistIds = eventEntity.Artists?.Select(a => a.Id).ToList(),
                 CurrencyList = currencies.Select(c => new SelectListItem
                 {
@@ -170,6 +176,18 @@ namespace MovieRental.MVC.Controllers
                     Value = a.Id.ToString(),
                     Text = a.Name,
                     Selected = eventEntity.Artists?.Any(art => art.Id == a.Id) ?? false
+                }).ToList(),
+                EventCategoryList = categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name,
+                    Selected = c.Name == eventEntity.CategoryName
+                }).ToList(),
+                LocationList = locations.Select(l => new SelectListItem
+                {
+                    Value = l.Id.ToString(),
+                    Text = l.Name,
+                    Selected = l.Name == eventEntity.LocationName
                 }).ToList()
             };
 
@@ -177,7 +195,6 @@ namespace MovieRental.MVC.Controllers
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, EventUpdateViewModel model)
         {
             if (id != model.Id)
@@ -187,21 +204,7 @@ namespace MovieRental.MVC.Controllers
 
             if (!ModelState.IsValid)
             {
-                var currencies = await _currencyService.GetAllAsync();
-                var artists = await _personService.GetArtistsAsync();
-
-                model.CurrencyList = currencies.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.Name} ({c.Symbol})"
-                }).ToList();
-
-                model.ArtistList = artists.Select(a => new SelectListItem
-                {
-                    Value = a.Id.ToString(),
-                    Text = a.Name
-                }).ToList();
-
+                await PopulateUpdateDropdownsAsync(model);
                 return View(model);
             }
 
@@ -220,28 +223,16 @@ namespace MovieRental.MVC.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Error updating event: {ex.Message}");
-
-                var currencies = await _currencyService.GetAllAsync();
-                var artists = await _personService.GetArtistsAsync();
-
-                model.CurrencyList = currencies.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = $"{c.Name} ({c.Symbol})"
-                }).ToList();
-
-                model.ArtistList = artists.Select(a => new SelectListItem
-                {
-                    Value = a.Id.ToString(),
-                    Text = a.Name
-                }).ToList();
-
+                await PopulateUpdateDropdownsAsync(model);
                 return View(model);
             }
         }
 
+        #endregion
+
+        #region Delete
+
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -264,8 +255,11 @@ namespace MovieRental.MVC.Controllers
             }
         }
 
+        #endregion
+
+        #region Artist Management
+
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> AddArtists(int eventId, List<int> artistIds)
         {
             try
@@ -291,7 +285,6 @@ namespace MovieRental.MVC.Controllers
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveArtist(int eventId, int artistId)
         {
             try
@@ -315,6 +308,10 @@ namespace MovieRental.MVC.Controllers
                 return RedirectToAction(nameof(Details), new { id = eventId });
             }
         }
+
+        #endregion
+
+        #region API Methods
 
         public async Task<IActionResult> GetUpcoming()
         {
@@ -340,7 +337,91 @@ namespace MovieRental.MVC.Controllers
             if (!events.Any())
                 return Content(string.Empty);
 
-            return PartialView("_EventCardsPartial", events); 
+            return PartialView("_EventCardsPartial", events);
         }
+
+        #endregion
+
+        #region Helper Methods
+
+        private async Task PopulateCreateDropdownsAsync(EventCreateViewModel model)
+        {
+            var currentLanguageId = await _cookieService.GetLanguageIdAsync();
+            var currencies = await _currencyService.GetAllAsync();
+            var artists = await _personService.GetArtistsAsync();
+            var categories = await _eventCategoryService.GetCategoriesForFilterAsync(currentLanguageId);
+            var locations = await _locationService.GetLocationsForFilterAsync(currentLanguageId);
+
+            model.CurrencyList = currencies.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = $"{c.Name} ({c.Symbol})"
+            }).ToList();
+
+            model.ArtistList = artists.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.Name
+            }).ToList();
+
+            model.EventCategoryList = categories.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+            }).ToList();
+
+            model.LocationList = locations.Select(l => new SelectListItem
+            {
+                Value = l.Id.ToString(),
+                Text = l.Name
+            }).ToList();
+        }
+
+        private async Task PopulateUpdateDropdownsAsync(EventUpdateViewModel model)
+        {
+            var currentLanguageId = await _cookieService.GetLanguageIdAsync();
+            var currencies = await _currencyService.GetAllAsync();
+            var artists = await _personService.GetArtistsAsync();
+            var categories = await _eventCategoryService.GetCategoriesForFilterAsync(currentLanguageId);
+            var locations = await _locationService.GetLocationsForFilterAsync(currentLanguageId);
+
+            model.CurrencyList = currencies.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = $"{c.Name} ({c.Symbol})"
+            }).ToList();
+
+            model.ArtistList = artists.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.Name
+            }).ToList();
+
+            model.EventCategoryList = categories.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+            }).ToList();
+
+            model.LocationList = locations.Select(l => new SelectListItem
+            {
+                Value = l.Id.ToString(),
+                Text = l.Name
+            }).ToList();
+        }
+
+        private int? GetCategoryIdFromName(string? categoryName, IEnumerable<EventCategoryOption> categories)
+        {
+            if (string.IsNullOrEmpty(categoryName)) return null;
+            return categories.FirstOrDefault(c => c.Name == categoryName)?.Id;
+        }
+
+        private int? GetLocationIdFromName(string? locationName, IEnumerable<LocationOption> locations)
+        {
+            if (string.IsNullOrEmpty(locationName)) return null;
+            return locations.FirstOrDefault(l => l.Name == locationName)?.Id;
+        }
+
+        #endregion
     }
 }

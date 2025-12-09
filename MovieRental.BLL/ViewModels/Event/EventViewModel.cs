@@ -9,7 +9,6 @@ namespace MovieRental.BLL.ViewModels.Event
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
-        public string? Location { get; set; }
         public required string ImageUrl { get; set; }
         public string? CoverImageUrl { get; set; }
         public DateTime EventDate { get; set; }
@@ -26,10 +25,11 @@ namespace MovieRental.BLL.ViewModels.Event
         public string? ContactEmail { get; set; }
         public string? Venue { get; set; }
         public string? GoogleMapsUrl { get; set; }
-
-        public string? Categories { get; set; }
-        public string? Languages { get; set; }
         public string? AgeRestriction { get; set; }
+
+        // Related Entities
+        public string? CategoryName { get; set; }
+        public string? LocationName { get; set; }
         public List<PersonViewModel>? Artists { get; set; }
 
         public int DaysUntilEvent => (EventDate - DateTime.Now).Days;
@@ -45,9 +45,6 @@ namespace MovieRental.BLL.ViewModels.Event
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
-        public string? Location { get; set; }
-        public string? Categories { get; set; }
-        public string? Languages { get; set; }
         public int EventId { get; set; }
         public EventViewModel? Event { get; set; }
         public int LanguageId { get; set; }

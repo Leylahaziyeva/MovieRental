@@ -40,7 +40,6 @@ namespace MovieRental.BLL
             services.AddScoped<ICurrencyService, CurrencyManager>();
 
             services.AddScoped<IAccountService, AccountManager>();
-
             services.AddScoped<IHomeService, HomeManager>();
             services.AddScoped<IHeaderService, HeaderManager>();
             services.AddScoped<ISearchHistoryService, SearchHistoryManager>();
@@ -50,8 +49,13 @@ namespace MovieRental.BLL
             services.AddScoped<IOfferService, OfferManager>();
             services.AddScoped<IGenreService, GenreManager>();
             services.AddScoped<IMovieService, MovieManager>();
+            services.AddScoped<IWatchlistService, WatchlistManager>();
+            services.AddScoped<IUserListService, UserListManager>();
             services.AddScoped<IEventService, EventManager>();
+            services.AddScoped<IEventCategoryService, EventCategoryManager>();
             services.AddScoped<ISportService, SportManager>();
+            services.AddScoped<ISportTypeService, SportTypeManager>();
+            services.AddScoped<ILocationService, LocationManager>();
             services.AddScoped<IFooterService, FooterManager>();
 
             //services.AddScoped<IProductTranslationService, ProductTranslationManager>();

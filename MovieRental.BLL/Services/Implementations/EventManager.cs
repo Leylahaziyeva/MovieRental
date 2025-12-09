@@ -5,7 +5,6 @@ using MovieRental.BLL.Services.Contracts;
 using MovieRental.BLL.ViewModels.Event;
 using MovieRental.BLL.ViewModels.Person;
 using MovieRental.DAL.DataContext.Entities;
-using MovieRental.DAL.Repositories.Contracts;
 using System.Linq.Expressions;
 
 namespace MovieRental.BLL.Services.Implementations
@@ -15,19 +14,27 @@ namespace MovieRental.BLL.Services.Implementations
         private readonly ICookieService _cookieService;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IRepositoryAsync<Person> _personRepository;
+        private readonly ILocationService _locationService;
+        private readonly IEventCategoryService _eventCategoryService;
 
         public EventManager(
             IRepositoryAsync<Event> repository,
             IMapper mapper,
             ICookieService cookieService,
             ICloudinaryService cloudinaryService,
-            IRepositoryAsync<Person> personRepository)
+            IRepositoryAsync<Person> personRepository,
+            ILocationService locationService,
+            IEventCategoryService eventCategoryService)
             : base(repository, mapper)
         {
             _cookieService = cookieService;
             _cloudinaryService = cloudinaryService;
             _personRepository = personRepository;
+            _locationService = locationService;
+            _eventCategoryService = eventCategoryService;
         }
+
+        #region Get Methods
 
         public async Task<IEnumerable<EventViewModel>> GetUpcomingEventsAsync(int languageId)
         {
@@ -38,12 +45,16 @@ namespace MovieRental.BLL.Services.Implementations
                 include: query => query
                     .Include(e => e.EventTranslations.Where(et => et.LanguageId == languageId))
                     .Include(e => e.Currency)
-                    .Include(e => e.Artists)!
+                    .Include(e => e.EventCategory!)
+                        .ThenInclude(ec => ec.Translations.Where(t => t.LanguageId == languageId))
+                    .Include(e => e.Location!)
+                        .ThenInclude(l => l.Translations.Where(t => t.LanguageId == languageId))
+                    .Include(e => e.Artists!.Where(a => a.PersonType == PersonType.Artist))
                         .ThenInclude(a => a.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
                 AsNoTracking: true
             );
 
-            return Mapper.Map<IEnumerable<EventViewModel>>(events);
+            return await MapToViewModelsAsync(events.ToList(), languageId);
         }
 
         public async Task<EventViewModel?> GetEventByIdWithTranslationsAsync(int id, int languageId)
@@ -53,84 +64,114 @@ namespace MovieRental.BLL.Services.Implementations
                 include: query => query
                     .Include(e => e.EventTranslations.Where(et => et.LanguageId == languageId))
                     .Include(e => e.Currency)
-                    .Include(e => e.Artists)!
+                    .Include(e => e.EventCategory!)
+                        .ThenInclude(ec => ec.Translations.Where(t => t.LanguageId == languageId))
+                    .Include(e => e.Location!)
+                        .ThenInclude(l => l.Translations.Where(t => t.LanguageId == languageId))
+                    .Include(e => e.Artists!.Where(a => a.PersonType == PersonType.Artist))
                         .ThenInclude(a => a.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
                 AsNoTracking: true
             );
 
-            return Mapper.Map<EventViewModel>(eventEntity);
+            if (eventEntity == null) return null;
+
+            var viewModels = await MapToViewModelsAsync(new List<Event> { eventEntity }, languageId);
+            return viewModels.FirstOrDefault();
         }
+
+        #endregion
+
+        #region Filtering & Pagination
 
         public async Task<EventFilterResultViewModel> GetFilteredEventsAsync(EventFilterViewModel filter)
         {
-            var query = await Repository.GetAllAsync(
-                predicate: e => e.IsActive,
-                include: q => q
-                    .Include(e => e.EventTranslations.Where(et => et.LanguageId == filter.CurrentLanguageId))
-                    .Include(e => e.Currency)
-                    .Include(e => e.Artists)!
-                        .ThenInclude(a => a.PersonTranslations!.Where(pt => pt.LanguageId == filter.CurrentLanguageId)),
-                AsNoTracking: true
-            );
+            Expression<Func<Event, bool>> predicate = e => e.IsActive;
 
             if (!string.IsNullOrWhiteSpace(filter.SearchQuery))
             {
-                query = query.Where(e =>
+                predicate = predicate.And(e =>
                     e.EventTranslations.Any(et =>
-                        et.Name.Contains(filter.SearchQuery, StringComparison.OrdinalIgnoreCase) ||
-                        et.Description.Contains(filter.SearchQuery, StringComparison.OrdinalIgnoreCase))
-                ).ToList();
+                        et.LanguageId == filter.CurrentLanguageId &&
+                        (et.Name.Contains(filter.SearchQuery) ||
+                         et.Description.Contains(filter.SearchQuery))));
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.Location))
+            if (filter.LocationId.HasValue)
             {
-                query = query.Where(e =>
-                    e.EventTranslations.Any(et =>
-                        et.Location.Contains(filter.Location, StringComparison.OrdinalIgnoreCase))
-                ).ToList();
+                predicate = predicate.And(e => e.LocationId == filter.LocationId.Value);
+            }
+
+            if (filter.EventCategoryId.HasValue)
+            {
+                predicate = predicate.And(e => e.EventCategoryId == filter.EventCategoryId.Value);
             }
 
             if (filter.FromDate.HasValue)
             {
-                query = query.Where(e => e.EventDate >= filter.FromDate.Value).ToList();
+                predicate = predicate.And(e => e.EventDate >= filter.FromDate.Value);
             }
 
             if (filter.ToDate.HasValue)
             {
-                query = query.Where(e => e.EventDate <= filter.ToDate.Value).ToList();
+                predicate = predicate.And(e => e.EventDate <= filter.ToDate.Value);
             }
 
             if (filter.MaxPrice.HasValue)
             {
-                query = query.Where(e => e.Price.HasValue && e.Price <= filter.MaxPrice.Value).ToList();
+                predicate = predicate.And(e => e.Price.HasValue && e.Price <= filter.MaxPrice.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.Category))
-            {
-                query = query.Where(e =>
-                    e.EventTranslations.Any(et =>
-                        et.Categories != null &&
-                        et.Categories.Contains(filter.Category, StringComparison.OrdinalIgnoreCase))
-                ).ToList();
-            }
+            Func<IQueryable<Event>, IIncludableQueryable<Event, object>> include = query =>
+                query.Include(e => e.EventTranslations.Where(et => et.LanguageId == filter.CurrentLanguageId))
+                     .Include(e => e.Currency)
+                     .Include(e => e.EventCategory!)
+                         .ThenInclude(ec => ec.Translations.Where(t => t.LanguageId == filter.CurrentLanguageId))
+                     .Include(e => e.Location!)
+                         .ThenInclude(l => l.Translations.Where(t => t.LanguageId == filter.CurrentLanguageId))
+                     .Include(e => e.Artists!.Where(a => a.PersonType == PersonType.Artist))
+                         .ThenInclude(a => a.PersonTranslations!.Where(pt => pt.LanguageId == filter.CurrentLanguageId));
 
-            var totalCount = query.Count();
+            var (items, totalCount) = await Repository.GetPagedAsync(
+                predicate: predicate,
+                orderBy: query => query.OrderBy(e => e.EventDate),
+                include: include,
+                page: filter.Page,
+                pageSize: filter.PageSize,
+                AsNoTracking: true
+            );
 
-            var paginatedEvents = query
-                .OrderBy(e => e.EventDate)
-                .Skip((filter.Page - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .ToList();
-
-            var events = Mapper.Map<List<EventViewModel>>(paginatedEvents);
+            var events = await MapToViewModelsAsync(items.ToList(), filter.CurrentLanguageId);
 
             return new EventFilterResultViewModel
             {
-                Events = events,
+                Events = events.ToList(),
                 TotalCount = totalCount,
                 Filter = filter
             };
         }
+
+        public async Task<(IEnumerable<EventViewModel> Events, int TotalCount)> GetEventsPagedAsync(EventFilterViewModel filter)
+        {
+            var result = await GetFilteredEventsAsync(filter);
+            return (result.Events, result.TotalCount);
+        }
+
+        public async Task<EventFilterViewModel> GetFilterOptionsAsync(int languageId)
+        {
+            var categories = await _eventCategoryService.GetCategoriesForFilterAsync(languageId);
+            var locations = await _locationService.GetLocationsForFilterAsync(languageId);
+
+            return new EventFilterViewModel
+            {
+                CurrentLanguageId = languageId,
+                Categories = categories.ToList(),
+                Locations = locations.ToList()
+            };
+        }
+
+        #endregion
+
+        #region Create & Update
 
         public override async Task<EventViewModel> CreateAsync(EventCreateViewModel model)
         {
@@ -149,16 +190,12 @@ namespace MovieRental.BLL.Services.Implementations
             eventEntity.UpdatedAt = DateTime.Now;
 
             var currentLanguageId = await _cookieService.GetLanguageIdAsync();
-
             eventEntity.EventTranslations = new List<EventTranslation>
             {
                 new EventTranslation
                 {
                     Name = model.Name,
                     Description = model.Description,
-                    Location = model.Location,
-                    Categories = model.Categories,
-                    Languages = model.Languages,
                     LanguageId = currentLanguageId,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
@@ -170,7 +207,9 @@ namespace MovieRental.BLL.Services.Implementations
                 eventEntity.Artists = new List<Person>();
                 foreach (var artistId in model.SelectedArtistIds)
                 {
-                    var artist = await _personRepository.GetByIdAsync(artistId);
+                    var artist = await _personRepository.GetAsync(
+                        predicate: p => p.Id == artistId && p.PersonType == PersonType.Artist
+                    );
                     if (artist != null)
                     {
                         eventEntity.Artists.Add(artist);
@@ -179,7 +218,9 @@ namespace MovieRental.BLL.Services.Implementations
             }
 
             var createdEntity = await Repository.AddAsync(eventEntity);
-            return Mapper.Map<EventViewModel>(createdEntity);
+
+            var viewModel = await GetEventByIdWithTranslationsAsync(createdEntity.Id, currentLanguageId);
+            return viewModel!;
         }
 
         public override async Task<bool> UpdateAsync(int id, EventUpdateViewModel model)
@@ -223,9 +264,6 @@ namespace MovieRental.BLL.Services.Implementations
             {
                 existingTranslation.Name = model.Name!;
                 existingTranslation.Description = model.Description!;
-                existingTranslation.Location = model.Location!;
-                existingTranslation.Categories = model.Categories;
-                existingTranslation.Languages = model.Languages;
                 existingTranslation.UpdatedAt = DateTime.Now;
             }
             else
@@ -234,9 +272,6 @@ namespace MovieRental.BLL.Services.Implementations
                 {
                     Name = model.Name!,
                     Description = model.Description!,
-                    Location = model.Location!,
-                    Categories = model.Categories,
-                    Languages = model.Languages,
                     LanguageId = currentLanguageId,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
@@ -250,7 +285,9 @@ namespace MovieRental.BLL.Services.Implementations
 
                 foreach (var artistId in model.SelectedArtistIds)
                 {
-                    var artist = await _personRepository.GetByIdAsync(artistId);
+                    var artist = await _personRepository.GetAsync(
+                        predicate: p => p.Id == artistId && p.PersonType == PersonType.Artist
+                    );
                     if (artist != null)
                     {
                         eventEntity.Artists.Add(artist);
@@ -280,6 +317,10 @@ namespace MovieRental.BLL.Services.Implementations
             return await base.DeleteAsync(id);
         }
 
+        #endregion
+
+        #region Artist Management
+
         public async Task<bool> AddArtistsToEventAsync(int eventId, List<int> artistIds)
         {
             var eventEntity = await Repository.GetAsync(
@@ -292,7 +333,8 @@ namespace MovieRental.BLL.Services.Implementations
             foreach (var artistId in artistIds)
             {
                 var artist = await _personRepository.GetByIdAsync(artistId);
-                if (artist != null && !eventEntity.Artists!.Any(a => a.Id == artistId))
+                if (artist != null && artist.PersonType == PersonType.Artist &&
+                    !eventEntity.Artists!.Any(a => a.Id == artistId))
                 {
                     eventEntity.Artists!.Add(artist);
                 }
@@ -322,64 +364,11 @@ namespace MovieRental.BLL.Services.Implementations
             return false;
         }
 
-        public async Task<(IEnumerable<EventViewModel> Events, int TotalCount)> GetEventsPagedAsync(EventFilterViewModel filter)
-        {
-            var languageId = await _cookieService.GetLanguageIdAsync();
+        #endregion
 
-            Expression<Func<Event, bool>> predicate = x => x.IsActive;
+        #region Helper Methods
 
-            if (!string.IsNullOrEmpty(filter.SearchQuery))
-            {
-                predicate = predicate.And(x => x.EventTranslations.Any(et =>
-                    et.LanguageId == languageId &&
-                    et.Name.Contains(filter.SearchQuery)));
-            }
-
-            if (!string.IsNullOrEmpty(filter.Location))
-            {
-                predicate = predicate.And(x => x.EventTranslations.Any(et =>
-                    et.LanguageId == languageId &&
-                    et.Location.Contains(filter.Location)));
-            }
-
-            if (filter.FromDate.HasValue)
-            {
-                predicate = predicate.And(x => x.EventDate >= filter.FromDate.Value);
-            }
-
-            if (filter.ToDate.HasValue)
-            {
-                predicate = predicate.And(x => x.EventDate <= filter.ToDate.Value);
-            }
-
-            if (filter.MaxPrice.HasValue)
-            {
-                predicate = predicate.And(x => x.Price <= filter.MaxPrice.Value);
-            }
-
-            Func<IQueryable<Event>, IIncludableQueryable<Event, object>> include = query =>
-                query.Include(e => e.EventTranslations.Where(et => et.LanguageId == languageId))
-                     .Include(e => e.Currency)
-                     .Include(e => e.Artists)!
-                         .ThenInclude(a => a.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
-
-            var (items, totalCount) = await Repository.GetPagedAsync(
-                predicate: predicate,
-                orderBy: query => query.OrderBy(x => x.EventDate),
-                include: include,
-                page: filter.Page,
-                pageSize: filter.PageSize,
-                AsNoTracking: true
-            );
-
-            var events = await MapToViewModelsAsync(items, languageId);
-
-            return (events, totalCount);
-        }
-
-        // Replace the MapToViewModelsAsync method (starting at line 380) with this:
-
-        private Task<IEnumerable<EventViewModel>> MapToViewModelsAsync(IList<Event> events, int languageId)
+        private async Task<IEnumerable<EventViewModel>> MapToViewModelsAsync(List<Event> events, int languageId)
         {
             var viewModels = new List<EventViewModel>();
 
@@ -392,7 +381,18 @@ namespace MovieRental.BLL.Services.Implementations
                 {
                     viewModel.Name = translation.Name;
                     viewModel.Description = translation.Description;
-                    viewModel.Location = translation.Location;
+                }
+
+                if (eventEntity.EventCategory != null)
+                {
+                    var categoryTranslation = eventEntity.EventCategory.Translations?.FirstOrDefault();
+                    viewModel.CategoryName = categoryTranslation?.Name;
+                }
+
+                if (eventEntity.Location != null)
+                {
+                    var locationTranslation = eventEntity.Location.Translations?.FirstOrDefault();
+                    viewModel.LocationName = locationTranslation?.Name;
                 }
 
                 if (eventEntity.Artists?.Any() == true)
@@ -419,7 +419,9 @@ namespace MovieRental.BLL.Services.Implementations
                 viewModels.Add(viewModel);
             }
 
-            return Task.FromResult<IEnumerable<EventViewModel>>(viewModels);
+            return viewModels;
         }
+
+        #endregion
     }
 }

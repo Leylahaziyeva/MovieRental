@@ -5,5 +5,6 @@ namespace MovieRental.BLL.Services.Contracts
 {
     public interface ILanguageService : ICrudService<Language, LanguageViewModel, LanguageCreateViewModel, LanguageUpdateViewModel>
     {
+        Task<IEnumerable<LanguageViewModel>> GetAllWithTranslationsAsync(int? translationLanguageId = null);
     }
 }

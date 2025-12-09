@@ -4,11 +4,11 @@
     ViewData["Title"] = Model.Title ?? localizer.GetValue("MovieDetails");
 }
 
-<div class="cover-pic">
+<div class="cover-pic" style="height: 450px; overflow: hidden; position: relative;">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <div class="position-absolute bg-white shadow-sm-sm rounded text-center p-2 mt-4 love-box">
+                <div class="position-absolute bg-white shadow-sm-sm rounded text-center p-2 mt-4 love-box" style="z-index: 10;">
                     <h6 class="text-gray-900 mb-0 font-weight-bold">
                         <i class="fas fa-heart text-danger"></i> @Model.LovePercentage%
                     </h6>
@@ -17,7 +17,7 @@
             </div>
         </div>
     </div>
-    <img src="~/img/@Model.CoverImageUrl" class="img-fluid" alt="@Model.Title">
+    <img src="@Model.CoverImageUrl" class="img-fluid" alt="@Model.Title" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
 </div>
 
 <div class="container">
@@ -25,7 +25,7 @@
         <!-- Left Sidebar -->
         <div class="col-xl-3 col-lg-3">
             <div class="bg-white p-3 widget shadow-sm rounded mb-4">
-                <img src="~/img/@Model.PosterImageUrl" class="img-fluid rounded" alt="@Model.Title">
+                <img src="@Model.PosterImageUrl" class="img-fluid rounded" alt="@Model.Title">
                 
                 @if (!string.IsNullOrEmpty(Model.DirectorNames))
                 {
@@ -220,7 +220,7 @@
                                         <div class="artist-list mb-3">
                                             <a class="d-flex align-items-center" href="#">
                                                 <div class="dropdown-list-image mr-3">
-                                                    <img class="rounded-circle" src="~/img/@(actor.ProfileImageUrl ?? "/img/default-avatar.png")" alt="@actor.Name">
+                                                    <img class="rounded-circle" src="@(actor.ProfileImageUrl ?? "/img/default-avatar.png")" alt="@actor.Name">
                                                     <div class="status-indicator bg-success"></div>
                                                 </div>
                                                 <div class="font-weight-bold">
@@ -242,7 +242,7 @@
                                         <div class="artist-list mb-3">
                                             <a class="d-flex align-items-center" href="#">
                                                 <div class="dropdown-list-image mr-3">
-                                                    <img class="rounded-circle" src="~/img/@(director.ProfileImageUrl ?? "/img/default-avatar.png")" alt="@director.Name">
+                                                    <img class="rounded-circle" src="@(director.ProfileImageUrl ?? "/img/default-avatar.png")" alt="@director.Name">
                                                     <div class="status-indicator bg-success"></div>
                                                 </div>
                                                 <div class="font-weight-bold">
@@ -264,7 +264,7 @@
                                         <div class="artist-list mb-3">
                                             <a class="d-flex align-items-center" href="#">
                                                 <div class="dropdown-list-image mr-3">
-                                                    <img class="rounded-circle" src="~/img/@(writer.ProfileImageUrl ?? "/img/default-avatar.png")" alt="@writer.Name">
+                                                    <img class="rounded-circle" src="@(writer.ProfileImageUrl ?? "/img/default-avatar.png")" alt="@writer.Name">
                                                     <div class="status-indicator bg-success"></div>
                                                 </div>
                                                 <div class="font-weight-bold">
@@ -294,7 +294,7 @@
                                         }
                                         <div class="embed-responsive embed-responsive-16by9">
                                             <video class="embed-responsive-item" controls>
-                                                <source src="~/img/@video.VideoUrl" type="video/mp4">
+                                                <source src="@video.VideoUrl" type="video/mp4">
                                                 @localizer.GetValue("BrowserNotSupportVideo")
                                             </video>
                                         </div>
@@ -312,7 +312,7 @@
                                 @foreach (var image in Model.Images)
                                 {
                                     <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
-                                        <img src="~/img/@image.ImageUrl" class="img-fluid rounded shadow-sm" alt="@localizer.GetValue("MovieImage")">
+                                        <img src="@image.ImageUrl" class="img-fluid rounded shadow-sm" alt="@localizer.GetValue("MovieImage")">
                                     </div>
                                 }
                             </div>

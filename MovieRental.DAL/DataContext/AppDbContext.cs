@@ -11,7 +11,9 @@ namespace MovieRental.DAL.DataContext
         }
 
         public required DbSet<Language> Languages { get; set; }
+        public required DbSet<LanguageTranslation> LanguageTranslations { get; set; }
         public required DbSet<Currency> Currencies { get; set; }
+        public required DbSet<CurrencyTranslation> CurrencyTranslations { get; set; }
         public required DbSet<Logo> Logos { get; set; }
         public required DbSet<Slider> Sliders { get; set; }
         public required DbSet<SliderTranslation> SliderTranslations { get; set; }
@@ -23,18 +25,26 @@ namespace MovieRental.DAL.DataContext
         public required DbSet<MovieVideo> MovieVideos { get; set; }
         public required DbSet<MovieVideoTranslation> MovieVideoTranslations { get; set; }
         public required DbSet<MovieSocialLink> MovieSocialLinks { get; set; }
+        public required DbSet<UserList> UserLists { get; set; }
+        public required DbSet<UserListMovie> UserListMovies { get; set; }
+        public required DbSet<UserWatchlist> UserWatchlists { get; set; }
         public required DbSet<Genre> Genres { get; set; }
         public required DbSet<GenreTranslation> GenreTranslations { get; set; }
         public required DbSet<Event> Events { get; set; }
         public required DbSet<EventTranslation> EventTranslations { get; set; }
+        public required DbSet<EventCategory> EventCategories { get; set; }
+        public required DbSet<EventCategoryTranslation> EventCategoryTranslations { get; set; }
         public required DbSet<Sport> Sports { get; set; }
         public required DbSet<SportTranslation> SportTranslations { get; set; }
+        public required DbSet<SportType> SportTypes { get; set; }
+        public required DbSet<SportTypeTranslation> SportTypeTranslations { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<LocationTranslation> LocationTranslations { get; set; }
         public required DbSet<Person> Persons { get; set; }
         public required DbSet<PersonTranslation> PersonTranslations { get; set; }
         public required DbSet<Review> Reviews { get; set; }
         public required DbSet<ReviewReaction> ReviewReactions { get; set; }
         public required DbSet<ShareLog> ShareLogs { get; set; }
-        public required DbSet<UserWatchlist> UserWatchlists { get; set; }
         public required DbSet<Rental> Rentals { get; set; }
         public required DbSet<Offer> Offers { get; set; }
         public required DbSet<OfferTranslation> OfferTranslations { get; set; }
@@ -46,6 +56,109 @@ namespace MovieRental.DAL.DataContext
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            #region Currency Translation Configuration
+
+            modelBuilder.Entity<CurrencyTranslation>()
+                .HasOne(ct => ct.Currency)
+                .WithMany(c => c.Translations)
+                .HasForeignKey(ct => ct.CurrencyId)
+                .OnDelete(DeleteBehavior.Cascade); 
+
+            modelBuilder.Entity<CurrencyTranslation>()
+                .HasOne(ct => ct.Language)
+                .WithMany()  
+                .HasForeignKey(ct => ct.LanguageId)
+                .OnDelete(DeleteBehavior.Restrict);  
+
+            modelBuilder.Entity<CurrencyTranslation>()
+                .HasIndex(ct => new { ct.CurrencyId, ct.LanguageId })
+                .IsUnique();
+
+            #endregion
+
+            #region Language Translation Configuration
+
+            modelBuilder.Entity<LanguageTranslation>()
+                .HasOne(lt => lt.Language)
+                .WithMany(l => l.LanguageTranslations)
+                .HasForeignKey(lt => lt.LanguageId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LanguageTranslation>()
+                .HasOne(lt => lt.TranslationLanguage)
+                .WithMany()  
+                .HasForeignKey(lt => lt.TranslationLanguageId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LanguageTranslation>()
+                .HasIndex(lt => new { lt.LanguageId, lt.TranslationLanguageId })
+                .IsUnique();
+
+            #endregion
+
+            #region UserWatchlist Configuration
+
+            modelBuilder.Entity<UserWatchlist>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Movie)
+                    .WithMany()
+                    .HasForeignKey(e => e.MovieId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(e => new { e.UserId, e.MovieId }).IsUnique();
+            });
+
+            #endregion
+
+            #region UserList Configuration
+
+            modelBuilder.Entity<UserList>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(1000);
+            });
+
+            #endregion
+
+            #region UserListMovie Configuration
+
+            modelBuilder.Entity<UserListMovie>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.UserList)
+                    .WithMany(ul => ul.UserListMovies)
+                    .HasForeignKey(e => e.UserListId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Movie)
+                    .WithMany()
+                    .HasForeignKey(e => e.MovieId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(e => new { e.UserListId, e.MovieId }).IsUnique();
+            });
+
+            #endregion
 
             #region Person Configuration
 
@@ -264,36 +377,97 @@ namespace MovieRental.DAL.DataContext
 
             #region Event Configuration
 
-            modelBuilder.Entity<Event>()
-                .HasMany(e => e.Artists)
-                .WithMany()
-                .UsingEntity<Dictionary<string, object>>(
-                    "EventArtists",
-                    j => j.HasOne<Person>().WithMany().HasForeignKey("PersonId").OnDelete(DeleteBehavior.Cascade),
-                    j => j.HasOne<Event>().WithMany().HasForeignKey("EventId").OnDelete(DeleteBehavior.Cascade)
-                );
+            modelBuilder.Entity<Event>(entity =>
+            {
+                entity.HasKey(e => e.Id);
 
-            modelBuilder.Entity<Event>()
-                .HasOne(e => e.Currency)
-                .WithMany()
-                .HasForeignKey(e => e.CurrencyId)
-                .OnDelete(DeleteBehavior.SetNull);
+                entity.Property(e => e.ImageUrl)
+                    .IsRequired()
+                    .HasMaxLength(500);
 
-            modelBuilder.Entity<Event>()
-                .HasMany(e => e.EventTranslations)
-                .WithOne(et => et.Event)
-                .HasForeignKey(et => et.EventId)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(e => e.CoverImageUrl)
+                    .HasMaxLength(500);
 
-            modelBuilder.Entity<EventTranslation>()
-                .HasOne(et => et.Language)
-                .WithMany()
-                .HasForeignKey(et => et.LanguageId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(e => e.Price)
+                    .HasColumnType("decimal(18,2)");
 
-            modelBuilder.Entity<EventTranslation>()
-                .HasIndex(et => new { et.EventId, et.LanguageId })
-                .IsUnique();
+                entity.Property(e => e.ContactPhone)
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.ContactEmail)
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.Venue)
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.GoogleMapsUrl)
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.AgeRestriction)
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.IsActive)
+                    .HasDefaultValue(true);
+
+                entity.Property(e => e.IsFeatured)
+                    .HasDefaultValue(false);
+
+                entity.HasOne(e => e.Currency)
+                    .WithMany()
+                    .HasForeignKey(e => e.CurrencyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.EventCategory)
+                    .WithMany(ec => ec.Events)
+                    .HasForeignKey(e => e.EventCategoryId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Location)
+                    .WithMany(l => l.Events)
+                    .HasForeignKey(e => e.LocationId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(e => e.Artists)
+                    .WithMany()
+                    .UsingEntity(j => j.ToTable("EventArtists"));
+
+                entity.HasIndex(e => e.EventDate);
+                entity.HasIndex(e => e.IsActive);
+                entity.HasIndex(e => e.IsFeatured);
+                entity.HasIndex(e => e.EventCategoryId);
+                entity.HasIndex(e => e.LocationId);
+                entity.HasIndex(e => e.IsDeleted);
+
+                entity.HasQueryFilter(e => !e.IsDeleted);
+            });
+
+            modelBuilder.Entity<EventTranslation>(entity =>
+            {
+                entity.HasKey(et => et.Id);
+
+                entity.Property(et => et.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                entity.Property(et => et.Description)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+
+                entity.HasOne(et => et.Event)
+                    .WithMany(e => e.EventTranslations)
+                    .HasForeignKey(et => et.EventId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(et => et.Language)
+                    .WithMany()
+                    .HasForeignKey(et => et.LanguageId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(et => new { et.EventId, et.LanguageId })
+                    .IsUnique();
+
+                entity.HasQueryFilter(et => !et.IsDeleted);
+            });
 
             #endregion
 
@@ -310,28 +484,23 @@ namespace MovieRental.DAL.DataContext
                 entity.Property(s => s.CoverImageUrl)
                     .HasMaxLength(500);
 
-                entity.Property(s => s.Venue)
+                entity.Property(s => s.Price)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(s => s.ContactPhone)
+                    .HasMaxLength(50);
+
+                entity.Property(s => s.ContactEmail)
                     .HasMaxLength(200);
+
+                entity.Property(s => s.Venue)
+                    .HasMaxLength(500);
 
                 entity.Property(s => s.GoogleMapsUrl)
                     .HasMaxLength(500);
 
-                entity.Property(s => s.ContactPhone)
-                    .HasMaxLength(20);
-
-                entity.Property(s => s.ContactEmail)
-                    .HasMaxLength(100);
-
-                entity.Property(s => s.Categories)
-                    .HasMaxLength(500); 
-
-                entity.Property(s => s.Languages)
-                    .HasMaxLength(200); 
-
                 entity.Property(s => s.AgeRestriction)
-                    .HasMaxLength(10); 
-                entity.Property(s => s.Price)
-                    .HasColumnType("decimal(18,2)");
+                    .HasMaxLength(50);
 
                 entity.Property(s => s.IsActive)
                     .HasDefaultValue(true);
@@ -339,46 +508,34 @@ namespace MovieRental.DAL.DataContext
                 entity.Property(s => s.IsFeatured)
                     .HasDefaultValue(false);
 
+                entity.HasOne(s => s.Currency)
+                    .WithMany()
+                    .HasForeignKey(s => s.CurrencyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(s => s.SportType)
+                    .WithMany(st => st.Sports)
+                    .HasForeignKey(s => s.SportTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(s => s.Location)
+                    .WithMany(l => l.Sports)
+                    .HasForeignKey(s => s.LocationId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(s => s.Players)
+                    .WithMany()
+                    .UsingEntity(j => j.ToTable("SportPlayers"));
+
                 entity.HasIndex(s => s.EventDate);
                 entity.HasIndex(s => s.IsActive);
                 entity.HasIndex(s => s.IsFeatured);
+                entity.HasIndex(s => s.SportTypeId);
+                entity.HasIndex(s => s.LocationId);
                 entity.HasIndex(s => s.IsDeleted);
 
                 entity.HasQueryFilter(s => !s.IsDeleted);
             });
-
-            modelBuilder.Entity<Sport>()
-                .HasMany(s => s.Players)
-                .WithMany()
-                .UsingEntity<Dictionary<string, object>>(
-                    "SportPlayers",
-                    j => j.HasOne<Person>()
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade), 
-                    j => j.HasOne<Sport>()
-                        .WithMany()
-                        .HasForeignKey("SportId")
-                        .OnDelete(DeleteBehavior.Cascade), 
-                    j =>
-                    {
-                        j.HasKey("SportId", "PersonId");
-                        j.HasIndex("PersonId");
-                        j.HasIndex("SportId");
-                    }
-                );
-
-            modelBuilder.Entity<Sport>()
-                .HasOne(s => s.Currency)
-                .WithMany()
-                .HasForeignKey(s => s.CurrencyId)
-                .OnDelete(DeleteBehavior.SetNull); 
-
-            modelBuilder.Entity<Sport>()
-                .HasMany(s => s.SportTranslations)
-                .WithOne(st => st.Sport)
-                .HasForeignKey(st => st.SportId)
-                .OnDelete(DeleteBehavior.Cascade); 
 
             modelBuilder.Entity<SportTranslation>(entity =>
             {
@@ -394,23 +551,66 @@ namespace MovieRental.DAL.DataContext
 
                 entity.Property(st => st.Location)
                     .IsRequired()
-                    .HasMaxLength(300);
+                    .HasMaxLength(500);
+
+                entity.HasOne(st => st.Sport)
+                    .WithMany(s => s.SportTranslations)
+                    .HasForeignKey(st => st.SportId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(st => st.Language)
+                    .WithMany()
+                    .HasForeignKey(st => st.LanguageId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasIndex(st => new { st.SportId, st.LanguageId })
                     .IsUnique();
 
-                entity.HasIndex(st => st.LanguageId);
-
-
                 entity.HasQueryFilter(st => !st.IsDeleted);
             });
 
-            modelBuilder.Entity<SportTranslation>()
-                .HasOne(st => st.Language)
-                .WithMany()
-                .HasForeignKey(st => st.LanguageId)
-                .OnDelete(DeleteBehavior.Restrict); 
+            #endregion
 
+            #region Location Configuration
+            modelBuilder.Entity<Location>(entity =>
+            {
+                entity.HasKey(l => l.Id);
+
+                entity.Property(l => l.CreatedAt)
+                    .IsRequired();
+
+                entity.Property(l => l.UpdatedAt)
+                    .IsRequired();
+
+                entity.HasIndex(l => l.IsDeleted);
+                entity.HasQueryFilter(l => !l.IsDeleted);
+            });
+
+            modelBuilder.Entity<LocationTranslation>(entity =>
+            {
+                entity.HasKey(lt => lt.Id);
+
+                entity.Property(lt => lt.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.HasIndex(lt => new { lt.LocationId, lt.LanguageId })
+                    .IsUnique();
+
+                entity.HasQueryFilter(lt => !lt.IsDeleted);
+            });
+
+            modelBuilder.Entity<LocationTranslation>()
+                .HasOne(lt => lt.Location)
+                .WithMany(l => l.Translations)
+                .HasForeignKey(lt => lt.LocationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LocationTranslation>()
+                .HasOne(lt => lt.Language)
+                .WithMany()
+                .HasForeignKey(lt => lt.LanguageId)
+                .OnDelete(DeleteBehavior.Restrict);
             #endregion
 
             #region Review Configuration

@@ -1,0 +1,73 @@
+﻿@model IEnumerable<MovieViewModel>
+
+@foreach (var movie in Model)
+{
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card m-card shadow-sm border-0">
+            <div class="m-card-cover position-relative">
+                <a href="@Url.Action("Details", "Movie", new { id = movie.Id })">
+                    <div class="position-absolute bg-white shadow-sm rounded text-center p-2 m-2 love-box">
+                        <h6 class="text-gray-900 mb-0 font-weight-bold">
+                            <i class="fas fa-heart text-danger"></i> @movie.LovePercentage%
+                        </h6>
+                        <small class="text-muted">@movie.VotesCount.ToString("N0")</small>
+                    </div>
+                    <img src="@movie.PosterImageUrl" class="card-img-top" alt="@movie.Title">
+                </a>
+            </div>
+            <div class="card-body p-3">
+                <a href="@Url.Action("Details", "Movie", new { id = movie.Id })" class="text-decoration-none">
+                    <h5 class="card-title text-white mb-1">@movie.Title</h5>
+                    <p class="card-text">
+                        <small class="text-white">@movie.LanguageName</small>
+                        <small class="text-danger ml-2">
+                            <i class="fas fa-calendar-alt fa-sm"></i> @movie.ReleaseDate.ToString("dd MMM yyyy")
+                        </small>
+                    </p>
+                </a>
+                <div class="mt-3">
+                    <button type="button"
+                            class="btn btn-danger btn-block btn-sm btn-remove-watchlist"
+                            data-movie-id="@movie.Id">
+                        <i class="fas fa-trash"></i> @localizer.GetValue("Remove")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@* @foreach (var movie in Model)
+{
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card m-card shadow-sm border-0">
+            <a href="@Url.Action("Details", "Movie", new { id = movie.Id })">
+                <div class="m-card-cover">
+                    <div class="position-absolute bg-white shadow-sm rounded text-center p-2 m-2 love-box">
+                        <h6 class="text-gray-900 mb-0 font-weight-bold">
+                            <i class="fas fa-heart text-danger"></i> @movie.LovePercentage%
+                        </h6>
+                        <small class="text-muted">@movie.VotesCount.ToString("N0")</small>
+                    </div>
+                    <img src="@movie.PosterImageUrl" class="card-img-top" alt="@movie.Title">
+                </div>
+                <div class="card-body p-3">
+                    <h5 class="card-title text-white mb-1">@movie.Title</h5>
+                    <p class="card-text">
+                        <small class="text-white">@movie.LanguageName</small>
+                        <small class="text-danger ml-2">
+                            <i class="fas fa-calendar-alt fa-sm"></i> @movie.ReleaseDate.ToString("dd MMM yyyy")
+                        </small>
+                    </p>
+                    <div class="mt-3">
+                        <button class="btn btn-danger btn-block btn-sm btn-remove-watchlist"
+                                data-movie-id="@movie.Id">
+                            <i class="fas fa-trash"></i> @localizer.GetValue("Remove")
+                        </button>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+}  *@

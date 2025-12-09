@@ -1,0 +1,511 @@
+﻿@model dynamic
+
+@{
+    var filterType = ViewBag.FilterType as string;
+    var actionName = ViewBag.ActionName as string ?? "Index";
+}
+
+<form asp-action="@actionName" method="get" id="sharedFilterForm">
+    @if (filterType == "Movie")
+    {
+        <input type="hidden" name="CurrentLanguageId" value="@(Model.CurrentLanguageId)" />
+        <input type="hidden" name="PageSize" value="@(Model.PageSize)" />
+    }
+
+    <div id="accordion">
+        @* Sort Filter - Yalnız Movie üçün *@
+        @if (filterType == "Movie")
+        {
+            <div class="filters-card border-bottom p-3">
+                <div class="filters-card-header" id="headingSort">
+                    <h6 class="mb-0">
+                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseSort" aria-expanded="false" aria-controls="collapseSort">
+                            @localizer.GetValue("SortBy") <i class="fas fa-angle-down float-right"></i>
+                        </a>
+                    </h6>
+                </div>
+                <div id="collapseSort" class="collapse" aria-labelledby="headingSort" data-parent="#accordion">
+                    <div class="filters-card-body card-shop-filters">
+                        <div class="custom-control custom-radio">
+                            <input type="radio" class="custom-control-input filter-radio" id="sort_relevance" name="Sort" value="" @(string.IsNullOrEmpty(Model.Sort) ? "checked" : "")>
+                            <label class="custom-control-label" for="sort_relevance">@localizer.GetValue("Relevance")</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" class="custom-control-input filter-radio" id="sort_price_asc" name="Sort" value="price_asc" @(Model.Sort == "price_asc" ? "checked" : "")>
+                            <label class="custom-control-label" for="sort_price_asc">@localizer.GetValue("PriceLowToHigh")</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" class="custom-control-input filter-radio" id="sort_price_desc" name="Sort" value="price_desc" @(Model.Sort == "price_desc" ? "checked" : "")>
+                            <label class="custom-control-label" for="sort_price_desc">@localizer.GetValue("PriceHighToLow")</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" class="custom-control-input filter-radio" id="sort_rating" name="Sort" value="rating" @(Model.Sort == "rating" ? "checked" : "")>
+                            <label class="custom-control-label" for="sort_rating">@localizer.GetValue("Rating")</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" class="custom-control-input filter-radio" id="sort_latest" name="Sort" value="latest" @(Model.Sort == "latest" ? "checked" : "")>
+                            <label class="custom-control-label" for="sort_latest">@localizer.GetValue("Latest")</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* Search Filter - Event üçün *@
+        @if (filterType == "Event")
+        {
+            <div class="filters-card border-bottom p-3">
+                <div class="filters-card-header" id="headingSearch">
+                    <h6 class="mb-0">
+                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseSearch" aria-expanded="true" aria-controls="collapseSearch">
+                            @localizer.GetValue("Search")
+                            <i class="fas fa-angle-down float-right"></i>
+                        </a>
+                    </h6>
+                </div>
+                <div id="collapseSearch" class="collapse show" aria-labelledby="headingSearch" data-parent="#accordion">
+                    <div class="filters-card-body card-shop-filters">
+                        <div class="form-group mb-0">
+                            <i class="fas fa-search"></i>
+                            <input type="text" name="SearchQuery" value="@Model.SearchQuery"
+                                   class="form-control" placeholder="@localizer.GetValue("SearchEvents")">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* Genre/Category Filter - Movie, Event, Sport üçün *@
+        <div class="filters-card border-bottom p-3">
+            <div class="filters-card-header" id="headingCategory">
+                <h6 class="mb-0">
+                    <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
+                        @if (filterType == "Movie")
+                        {
+                            @localizer.GetValue("Genre")
+                        }
+                        else
+                        {
+                            @localizer.GetValue("Category")
+                        }
+                        <i class="fas fa-angle-down float-right"></i>
+                    </a>
+                </h6>
+            </div>
+            <div id="collapseCategory" class="collapse show" aria-labelledby="headingCategory" data-parent="#accordion">
+                <div class="filters-card-body card-shop-filters">
+                    @if (filterType == "Movie" && ViewBag.Genres != null)
+                    {
+                        <form class="filters-search mb-3">
+                            <div class="form-group mb-3">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" id="categorySearch" placeholder="@localizer.GetValue("StartTypingToSearch")">
+                            </div>
+                        </form>
+
+                        <div class="category-list">
+                            @foreach (var genre in ViewBag.Genres)
+                            {
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input category-checkbox filter-radio"
+                                           id="category_@genre.Id"
+                                           name="GenreId"
+                                           value="@genre.Id"
+                                           @(Model.GenreId == genre.Id ? "checked" : "")>
+                                    <label class="custom-control-label" for="category_@genre.Id">
+                                        @genre.Name
+                                    </label>
+                                </div>
+                            }
+                            <div class="custom-control custom-radio mt-2">
+                                <input type="radio" class="custom-control-input filter-radio"
+                                       id="category_all"
+                                       name="GenreId"
+                                       value="0"
+                                       @(!Model.GenreId.HasValue || Model.GenreId == 0 ? "checked" : "")>
+                                <label class="custom-control-label text-muted" for="category_all">
+                                    <small>@localizer.GetValue("AllGenres")</small>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                    else if (filterType == "Event" && Model.Categories != null && Model.Categories.Any())
+                    {
+                        <form class="filters-search mb-3">
+                            <div class="form-group mb-3">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" id="categorySearch" placeholder="@localizer.GetValue("StartTypingToSearch")">
+                            </div>
+                        </form>
+
+                        <div class="category-list">
+                            @foreach (var category in Model.Categories)
+                            {
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input category-checkbox filter-radio"
+                                           id="category_@category.Id"
+                                           name="EventCategoryId"
+                                           value="@category.Id"
+                                           @(Model.EventCategoryId == category.Id ? "checked" : "")>
+                                    <label class="custom-control-label" for="category_@category.Id">
+                                        @category.Name <small class="text-black-50">@category.Count</small>
+                                    </label>
+                                </div>
+                            }
+                            <div class="custom-control custom-radio mt-2">
+                                <input type="radio" class="custom-control-input filter-radio"
+                                       id="category_all"
+                                       name="EventCategoryId"
+                                       value=""
+                                       @(!Model.EventCategoryId.HasValue ? "checked" : "")>
+                                <label class="custom-control-label text-muted" for="category_all">
+                                    <small>@localizer.GetValue("AllCategories")</small>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                    else if (filterType == "Sport" && ViewBag.SportTypes != null)
+                    {
+                        <form class="filters-search mb-3">
+                            <div class="form-group mb-3">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" id="categorySearch" placeholder="@localizer.GetValue("SearchPlaceholder")">
+                            </div>
+                        </form>
+
+                        <div class="category-list">
+                            @foreach (var sportType in ViewBag.SportTypes)
+                            {
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input category-checkbox"
+                                           id="sport_@sportType.Id"
+                                           name="SportTypeIds"
+                                           value="@sportType.Id">
+                                    <label class="custom-control-label" for="sport_@sportType.Id">
+                                        @sportType.Name <small class="text-black-50">@sportType.Count</small>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        <div class="mt-2"><a href="#" class="link">@localizer.GetValue("SeeAll")</a></div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Language Filter - Movie və Sport üçün *@
+        @if (filterType == "Movie" || filterType == "Sport")
+        {
+            <div class="filters-card border-bottom p-3">
+                <div class="filters-card-header" id="headingLanguage">
+                    <h6 class="mb-0">
+                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseLanguage" aria-expanded="true" aria-controls="collapseLanguage">
+                            @localizer.GetValue("SelectLanguage") <i class="fas fa-angle-down float-right"></i>
+                        </a>
+                    </h6>
+                </div>
+                <div id="collapseLanguage" class="collapse show" aria-labelledby="headingLanguage" data-parent="#accordion">
+                    <div class="filters-card-body card-shop-filters">
+                        @if (ViewBag.Languages != null)
+                        {
+                            @foreach (var language in ViewBag.Languages)
+                            {
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input filter-radio"
+                                           id="lang_@language.Id"
+                                           name="Language"
+                                           value="@language.Name"
+                                           @(Model.Language == language.Name ? "checked" : "")>
+                                    <label class="custom-control-label" for="lang_@language.Id">
+                                        @language.Name
+                                        @if (filterType == "Sport")
+                                        {
+                                            <small class="text-black-50">@language.Count</small>
+                                        }
+                                    </label>
+                                </div>
+                            }
+                            <div class="custom-control custom-radio mt-2">
+                                <input type="radio" class="custom-control-input filter-radio"
+                                       id="lang_all"
+                                       name="Language"
+                                       value=""
+                                       @(string.IsNullOrEmpty(Model.Language) ? "checked" : "")>
+                                <label class="custom-control-label text-muted" for="lang_all">
+                                    <small>@localizer.GetValue("AllLanguages")</small>
+                                </label>
+                            </div>
+                        }
+                        @if (filterType == "Sport")
+                        {
+                            <div class="mt-2"><a href="#" class="link">@localizer.GetValue("SeeAll")</a></div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* Location Filter - Event və Sport üçün *@
+        @if (filterType == "Event" || filterType == "Sport")
+        {
+            <div class="filters-card border-bottom p-3">
+                <div class="filters-card-header" id="headingLocation">
+                    <h6 class="mb-0">
+                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseLocation" aria-expanded="@(filterType == "Event" ? "true" : "false")" aria-controls="collapseLocation">
+                            @localizer.GetValue("Location")
+                            <i class="fas fa-angle-down float-right"></i>
+                        </a>
+                    </h6>
+                </div>
+                <div id="collapseLocation" class="collapse @(filterType == "Event" ? "show" : "")" aria-labelledby="headingLocation" data-parent="#accordion">
+                    <div class="filters-card-body card-shop-filters">
+                        @if (filterType == "Event" && Model.Locations != null && Model.Locations.Any())
+                        {
+                            <form class="filters-search mb-3">
+                                <div class="form-group mb-3">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" id="locationSearch" placeholder="@localizer.GetValue("StartTypingToSearch")">
+                                </div>
+                            </form>
+
+                            <div class="location-list">
+                                @foreach (var location in Model.Locations)
+                                {
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input location-checkbox filter-radio"
+                                               id="location_@location.Id"
+                                               name="LocationId"
+                                               value="@location.Id"
+                                               @(Model.LocationId == location.Id ? "checked" : "")>
+                                        <label class="custom-control-label" for="location_@location.Id">
+                                            @location.Name <small class="text-black-50">@location.Count</small>
+                                        </label>
+                                    </div>
+                                }
+                                <div class="custom-control custom-radio mt-2">
+                                    <input type="radio" class="custom-control-input filter-radio"
+                                           id="location_all"
+                                           name="LocationId"
+                                           value=""
+                                           @(!Model.LocationId.HasValue ? "checked" : "")>
+                                    <label class="custom-control-label text-muted" for="location_all">
+                                        <small>@localizer.GetValue("AllLocations")</small>
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                        else if (filterType == "Sport" && ViewBag.Locations != null)
+                        {
+                            @foreach (var location in ViewBag.Locations)
+                            {
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input"
+                                           id="location_@location.Id"
+                                           name="LocationIds"
+                                           value="@location.Id">
+                                    <label class="custom-control-label" for="location_@location.Id">
+                                        @location.Name <small class="text-black-50">@location.Count</small>
+                                    </label>
+                                </div>
+                            }
+                            <div class="mt-2"><a href="#" class="link">@localizer.GetValue("SeeAll")</a></div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* Format Filter - Yalnız Movie üçün *@
+        @if (filterType == "Movie")
+        {
+            <div class="filters-card border-bottom p-3">
+                <div class="filters-card-header" id="headingFormat">
+                    <h6 class="mb-0">
+                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseFormat" aria-expanded="false" aria-controls="collapseFormat">
+                            @localizer.GetValue("Format") <i class="fas fa-angle-down float-right"></i>
+                        </a>
+                    </h6>
+                </div>
+                <div id="collapseFormat" class="collapse" aria-labelledby="headingFormat" data-parent="#accordion">
+                    <div class="filters-card-body card-shop-filters">
+                        @if (ViewBag.Formats != null)
+                        {
+                            @foreach (var format in ViewBag.Formats)
+                            {
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input filter-radio"
+                                           id="format_@format"
+                                           name="Format"
+                                           value="@format"
+                                           @(Model.Format == format ? "checked" : "")>
+                                    <label class="custom-control-label" for="format_@format">@format</label>
+                                </div>
+                            }
+                            <div class="custom-control custom-radio mt-2">
+                                <input type="radio" class="custom-control-input filter-radio"
+                                       id="format_all"
+                                       name="Format"
+                                       value=""
+                                       @(string.IsNullOrEmpty(Model.Format) ? "checked" : "")>
+                                <label class="custom-control-label text-muted" for="format_all">
+                                    <small>@localizer.GetValue("AllFormats")</small>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* Year Filter - Yalnız Movie üçün *@
+        @if (filterType == "Movie")
+        {
+            <div class="filters-card border-bottom p-3">
+                <div class="filters-card-header" id="headingYear">
+                    <h6 class="mb-0">
+                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseYear" aria-expanded="false" aria-controls="collapseYear">
+                            @localizer.GetValue("ReleaseYear") <i class="fas fa-angle-down float-right"></i>
+                        </a>
+                    </h6>
+                </div>
+                <div id="collapseYear" class="collapse" aria-labelledby="headingYear" data-parent="#accordion">
+                    <div class="filters-card-body card-shop-filters">
+                        @if (ViewBag.Years != null)
+                        {
+                            <select class="form-control mb-2 filter-select" name="Year">
+                                <option value="">@localizer.GetValue("AllYears")</option>
+                                @foreach (var year in ViewBag.Years)
+                                {
+                                    <option value="@year" selected="@(Model.Year == year ? "selected" : null)">
+                                        @year
+                                    </option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <div class="form-group mb-0">
+                                <input type="number" class="form-control filter-input" name="Year"
+                                       placeholder="@localizer.GetValue("EnterYear")"
+                                       value="@Model.Year"
+                                       min="1900"
+                                       max="@(DateTime.Now.Year + 5)">
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* Date Range Filter - Yalnız Event üçün *@
+        @if (filterType == "Event")
+        {
+            <div class="filters-card border-bottom p-3">
+                <div class="filters-card-header" id="headingDateRange">
+                    <h6 class="mb-0">
+                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseDateRange" aria-expanded="false" aria-controls="collapseDateRange">
+                            @localizer.GetValue("DateRange")
+                            <i class="fas fa-angle-down float-right"></i>
+                        </a>
+                    </h6>
+                </div>
+                <div id="collapseDateRange" class="collapse" aria-labelledby="headingDateRange" data-parent="#accordion">
+                    <div class="filters-card-body card-shop-filters">
+                        <div class="mb-2">
+                            <label class="small">@localizer.GetValue("From")</label>
+                            <input type="date" name="FromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")"
+                                   class="form-control form-control-sm">
+                        </div>
+                        <div>
+                            <label class="small">@localizer.GetValue("To")</label>
+                            <input type="date" name="ToDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")"
+                                   class="form-control form-control-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* Price Filter - Movie və Event üçün *@
+        @if (filterType == "Movie" || filterType == "Event")
+        {
+            <div class="filters-card border-bottom p-3">
+                <div class="filters-card-header" id="headingPrice">
+                    <h6 class="mb-0">
+                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapsePrice" aria-expanded="false" aria-controls="collapsePrice">
+                            @localizer.GetValue("MaxPrice")
+                            <i class="fas fa-angle-down float-right"></i>
+                        </a>
+                    </h6>
+                </div>
+                <div id="collapsePrice" class="collapse" aria-labelledby="headingPrice" data-parent="#accordion">
+                    <div class="filters-card-body card-shop-filters">
+                        <input type="number" name="MaxPrice" value="@Model.MaxPrice"
+                               class="form-control" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="p-3">
+        <button type="submit" class="btn btn-primary btn-block">
+            <i class="fas fa-filter mr-2"></i>@localizer.GetValue("ApplyFilters")
+        </button>
+    </div>
+</form>
+
+<script>
+    document.getElementById('categorySearch')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const checkboxes = document.querySelectorAll('.category-checkbox');
+
+        checkboxes.forEach(function(checkbox) {
+            const label = checkbox.nextElementSibling.textContent.toLowerCase();
+            const parent = checkbox.closest('.custom-control');
+
+            if (label.includes(searchTerm)) {
+                parent.style.display = 'block';
+            } else {
+                parent.style.display = 'none';
+            }
+        });
+    });
+
+    document.getElementById('locationSearch')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const checkboxes = document.querySelectorAll('.location-checkbox');
+
+        checkboxes.forEach(function(checkbox) {
+            const label = checkbox.nextElementSibling.textContent.toLowerCase();
+            const parent = checkbox.closest('.custom-control');
+
+            if (label.includes(searchTerm)) {
+                parent.style.display = 'block';
+            } else {
+                parent.style.display = 'none';
+            }
+        });
+    });
+
+    document.querySelectorAll('.filter-radio').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            document.getElementById('sharedFilterForm').submit();
+        });
+    });
+
+    document.querySelectorAll('.filter-select').forEach(function(select) {
+        select.addEventListener('change', function() {
+            document.getElementById('sharedFilterForm').submit();
+        });
+    });
+
+    document.querySelectorAll('.filter-input').forEach(function(input) {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('sharedFilterForm').submit();
+            }
+        });
+    });
+</script>

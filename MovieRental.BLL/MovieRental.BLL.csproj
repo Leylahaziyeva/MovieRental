@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Desktop\TEMPLATES\Mailing-master\Mailing-master\Mailing.csproj" />
     <ProjectReference Include="..\MovieRental.DAL\MovieRental.DAL.csproj" />
   </ItemGroup>
 

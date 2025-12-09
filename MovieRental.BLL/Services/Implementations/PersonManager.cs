@@ -184,7 +184,16 @@ namespace MovieRental.BLL.Services.Implementations
 
         public async Task<IEnumerable<PersonViewModel>> GetArtistsAsync()
         {
-            return await GetByPersonTypeAsync(PersonType.Artist);
+            var languageId = await _cookieService.GetLanguageIdAsync();
+
+            var artists = await Repository.GetAllAsync(
+                predicate: p => p.PersonType == PersonType.Artist && !p.IsDeleted,
+                include: query => query
+                    .Include(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
+                AsNoTracking: true
+            );
+
+            return Mapper.Map<IEnumerable<PersonViewModel>>(artists);
         }
     }
 }

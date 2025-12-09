@@ -6,16 +6,16 @@ namespace MovieRental.BLL.ViewModels.Genre
     {
         public int Id { get; set; }
         public required string Name { get; set; }
+        public int DefaultLanguageId { get; set; } = 1;  
+
         public List<GenreTranslationUpdateViewModel> Translations { get; set; } = [];
         public List<SelectListItem>? Languages { get; set; }
     }
 
     public class GenreTranslationUpdateViewModel
     {
-        public int Id { get; set; }
+        public int Id { get; set; }  
         public required string Name { get; set; }
-        public int GenreId { get; set; }
         public int LanguageId { get; set; }
-        public List<SelectListItem>? Languages { get; set; }
     }
 }

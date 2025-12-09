@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MovieRental.BLL.Services.Contracts;
+using MovieRental.BLL.Services.Implementations;
 using MovieRental.BLL.ViewModels.Sport;
 
 namespace MovieRental.MVC.Controllers
@@ -10,41 +11,46 @@ namespace MovieRental.MVC.Controllers
         private readonly ISportService _sportService;
         private readonly IPersonService _personService;
         private readonly ICurrencyService _currencyService;
+        private readonly ICookieService _cookieService;
+        private readonly ISportTypeService _sportTypeService;
+        private readonly ILocationService _locationService;
 
-        public SportController(ISportService sportService, IPersonService personService, ICurrencyService currencyService)
+        public SportController(
+            ISportService sportService,
+            IPersonService personService,
+            ICurrencyService currencyService,
+            ICookieService cookieService,
+            ISportTypeService sportTypeService,
+            ILocationService locationService)
         {
             _sportService = sportService;
             _personService = personService;
             _currencyService = currencyService;
+            _cookieService = cookieService;
+            _sportTypeService = sportTypeService;
+            _locationService = locationService;
         }
-        public async Task<IActionResult> Index(string? location, string? category, string? language, DateTime? startDate, DateTime? endDate)
+
+        public async Task<IActionResult> Index(SportFilterViewModel filter)
         {
-            IEnumerable<SportViewModel> sports;
+            var languageId = await _cookieService.GetLanguageIdAsync();
 
-            if (!string.IsNullOrEmpty(location))
-            {
-                sports = await _sportService.GetSportsByLocationAsync(location);
-            }
-            else if (!string.IsNullOrEmpty(category))
-            {
-                sports = await _sportService.GetSportsByCategoryAsync(category);
-            }
-            else if (startDate.HasValue && endDate.HasValue)
-            {
-                sports = await _sportService.GetSportsByDateRangeAsync(startDate.Value, endDate.Value);
-            }
-            else
-            {
-                sports = await _sportService.GetUpcomingSportsAsync();
-            }
+            var filterOptions = await _sportService.GetFilterOptionsAsync(languageId);
 
-            ViewData["Location"] = location;
-            ViewData["Category"] = category;
-            ViewData["Language"] = language;
-            ViewData["StartDate"] = startDate;
-            ViewData["EndDate"] = endDate;
+            filter.SportTypes = filterOptions.SportTypes;
+            filter.Locations = filterOptions.Locations;
+            filter.Languages = filterOptions.Languages;
 
-            return View(sports);
+            var result = await _sportService.GetFilteredSportsAsync(filter);
+
+            ViewBag.FilterType = "Sport";
+            ViewBag.ActionName = "Index";
+            ViewBag.Filter = result.Filter;  
+            ViewBag.SportTypes = result.Filter.SportTypes;
+            ViewBag.Locations = result.Filter.Locations;
+            ViewBag.Languages = result.Filter.Languages;
+
+            return View(result.Sports);
         }
 
         public async Task<IActionResult> Details(int id)
@@ -61,7 +67,11 @@ namespace MovieRental.MVC.Controllers
 
         public async Task<IActionResult> Create()
         {
+            var languageId = await _cookieService.GetLanguageIdAsync();
+
             var currencies = await _currencyService.GetAllAsync();
+            var sportTypes = await _sportTypeService.GetActiveSportTypesAsync();
+            var locations = await _locationService.GetLocationsForFilterAsync(languageId);
 
             var model = new SportCreateViewModel
             {
@@ -70,6 +80,16 @@ namespace MovieRental.MVC.Controllers
                 Location = string.Empty,
                 ImageFile = null!,
                 EventDate = DateTime.Now.AddDays(7),
+                SportTypeList = sportTypes.Select(st => new SelectListItem
+                {
+                    Value = st.Id.ToString(),
+                    Text = st.Name ?? "Unknown"
+                }).ToList(),
+                LocationList = locations.Select(l => new SelectListItem
+                {
+                    Value = l.Id.ToString(),
+                    Text = l.Name
+                }).ToList(),
                 CurrencyList = currencies.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
@@ -80,9 +100,7 @@ namespace MovieRental.MVC.Controllers
             return View(model);
         }
 
-        /// Sport yaratma (Admin)
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SportCreateViewModel model)
         {
             if (!ModelState.IsValid)
@@ -103,7 +121,6 @@ namespace MovieRental.MVC.Controllers
             }
         }
 
-        /// GET: /Sport/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             var sport = await _sportService.GetByIdAsync(id);
@@ -113,7 +130,11 @@ namespace MovieRental.MVC.Controllers
                 return NotFound();
             }
 
+            var languageId = await _cookieService.GetLanguageIdAsync();
+
             var currencies = await _currencyService.GetAllAsync();
+            var sportTypes = await _sportTypeService.GetActiveSportTypesAsync();
+            var locations = await _locationService.GetLocationsForFilterAsync(languageId);
 
             var model = new SportUpdateViewModel
             {
@@ -131,10 +152,18 @@ namespace MovieRental.MVC.Controllers
                 ContactEmail = sport.ContactEmail,
                 Venue = sport.Venue,
                 GoogleMapsUrl = sport.GoogleMapsUrl,
-                Categories = sport.Categories,
-                Languages = sport.Languages,
                 AgeRestriction = sport.AgeRestriction,
                 CurrencyId = sport.Currency?.Id,
+                SportTypeList = sportTypes.Select(st => new SelectListItem
+                {
+                    Value = st.Id.ToString(),
+                    Text = st.Name ?? "Unknown"
+                }).ToList(),
+                LocationList = locations.Select(l => new SelectListItem
+                {
+                    Value = l.Id.ToString(),
+                    Text = l.Name
+                }).ToList(),
                 CurrencyList = currencies.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
@@ -146,9 +175,7 @@ namespace MovieRental.MVC.Controllers
             return View(model);
         }
 
-        /// Sport redaktə (Admin)
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, SportUpdateViewModel model)
         {
             if (id != model.Id)
@@ -180,9 +207,7 @@ namespace MovieRental.MVC.Controllers
             }
         }
 
-        /// Sport silmə (Admin)
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -205,9 +230,7 @@ namespace MovieRental.MVC.Controllers
             }
         }
 
-        /// Player əlavə et (Admin)
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPlayers(int sportId, List<int> playerIds)
         {
             try
@@ -232,9 +255,7 @@ namespace MovieRental.MVC.Controllers
             }
         }
 
-        /// Player sil (Admin)
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> RemovePlayer(int sportId, int playerId)
         {
             try
@@ -259,14 +280,12 @@ namespace MovieRental.MVC.Controllers
             }
         }
 
-        /// GET: /Sport/GetUpcoming
         public async Task<IActionResult> GetUpcoming()
         {
             var sports = await _sportService.GetUpcomingSportsAsync();
             return Json(sports);
         }
 
-        /// GET: /Sport/GetFeatured
         public async Task<IActionResult> GetFeatured(int count = 4)
         {
             var sports = await _sportService.GetFeaturedSportsAsync(count);
@@ -281,7 +300,7 @@ namespace MovieRental.MVC.Controllers
             if (!sports.Any())
                 return Content(string.Empty);
 
-            return PartialView("_SportCardsPartial", sports); 
+            return PartialView("_SportCardsPartial", sports);
         }
     }
 }

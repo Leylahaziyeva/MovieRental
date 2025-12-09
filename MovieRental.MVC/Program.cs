@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Mailing;
+using Mailing.MailKitImplementations;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MovieRental.BLL;
+using MovieRental.BLL.Mapping;
 using MovieRental.DAL;
 using MovieRental.DAL.DataContext;
 using MovieRental.DAL.DataContext.Entities;
@@ -16,12 +20,26 @@ namespace MovieRental.MVC
 
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-            builder.Services.AddMvc().AddViewLocalization();
 
+            builder.Services.AddMvc().AddViewLocalization().AddDataAnnotationsLocalization(options =>
+            {
+                options.DataAnnotationLocalizerProvider = (type, factory) =>
+                factory.Create("SharedResources", "MovieRental.MVC");
+            });
 
             builder.Services.AddDataAccessLayerServices(builder.Configuration);
             builder.Services.AddBusinessLogicLayerServices();
             //builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile<MappingProfile>();
+                cfg.AddProfile<MovieMappingProfile>();
+                cfg.AddProfile<GenreMappingProfile>();
+                cfg.AddProfile<PersonMappingProfile>();
+                cfg.AddProfile<EventMappingProfile>();
+            });
+
 
             builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
             {
@@ -37,6 +55,8 @@ namespace MovieRental.MVC
 
                 options.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
+            builder.Services.AddScoped<IMailService, MailKitMailService>();
 
             //FilePathConstants.ProductImagePath = Path.Combine(builder.Environment.WebRootPath, "images", "products");
             //FilePathConstants.ProfileImagePath = Path.Combine(builder.Environment.WebRootPath, "images", "users");

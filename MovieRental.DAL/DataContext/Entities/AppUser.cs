@@ -4,8 +4,11 @@ namespace MovieRental.DAL.DataContext.Entities
 {
     public class AppUser : IdentityUser
     {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
+        public required string FirstName { get; set; }
+        public required string LastName { get; set; }
+
+        public string? Company { get; set; }
+        public string? Address { get; set; }
 
         public string? ProfileImage { get; set; }
         public DateTime? DateOfBirth { get; set; }

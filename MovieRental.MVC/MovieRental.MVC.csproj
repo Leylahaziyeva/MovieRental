@@ -15,7 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Desktop\TEMPLATES\Mailing-master\Mailing-master\Mailing.csproj" />
     <ProjectReference Include="..\MovieRental.BLL\MovieRental.BLL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\img\user\" />
   </ItemGroup>
 
 </Project>

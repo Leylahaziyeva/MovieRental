@@ -9,18 +9,23 @@ namespace MovieRental.BLL.Mapping
         public SportMapperProfile()
         {
             CreateMap<Sport, SportViewModel>()
-                .ForMember(dest => dest.FormattedPrice, opt => opt.Ignore()) 
+                .ForMember(dest => dest.FormattedPrice, opt => opt.Ignore())
                 .ForMember(dest => dest.Players, opt => opt.MapFrom(src => src.Players))
                 .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.Currency))
-                .ForMember(dest => dest.Name, opt => opt.Ignore()) 
-                .ForMember(dest => dest.Description, opt => opt.Ignore()) 
-                .ForMember(dest => dest.Location, opt => opt.Ignore()); 
+                .ForMember(dest => dest.Name, opt => opt.Ignore())
+                .ForMember(dest => dest.Description, opt => opt.Ignore())
+                .ForMember(dest => dest.Location, opt => opt.Ignore())
+                .ForMember(dest => dest.Categories, opt => opt.Ignore()) 
+                .ForMember(dest => dest.Languages, opt => opt.Ignore()); 
 
             CreateMap<SportCreateViewModel, Sport>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
                 .ForMember(dest => dest.Currency, opt => opt.Ignore())
+                .ForMember(dest => dest.SportType, opt => opt.Ignore())
+                .ForMember(dest => dest.Location, opt => opt.Ignore())
                 .ForMember(dest => dest.SportTranslations, opt => opt.Ignore())
                 .ForMember(dest => dest.Players, opt => opt.Ignore());
 
@@ -28,7 +33,10 @@ namespace MovieRental.BLL.Mapping
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
                 .ForMember(dest => dest.Currency, opt => opt.Ignore())
+                .ForMember(dest => dest.SportType, opt => opt.Ignore())
+                .ForMember(dest => dest.Location, opt => opt.Ignore())
                 .ForMember(dest => dest.SportTranslations, opt => opt.Ignore())
                 .ForMember(dest => dest.Players, opt => opt.Ignore());
 
@@ -38,14 +46,16 @@ namespace MovieRental.BLL.Mapping
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
                 .ForMember(dest => dest.Sport, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore());
 
             CreateMap<SportTranslationUpdateViewModel, SportTranslation>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
                 .ForMember(dest => dest.Sport, opt => opt.Ignore())
-                .ForMember(dest => dest.Language, opt => opt.Ignore());
+                .ForMember(dest => dest.Language, opt => opt.Ignore()); 
         }
     }
 }

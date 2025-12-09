@@ -79,7 +79,8 @@
     <div class="row">
         @if (Model.FeaturedMovies != null && Model.FeaturedMovies.Any())
         {
-            <partial name="_MovieCardsPartial" model="Model.FeaturedMovies.Take(4)" />
+            var featuredMovies = Model.FeaturedMovies.Take(4).ToList();
+            <partial name="_MovieCardsPartial" model="@featuredMovies" />
         }
         else
         {

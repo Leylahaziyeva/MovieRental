@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MovieRental.BLL.ViewModels.Movie;
+using MovieRental.BLL.ViewModels.Genre;  
 using MovieRental.DAL.DataContext.Entities;
 
 namespace MovieRental.BLL.Mapping
@@ -14,38 +15,71 @@ namespace MovieRental.BLL.Mapping
                         ? src.MovieTranslations.First().Title
                         : "N/A"))
                 .ForMember(dest => dest.Genres, opt => opt.MapFrom(src =>
-                    src.MovieGenres.Select(mg => mg.Genre!.GenreTranslations.First().Name).ToList()))
+                    src.MovieGenres
+                        .Where(mg => mg.Genre != null && !mg.Genre.IsDeleted)
+                        .Select(mg => new GenreViewModel
+                        {
+                            Id = mg.Genre!.Id,
+                            Name = mg.Genre.GenreTranslations
+                                .Where(gt => !gt.IsDeleted)
+                                .Select(gt => gt.Name)
+                                .FirstOrDefault() ?? "N/A"
+                        })
+                        .ToList()))
                 .ForMember(dest => dest.CurrencyCode, opt => opt.MapFrom(src => src.Currency.IsoCode))
                 .ForMember(dest => dest.CurrencySymbol, opt => opt.MapFrom(src => src.Currency.Symbol))
                 .ForMember(dest => dest.FormattedPrice, opt => opt.MapFrom(src =>
                     $"{src.Currency.Symbol}{src.RentalPrice:F2}"))
                 .ForMember(dest => dest.Format, opt => opt.MapFrom(src => src.Format ?? "2D"))
                 .ForMember(dest => dest.Language, opt => opt.MapFrom(src => src.Language))
-                .ForMember(dest => dest.LanguageName, opt => opt.MapFrom(src => src.Language.Name));
+                .ForMember(dest => dest.LanguageName, opt => opt.MapFrom(src =>
+                     src.Language.LanguageTranslations.FirstOrDefault() != null
+                         ? src.Language.LanguageTranslations.First().Name
+                         : "N/A"));
 
 
             CreateMap<Movie, MovieDetailsViewModel>()
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src =>
-                    src.MovieTranslations.First().Title))
+                    src.MovieTranslations.FirstOrDefault() != null
+                        ? src.MovieTranslations.First().Title
+                        : "N/A"))
                 .ForMember(dest => dest.Plot, opt => opt.MapFrom(src =>
-                    src.MovieTranslations.First().Plot))
+                    src.MovieTranslations.FirstOrDefault() != null
+                        ? src.MovieTranslations.First().Plot
+                        : "N/A"))
                 .ForMember(dest => dest.DirectorNames, opt => opt.MapFrom(src =>
-                    src.MovieTranslations.First().Director))  
+                    src.MovieTranslations.FirstOrDefault() != null
+                        ? src.MovieTranslations.First().Director
+                        : "N/A"))
                 .ForMember(dest => dest.WriterNames, opt => opt.MapFrom(src =>
-                    src.MovieTranslations.First().Writers))   
+                    src.MovieTranslations.FirstOrDefault() != null
+                        ? src.MovieTranslations.First().Writers
+                        : "N/A"))
                 .ForMember(dest => dest.CastNames, opt => opt.MapFrom(src =>
-                    src.MovieTranslations.First().Cast))     
-
+                    src.MovieTranslations.FirstOrDefault() != null
+                        ? src.MovieTranslations.First().Cast
+                        : "N/A"))
                 .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.Currency))
                 .ForMember(dest => dest.FormattedPrice, opt => opt.MapFrom(src =>
                     $"{src.Currency.Symbol}{src.RentalPrice:F2}"))
-
                 .ForMember(dest => dest.Language, opt => opt.MapFrom(src => src.Language))
-                .ForMember(dest => dest.LanguageName, opt => opt.MapFrom(src => src.Language.Name))
-
+                .ForMember(dest => dest.LanguageName, opt => opt.MapFrom(src =>
+                     src.Language.LanguageTranslations.FirstOrDefault() != null
+                         ? src.Language.LanguageTranslations.First().Name
+                         : "N/A"))
+                // DƏYIŞIKLIK: Genres üçün də GenreViewModel istifadə edin (əgər varsa)
                 .ForMember(dest => dest.Genres, opt => opt.MapFrom(src =>
-                    src.MovieGenres.Select(mg => mg.Genre)))
-
+                    src.MovieGenres
+                        .Where(mg => mg.Genre != null && !mg.Genre.IsDeleted)
+                        .Select(mg => new GenreViewModel
+                        {
+                            Id = mg.Genre!.Id,
+                            Name = mg.Genre.GenreTranslations
+                                .Where(gt => !gt.IsDeleted)
+                                .Select(gt => gt.Name)
+                                .FirstOrDefault() ?? "N/A"
+                        })
+                        .ToList()))
                 .ForMember(dest => dest.Actors, opt => opt.MapFrom(src =>
                     src.MoviePersons
                         .Where(mp => mp.Role == MoviePersonRole.Actor && mp.IsActive)
@@ -59,7 +93,6 @@ namespace MovieRental.BLL.Mapping
                     src.MoviePersons
                         .Where(mp => mp.Role == MoviePersonRole.Writer && mp.IsActive)
                         .Select(mp => mp.Person)))
-
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(src =>
                     src.MovieImages.Where(mi => mi.IsActive).OrderBy(mi => mi.DisplayOrder)))
                 .ForMember(dest => dest.Videos, opt => opt.MapFrom(src =>
@@ -69,9 +102,9 @@ namespace MovieRental.BLL.Mapping
 
             CreateMap<MovieCreateViewModel, Movie>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.PosterImageUrl, opt => opt.Ignore()) 
-                .ForMember(dest => dest.CoverImageUrl, opt => opt.Ignore())  
-                .ForMember(dest => dest.VideoUrl, opt => opt.Ignore())       
+                .ForMember(dest => dest.PosterImageUrl, opt => opt.Ignore())
+                .ForMember(dest => dest.CoverImageUrl, opt => opt.Ignore())
+                .ForMember(dest => dest.VideoUrl, opt => opt.Ignore())
                 .ForMember(dest => dest.LovePercentage, opt => opt.MapFrom(src => 0))
                 .ForMember(dest => dest.VotesCount, opt => opt.MapFrom(src => 0))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
@@ -93,7 +126,6 @@ namespace MovieRental.BLL.Mapping
                 .ForMember(dest => dest.MovieVideos, opt => opt.Ignore())
                 .ForMember(dest => dest.MovieSocialLinks, opt => opt.Ignore());
 
-            
             CreateMap<MovieTranslation, MovieTranslationViewModel>()
                 .ForMember(dest => dest.DirectorNames, opt => opt.MapFrom(src => src.Director))
                 .ForMember(dest => dest.WriterNames, opt => opt.MapFrom(src => src.Writers))
@@ -111,7 +143,7 @@ namespace MovieRental.BLL.Mapping
                 .ForMember(dest => dest.Cast, opt => opt.MapFrom(src => src.CastNames));
 
             CreateMap<MovieImage, MovieImageViewModel>();
-            
+
             CreateMap<MovieVideo, MovieVideoViewModel>()
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src =>
                     src.MovieVideoTranslations.FirstOrDefault() != null
@@ -123,7 +155,7 @@ namespace MovieRental.BLL.Mapping
                         : ""))
                 .ForMember(dest => dest.VideoType, opt => opt.MapFrom(src =>
                     src.VideoType.ToString()));
-            
+
             CreateMap<MovieSocialLink, MovieSocialLinkViewModel>();
             CreateMap<MovieSocialLinkCreateDto, MovieSocialLink>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

@@ -1,0 +1,445 @@
+﻿@model UserListViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<section class="py-4 bg-light inner-header border-bottom">
+    <div class="container">
+        <div class="row d-flex align-items-center">
+            <div class="col-lg-6 col-md-6">
+                <h4 class="mt-0 mb-0 text-dark">@Model.Name</h4>
+            </div>
+            <div class="col-lg-6 col-md-6 text-right">
+                <div class="breadcrumbs">
+                    <p class="mb-0">
+                        <a asp-controller="Home" asp-action="Index">
+                            <i class="icofont-ui-home"></i> @localizer.GetValue("Home")
+                        </a> /
+                        <a asp-controller="Profile" asp-action="Index">
+                            @localizer.GetValue("Profile")
+                        </a> /
+                        <span>@Model.Name</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container pt-5 mb-4 pb-2">
+    <div class="row">
+        <!-- List Info Card -->
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="mb-2">@Model.Name</h3>
+
+                            @if (!string.IsNullOrEmpty(Model.Description))
+                            {
+                                <p class="text-muted mb-3">@Model.Description</p>
+                            }
+
+                            <div class="d-flex align-items-center gap-3 flex-wrap">
+                                <span class="badge badge-pill @(Model.IsPublic ? "badge-success" : "badge-secondary") px-3 py-2">
+                                    <i class="fas @(Model.IsPublic ? "fa-globe" : "fa-lock") mr-1"></i>
+                                    @(Model.IsPublic? localizer.GetValue("Public") : localizer.GetValue("Private"))
+                                </span>
+
+                                <span class="text-muted">
+                                    <i class="fas fa-film mr-1"></i>
+                                    <strong>@Model.MovieCount</strong> @localizer.GetValue("Movies")
+                                </span>
+
+                                <span class="text-muted">
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    @localizer.GetValue("Created"): @Model.CreatedAt.ToString("dd MMM yyyy")
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 text-md-right mt-3 mt-md-0">
+                            <button type="button" class="btn btn-primary mb-2" id="btn-add-movie">
+                                <i class="fas fa-plus"></i> @localizer.GetValue("AddMovie")
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary mb-2" id="btn-edit-list"
+                                    data-list-id="@Model.Id"
+                                    data-list-name="@Model.Name"
+                                    data-list-description="@Model.Description"
+                                    data-list-public="@Model.IsPublic.ToString().ToLower()">
+                                <i class="fas fa-edit"></i> @localizer.GetValue("EditList")
+                            </button>
+                            <button type="button" class="btn btn-outline-danger mb-2" id="btn-delete-list"
+                                    data-list-id="@Model.Id"
+                                    data-list-name="@Model.Name">
+                                <i class="fas fa-trash"></i> @localizer.GetValue("DeleteList")
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movies Section -->
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">@localizer.GetValue("MoviesInList")</h5>
+                <a asp-controller="Profile" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> @localizer.GetValue("BackToLists")
+                </a>
+            </div>
+
+            @if (Model.MovieCount > 0)
+            {
+                <div class="row" id="movies-container">
+                    @foreach (var movie in Model.Movies)
+                    {
+                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4" data-movie-id="@movie.Id">
+                            <div class="card m-card shadow-sm border-0 h-100">
+                                <div class="m-card-cover position-relative">
+                                    <a href="@Url.Action("Details", "Movie", new { id = movie.Id })">
+                                        <div class="position-absolute bg-white shadow-sm rounded text-center p-2 m-2 love-box">
+                                            <h6 class="text-gray-900 mb-0 font-weight-bold">
+                                                <i class="fas fa-heart text-danger"></i> @movie.LovePercentage%
+                                            </h6>
+                                            <small class="text-muted">@movie.VotesCount.ToString("N0")</small>
+                                        </div>
+                                        <img src="@movie.PosterImageUrl" class="card-img-top" alt="@movie.Title">
+                                    </a>
+                                </div>
+                                <div class="card-body p-3 d-flex flex-column">
+                                    <a href="@Url.Action("Details", "Movie", new { id = movie.Id })" class="text-decoration-none">
+                                        <h5 class="card-title text-white mb-1">@movie.Title</h5>
+                                        <p class="card-text mb-2">
+                                            <small class="text-white">@movie.LanguageName</small>
+                                            <small class="text-danger ml-2">
+                                                <i class="fas fa-calendar-alt fa-sm"></i>
+                                                @movie.ReleaseDate.ToString("dd MMM yyyy")
+                                            </small>
+                                        </p>
+                                        @if (movie.Genres.Any())
+                                        {
+                                            <p class="card-text mb-2">
+                                                @foreach (var genre in movie.Genres.Take(3))
+                                                {
+                                                    <span class="badge badge-secondary mr-1">@genre</span>
+                                                }
+                                            </p>
+                                        }
+                                    </a>
+                                    <div class="mt-auto">
+                                        <button type="button"
+                                                class="btn btn-danger btn-block btn-sm btn-remove-movie"
+                                                data-movie-id="@movie.Id"
+                                                data-movie-title="@movie.Title">
+                                            <i class="fas fa-times"></i> @localizer.GetValue("RemoveFromList")
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-film fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">@localizer.GetValue("NoMoviesInList")</h5>
+                    <p class="text-muted">@localizer.GetValue("AddMoviesToGetStarted")</p>
+                    <button type="button" class="btn btn-primary" id="btn-add-first-movie">
+                        <i class="fas fa-plus"></i> @localizer.GetValue("AddMovie")
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+
+    <script>
+        const listId = @Model.Id;
+
+        // Localization variables
+        const i18n = {
+            confirmRemoveMovie: '@Html.Raw(localizer.GetValue("ConfirmRemoveMovie"))',
+            confirmDeleteList: '@Html.Raw(localizer.GetValue("ConfirmDeleteList"))',
+            errorOccurred: '@Html.Raw(localizer.GetValue("ErrorOccurred"))',
+            pleaseEnterListName: '@Html.Raw(localizer.GetValue("PleaseEnterListName"))',
+            searchFunctionalityComingSoon: '@Html.Raw(localizer.GetValue("SearchFunctionalityComingSoon"))'
+        };
+
+        $(document).ready(function() {
+            // Add Movie Button
+            $('#btn-add-movie, #btn-add-first-movie').click(function() {
+                showAddMovieModal();
+            });
+
+            // Edit List Button
+            $('#btn-edit-list').click(function() {
+                const listName = $(this).data('list-name');
+                const listDescription = $(this).data('list-description');
+                const isPublic = $(this).data('list-public') === 'true';
+
+                showEditListModal(listId, listName, listDescription, isPublic);
+            });
+
+            // Delete List Button
+            $('#btn-delete-list').click(function() {
+                const listName = $(this).data('list-name');
+                deleteList(listId, listName);
+            });
+
+            // Remove Movie from List
+            $(document).on('click', '.btn-remove-movie', function() {
+                const button = $(this);
+                const movieId = button.data('movie-id');
+                const movieTitle = button.data('movie-title');
+
+                removeMovieFromList(movieId, movieTitle);
+            });
+        });
+
+        function showAddMovieModal() {
+            const modalHtml = `
+                <div class="modal fade" id="addMovieModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">@localizer.GetValue("AddMovie")</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="movieSearch">@localizer.GetValue("SearchMovie")</label>
+                                    <input type="text" class="form-control" id="movieSearch" placeholder="@localizer.GetValue("TypeMovieName")">
+                                </div>
+                                <div id="searchResults" class="mt-3">
+                                    <!-- Search results will appear here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $('body').append(modalHtml);
+            $('#addMovieModal').modal('show');
+
+            $('#addMovieModal').on('hidden.bs.modal', function() {
+                $(this).remove();
+            });
+
+            // TODO: Implement movie search functionality
+            $('#movieSearch').on('input', debounce(function() {
+                const query = $(this).val();
+                if (query.length >= 2) {
+                    searchMovies(query);
+                }
+            }, 500));
+        }
+
+        function searchMovies(query) {
+            // TODO: Implement AJAX search
+            $('#searchResults').html(`<p class="text-center">${i18n.searchFunctionalityComingSoon}</p>`);
+        }
+
+        function removeMovieFromList(movieId, movieTitle) {
+            if (!confirm(`${i18n.confirmRemoveMovie}: "${movieTitle}"?`)) {
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("RemoveMovieFromList", "Profile")',
+                type: 'POST',
+                data: {
+                    listId: listId,
+                    movieId: movieId,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $(`[data-movie-id="${movieId}"]`).fadeOut(300, function() {
+                            $(this).remove();
+
+                            // Check if list is empty
+                            if ($('#movies-container').children().length === 0) {
+                                location.reload();
+                            }
+                        });
+
+                        showNotification(response.message, 'success');
+                    } else {
+                        showNotification(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showNotification(i18n.errorOccurred, 'error');
+                }
+            });
+        }
+
+        function showEditListModal(listId, listName, listDescription, isPublic) {
+            const modalHtml = `
+                <div class="modal fade" id="editListModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">@localizer.GetValue("EditList")</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editListForm">
+                                    <div class="form-group">
+                                        <label for="editListName">@localizer.GetValue("ListName")</label>
+                                        <input type="text" class="form-control" id="editListName" value="${listName}" required maxlength="200">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editListDescription">@localizer.GetValue("Description")</label>
+                                        <textarea class="form-control" id="editListDescription" rows="3" maxlength="1000">${listDescription || ''}</textarea>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="editListIsPublic" ${isPublic ? 'checked' : ''}>
+                                        <label class="form-check-label" for="editListIsPublic">
+                                            @localizer.GetValue("MakePublic")
+                                        </label>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">@localizer.GetValue("Cancel")</button>
+                                <button type="button" class="btn btn-primary" id="btnUpdateList">@localizer.GetValue("SaveChanges")</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $('body').append(modalHtml);
+            $('#editListModal').modal('show');
+
+            $('#editListModal').on('hidden.bs.modal', function() {
+                $(this).remove();
+            });
+
+            $('#btnUpdateList').click(function() {
+                updateList(listId);
+            });
+        }
+
+        function updateList(listId) {
+            const formData = {
+                Name: $('#editListName').val().trim(),
+                Description: $('#editListDescription').val().trim(),
+                IsPublic: $('#editListIsPublic').is(':checked')
+            };
+
+            if (!formData.Name) {
+                showNotification(i18n.pleaseEnterListName, 'error');
+                return;
+            }
+
+            const button = $('#btnUpdateList');
+            const originalText = button.text();
+
+            $.ajax({
+                url: '@Url.Action("UpdateList", "Profile")',
+                type: 'POST',
+                data: {
+                    listId: listId,
+                    ...formData,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                beforeSend: function() {
+                    button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#editListModal').modal('hide');
+                        showNotification(response.message, 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        button.prop('disabled', false).text(originalText);
+                        showNotification(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    button.prop('disabled', false).text(originalText);
+                    showNotification(i18n.errorOccurred, 'error');
+                }
+            });
+        }
+
+        function deleteList(listId, listName) {
+            if (!confirm(`${i18n.confirmDeleteList}: "${listName}"?`)) {
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("DeleteList", "Profile")',
+                type: 'POST',
+                data: {
+                    listId: listId,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showNotification(response.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = '@Url.Action("Index", "Profile")';
+                        }, 1000);
+                    } else {
+                        showNotification(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showNotification(i18n.errorOccurred, 'error');
+                }
+            });
+        }
+
+        function showNotification(message, type) {
+            if (typeof toastr !== 'undefined') {
+                toastr[type](message);
+            } else {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const alert = `
+                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed"
+                         style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+                        ${message}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                `;
+                $('body').append(alert);
+
+                setTimeout(function() {
+                    $('.alert').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                }, 3000);
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+}

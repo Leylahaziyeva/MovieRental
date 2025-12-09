@@ -1,4 +1,5 @@
 ﻿using MovieRental.BLL.ViewModels.Sport;
+using MovieRental.BLL.ViewModels.Sport.MovieRental.BLL.ViewModels.Sport;
 using MovieRental.DAL.DataContext.Entities;
 
 namespace MovieRental.BLL.Services.Contracts
@@ -15,9 +16,11 @@ namespace MovieRental.BLL.Services.Contracts
         Task<bool> AddPlayersToSportAsync(int sportId, List<int> playerIds);
         Task<bool> RemovePlayerFromSportAsync(int sportId, int playerId);
         Task<(IEnumerable<SportViewModel> Sports, int TotalCount)> GetSportsPagedAsync(
-        int page = 1,
-        int pageSize = 12,
-        string? location = null,
-        string? category = null);
+            int page = 1,
+            int pageSize = 12,
+            string? location = null,
+            string? category = null);
+        Task<SportFilterResultViewModel> GetFilteredSportsAsync(SportFilterViewModel filter);
+        Task<SportFilterViewModel> GetFilterOptionsAsync(int languageId);
     }
 }

@@ -243,88 +243,30 @@ namespace MovieRental.MVC.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                TempData["Error"] = _localizer.GetValue("PleaseFillAllFields");
+                return RedirectToAction(nameof(Index));
             }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
             {
-                return RedirectToAction(nameof(Login));
+                return RedirectToAction("Login", "Account"); 
             }
+
 
             var result = await _accountService.ChangePasswordAsync(userId, model);
 
             if (result.Succeeded)
             {
-                TempData["Success"] = _localizer.GetValue("PasswordChangedSuccessfully");
-                return RedirectToAction(nameof(Profile));
+                TempData["PasswordSuccess"] = _localizer.GetValue("PasswordChangedSuccessfully");
             }
-
-            foreach (var error in result.Errors)
+            else
             {
-                ModelState.AddModelError(string.Empty, error.Description);
+                TempData["Error"] = result.Errors.FirstOrDefault()?.Description ?? _localizer.GetValue("ErrorOccurred");
             }
 
-            return View(model);
-        }
-
-        #endregion
-
-        #region Profile
-
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> Profile()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
-            var profile = await _accountService.GetUserProfileAsync(userId);
-
-            if (profile == null)
-            {
-                return NotFound();
-            }
-
-            return View(profile);
-        }
-
-        [HttpPost]
-        [Authorize]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProfile(AccountViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View("Profile", model);
-            }
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
-            var result = await _accountService.UpdateProfileAsync(userId, model);
-
-            if (result.Succeeded)
-            {
-                TempData["Success"] = _localizer.GetValue("ProfileUpdatedSuccessfully");
-                return RedirectToAction(nameof(Profile));
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-
-            return View("Profile", model);
+            return RedirectToAction(nameof(Index));
         }
 
         #endregion

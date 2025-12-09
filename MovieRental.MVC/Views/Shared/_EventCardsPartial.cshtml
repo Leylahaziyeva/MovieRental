@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<EventViewModel>
-@inject StringLocalizerManager localizer
 
 @foreach (var eventItem in Model)
 {
@@ -7,7 +6,7 @@
         <div class="card e-card shadow-sm border-0">
             <a asp-controller="Event" asp-action="Details" asp-route-id="@eventItem.Id">
                 <div class="m-card-cover">
-                    <img src="~/img/@eventItem.ImageUrl" class="card-img-top" alt="@eventItem.Name">
+                    <img src="@eventItem.ImageUrl" class="card-img-top" alt="@eventItem.Name">
 
                     @if (eventItem.IsFeatured)
                     {
@@ -30,7 +29,7 @@
                             <p class="card-text text-gray-900 mb-1 font-weight-bold">@eventItem.Name</p>
                             <p class="card-text mb-1">
                                 <small class="text-muted">
-                                    <i class="fas fa-map-marker-alt fa-sm mr-1"></i> @eventItem.Location
+                                    <i class="fas fa-map-marker-alt fa-sm mr-1"></i> @eventItem.LocationName
                                 </small>
                             </p>
 

@@ -19,106 +19,7 @@
                     </a>
                 </div>
                 <div id="mobile-filters" class="filters-body collapse multi-collapse">
-                    <div id="accordion">
-                        <form asp-action="Index" method="get" id="mobileFilterForm">
-                            <!-- Search -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingSearchMobile">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseSearchMobile" aria-expanded="true" aria-controls="collapseSearchMobile">
-                                            @localizer.GetValue("Search") <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapseSearchMobile" class="collapse" aria-labelledby="headingSearchMobile" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <input type="text" name="SearchQuery" value="@Model.Filter.SearchQuery"
-                                               class="form-control" placeholder="@localizer.GetValue("SearchEvents")">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Category -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingGenreMobile">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseGenreMobile" aria-expanded="true" aria-controls="collapseGenreMobile">
-                                            @localizer.GetValue("Category") <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapseGenreMobile" class="collapse" aria-labelledby="headingGenreMobile" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <input type="text" name="Category" value="@Model.Filter.Category"
-                                               class="form-control" placeholder="@localizer.GetValue("SearchCategory")">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Location -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingLocationMobile">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseLocationMobile" aria-expanded="true" aria-controls="collapseLocationMobile">
-                                            @localizer.GetValue("Location") <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapseLocationMobile" class="collapse" aria-labelledby="headingLocationMobile" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <input type="text" name="Location" value="@Model.Filter.Location"
-                                               class="form-control" placeholder="@localizer.GetValue("EnterLocation")">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Date Range -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingDateMobile">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseDateMobile" aria-expanded="true" aria-controls="collapseDateMobile">
-                                            @localizer.GetValue("DateRange") <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapseDateMobile" class="collapse" aria-labelledby="headingDateMobile" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <div class="mb-2">
-                                            <label class="small">@localizer.GetValue("From")</label>
-                                            <input type="date" name="FromDate" value="@Model.Filter.FromDate?.ToString("yyyy-MM-dd")" class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="small">@localizer.GetValue("To")</label>
-                                            <input type="date" name="ToDate" value="@Model.Filter.ToDate?.ToString("yyyy-MM-dd")" class="form-control form-control-sm">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Price -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingPriceMobile">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapsePriceMobile" aria-expanded="true" aria-controls="collapsePriceMobile">
-                                            @localizer.GetValue("MaxPrice") <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapsePriceMobile" class="collapse" aria-labelledby="headingPriceMobile" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <input type="number" name="MaxPrice" value="@Model.Filter.MaxPrice"
-                                               class="form-control" placeholder="0.00" step="0.01" min="0">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="p-3">
-                                <button type="submit" class="btn btn-primary btn-block">
-                                    @localizer.GetValue("ApplyFilters")
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    @await Html.PartialAsync("_FiltersPartial", Model.Filter)
                 </div>
             </div>
 
@@ -128,124 +29,8 @@
                     <h6 class="m-0 text-dark">@localizer.GetValue("FilterBy")</h6>
                 </div>
                 <div class="filters-body">
-                    <div id="accordion">
-                        <form asp-action="Index" method="get" id="filterForm">
-                            <!-- Search Filter -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingSearch">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseSearch" aria-expanded="true" aria-controls="collapseSearch">
-                                            @localizer.GetValue("Search")
-                                            <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapseSearch" class="collapse show" aria-labelledby="headingSearch" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <div class="form-group">
-                                            <i class="fas fa-search"></i>
-                                            <input type="text" name="SearchQuery" value="@Model.Filter.SearchQuery"
-                                                   class="form-control" placeholder="@localizer.GetValue("SearchEvents")">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Category Filter -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingCategory">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
-                                            @localizer.GetValue("Category")
-                                            <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapseCategory" class="collapse show" aria-labelledby="headingCategory" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <div class="form-group">
-                                            <i class="fas fa-search"></i>
-                                            <input type="text" name="Category" value="@Model.Filter.Category"
-                                                   class="form-control" placeholder="@localizer.GetValue("SearchCategory")">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Location Filter -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingLocation">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseLocation" aria-expanded="true" aria-controls="collapseLocation">
-                                            @localizer.GetValue("Location")
-                                            <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapseLocation" class="collapse show" aria-labelledby="headingLocation" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <input type="text" name="Location" value="@Model.Filter.Location"
-                                               class="form-control" placeholder="@localizer.GetValue("EnterLocation")">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Date Range Filter -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingDateRange">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapseDateRange" aria-expanded="false" aria-controls="collapseDateRange">
-                                            @localizer.GetValue("DateRange")
-                                            <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapseDateRange" class="collapse" aria-labelledby="headingDateRange" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <div class="mb-2">
-                                            <label class="small">@localizer.GetValue("From")</label>
-                                            <input type="date" name="FromDate" value="@Model.Filter.FromDate?.ToString("yyyy-MM-dd")"
-                                                   class="form-control form-control-sm">
-                                        </div>
-                                        <div>
-                                            <label class="small">@localizer.GetValue("To")</label>
-                                            <input type="date" name="ToDate" value="@Model.Filter.ToDate?.ToString("yyyy-MM-dd")"
-                                                   class="form-control form-control-sm">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Price Filter -->
-                            <div class="filters-card border-bottom p-3">
-                                <div class="filters-card-header" id="headingPrice">
-                                    <h6 class="mb-0">
-                                        <a href="#" class="btn-link" data-toggle="collapse" data-target="#collapsePrice" aria-expanded="false" aria-controls="collapsePrice">
-                                            @localizer.GetValue("MaxPrice")
-                                            <i class="fas fa-angle-down float-right"></i>
-                                        </a>
-                                    </h6>
-                                </div>
-                                <div id="collapsePrice" class="collapse" aria-labelledby="headingPrice" data-parent="#accordion">
-                                    <div class="filters-card-body card-shop-filters">
-                                        <input type="number" name="MaxPrice" value="@Model.Filter.MaxPrice"
-                                               class="form-control" placeholder="0.00" step="0.01" min="0">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="p-3">
-                                <button type="submit" class="btn btn-primary btn-block">
-                                    @localizer.GetValue("ApplyFilters")
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    @await Html.PartialAsync("_FiltersPartial", Model.Filter)
                 </div>
-            </div>
-
-            <div class="d-none d-sm-none d-lg-block">
-                <img class="img-fluid rounded mt-3" src="https://via.placeholder.com/255x623" alt="Advertisement">
             </div>
         </div>
 
@@ -309,11 +94,12 @@
                     page: currentPage,
                     pageSize: @Model.Filter.PageSize,
                     searchQuery: '@Model.Filter.SearchQuery',
-                    location: '@Model.Filter.Location',
-                    category: '@Model.Filter.Category',
+                    locationId: '@Model.Filter.LocationId',
+                    eventCategoryId: '@Model.Filter.EventCategoryId',
                     fromDate: '@Model.Filter.FromDate?.ToString("yyyy-MM-dd")',
                     toDate: '@Model.Filter.ToDate?.ToString("yyyy-MM-dd")',
-                    maxPrice: '@Model.Filter.MaxPrice'
+                    maxPrice: '@Model.Filter.MaxPrice',
+                    currentLanguageId: '@Model.Filter.CurrentLanguageId'
                 },
                 success: function(data) {
                     if (data.trim() === '') {

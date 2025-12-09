@@ -2,10 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using MovieRental.BLL.Services.Contracts;
-using MovieRental.BLL.ViewModels.Sport;
+using MovieRental.BLL.ViewModels.Language;
 using MovieRental.BLL.ViewModels.Person;
+using MovieRental.BLL.ViewModels.Sport;
+using MovieRental.BLL.ViewModels.Sport.MovieRental.BLL.ViewModels.Sport;
+using MovieRental.BLL.ViewModels.SportType;
 using MovieRental.DAL.DataContext.Entities;
-using MovieRental.DAL.Repositories.Contracts;
 using System.Linq.Expressions;
 
 namespace MovieRental.BLL.Services.Implementations
@@ -17,6 +19,9 @@ namespace MovieRental.BLL.Services.Implementations
         private readonly ICurrencyService _currencyService;
         private readonly IRepositoryAsync<Person> _personRepository;
         private readonly IPersonService _personService;
+        private readonly ISportTypeService _sportTypeService;
+        private readonly ILocationService _locationService;
+        private readonly IRepositoryAsync<Language> _languageRepository;
 
         public SportManager(
             IRepositoryAsync<Sport> repository,
@@ -25,14 +30,20 @@ namespace MovieRental.BLL.Services.Implementations
             ICookieService cookieService,
             ICurrencyService currencyService,
             IRepositoryAsync<Person> personRepository,
-            IPersonService personService) 
+            IPersonService personService,
+            ISportTypeService sportTypeService,
+            ILocationService locationService,
+            IRepositoryAsync<Language> languageRepository)
             : base(repository, mapper)
         {
             _cloudinaryService = cloudinaryService;
             _cookieService = cookieService;
             _currencyService = currencyService;
             _personRepository = personRepository;
-            _personService = personService; 
+            _personService = personService;
+            _sportTypeService = sportTypeService;
+            _locationService = locationService;
+            _languageRepository = languageRepository;
         }
 
         public override async Task<SportViewModel?> GetByIdAsync(int id)
@@ -44,6 +55,10 @@ namespace MovieRental.BLL.Services.Implementations
                 include: query => query
                     .Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
                     .Include(s => s.Currency)
+                    .Include(s => s.SportType)
+                        .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
+                    .Include(s => s.Location)
+                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
                     .Include(s => s.Players)
                         .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
                 AsNoTracking: true
@@ -65,6 +80,18 @@ namespace MovieRental.BLL.Services.Implementations
                 viewModel.Name = $"[No translation for language {languageId}]";
                 viewModel.Description = string.Empty;
                 viewModel.Location = string.Empty;
+            }
+
+            if (sport.SportType?.Translations?.Any() == true)
+            {
+                var sportTypeTranslation = sport.SportType.Translations.FirstOrDefault();
+                viewModel.Categories = sportTypeTranslation?.Name ?? string.Empty;
+            }
+
+            if (sport.Location?.Translations?.Any() == true)
+            {
+                var locationTranslation = sport.Location.Translations.FirstOrDefault();
+                // Əgər Location ayrıca field lazımdırsa: viewModel.LocationName = locationTranslation?.Name;
             }
 
             if (sport.Players?.Any() == true)
@@ -106,6 +133,10 @@ namespace MovieRental.BLL.Services.Implementations
                 var included = query
                     .Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
                     .Include(s => s.Currency)
+                    .Include(s => s.SportType)
+                        .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
+                    .Include(s => s.Location)
+                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
                     .Include(s => s.Players)
                         .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
 
@@ -130,6 +161,12 @@ namespace MovieRental.BLL.Services.Implementations
                     viewModel.Name = translation.Name;
                     viewModel.Description = translation.Description;
                     viewModel.Location = translation.Location;
+                }
+
+                if (sport.SportType?.Translations?.Any() == true)
+                {
+                    var sportTypeTranslation = sport.SportType.Translations.FirstOrDefault();
+                    viewModel.Categories = sportTypeTranslation?.Name ?? string.Empty;
                 }
 
                 if (sport.Players?.Any() == true)
@@ -171,6 +208,10 @@ namespace MovieRental.BLL.Services.Implementations
                 include: query => query
                     .Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
                     .Include(s => s.Currency)
+                    .Include(s => s.SportType)
+                        .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
+                    .Include(s => s.Location)
+                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
                     .Include(s => s.Players)
                         .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
                 AsNoTracking: true
@@ -291,8 +332,14 @@ namespace MovieRental.BLL.Services.Implementations
 
         public async Task<IEnumerable<SportViewModel>> GetSportsByCategoryAsync(string category)
         {
+            var languageId = await _cookieService.GetLanguageIdAsync();
+
             return await GetAllAsync(
-                predicate: x => x.IsActive && x.Categories != null && x.Categories.Contains(category),
+                predicate: x => x.IsActive &&
+                    x.SportType != null &&
+                    x.SportType.Translations.Any(st =>
+                        st.LanguageId == languageId &&
+                        st.Name.Contains(category)),
                 orderBy: query => query.OrderBy(x => x.EventDate),
                 AsNoTracking: true
             );
@@ -345,7 +392,11 @@ namespace MovieRental.BLL.Services.Implementations
             return false;
         }
 
-        public async Task<(IEnumerable<SportViewModel> Sports, int TotalCount)> GetSportsPagedAsync(int page = 1, int pageSize = 12, string? location = null, string? category = null)
+        public async Task<(IEnumerable<SportViewModel> Sports, int TotalCount)> GetSportsPagedAsync(
+            int page = 1,
+            int pageSize = 12,
+            string? location = null,
+            string? category = null)
         {
             var languageId = await _cookieService.GetLanguageIdAsync();
 
@@ -360,12 +411,23 @@ namespace MovieRental.BLL.Services.Implementations
 
             if (!string.IsNullOrEmpty(category))
             {
-                predicate = predicate.And(x => x.Categories != null && x.Categories.Contains(category));
+                predicate = predicate.And(x =>
+                    x.SportType != null &&
+                    x.SportType.Translations.Any(st =>
+                        st.LanguageId == languageId &&
+                        st.Name.Contains(category)));
             }
 
             Func<IQueryable<Sport>, IIncludableQueryable<Sport, object>> include = query =>
-                query.Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
-                     .Include(s => s.Currency).Include(s => s.Players).ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
+                query
+                    .Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
+                    .Include(s => s.Currency)
+                    .Include(s => s.SportType)
+                        .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
+                    .Include(s => s.Location)
+                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
+                    .Include(s => s.Players)
+                        .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
 
             var (items, totalCount) = await Repository.GetPagedAsync(
                 predicate: predicate,
@@ -379,6 +441,100 @@ namespace MovieRental.BLL.Services.Implementations
             var sports = await MapToViewModelsAsync(items, languageId);
 
             return (sports, totalCount);
+        }
+
+        public async Task<SportFilterResultViewModel> GetFilteredSportsAsync(SportFilterViewModel filter)
+        {
+            var languageId = await _cookieService.GetLanguageIdAsync();
+
+            Expression<Func<Sport, bool>> predicate = x => x.IsActive && x.EventDate > DateTime.Now;
+
+            if (filter.SportTypes?.Any(st => st.Id > 0) == true)
+            {
+                var selectedTypeIds = filter.SportTypes.Select(st => st.Id).ToList();
+                predicate = predicate.And(x => x.SportTypeId.HasValue && selectedTypeIds.Contains(x.SportTypeId.Value));
+            }
+
+            if (filter.Locations?.Any(l => l.Id > 0) == true)
+            {
+                var selectedLocationIds = filter.Locations.Select(l => l.Id).ToList();
+                predicate = predicate.And(x => x.LocationId.HasValue && selectedLocationIds.Contains(x.LocationId.Value));
+            }
+
+            if (filter.StartDate.HasValue)
+            {
+                predicate = predicate.And(x => x.EventDate >= filter.StartDate.Value);
+            }
+
+            if (filter.EndDate.HasValue)
+            {
+                predicate = predicate.And(x => x.EventDate <= filter.EndDate.Value);
+            }
+
+            Func<IQueryable<Sport>, IIncludableQueryable<Sport, object>> include = query =>
+                query
+                    .Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
+                    .Include(s => s.Currency)
+                    .Include(s => s.SportType)
+                        .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
+                    .Include(s => s.Location)
+                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
+                    .Include(s => s.Players)
+                        .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
+
+            var (items, totalCount) = await Repository.GetPagedAsync(
+                predicate: predicate,
+                orderBy: query => query.OrderBy(x => x.EventDate),
+                include: include,
+                page: filter.Page,
+                pageSize: filter.PageSize,
+                AsNoTracking: true
+            );
+
+            var sports = await MapToViewModelsAsync(items, languageId);
+
+            var result = new SportFilterResultViewModel
+            {
+                Sports = sports,
+                Filter = filter,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)filter.PageSize),
+                HasNextPage = filter.Page < (int)Math.Ceiling(totalCount / (double)filter.PageSize),
+                HasPreviousPage = filter.Page > 1
+            };
+
+            return result;
+        }
+
+        public async Task<SportFilterViewModel> GetFilterOptionsAsync(int languageId)
+        {
+            var sportTypes = await _sportTypeService.GetSportTypesWithCountAsync(languageId);
+            var sportTypeOptions = sportTypes.Select(st => new SportTypeOption
+            {
+                Id = st.Id,
+                Name = st.Name ?? "Unknown",
+                Count = st.SportCount
+            });
+
+            var locationOptions = await _locationService.GetLocationsForFilterAsync(languageId);
+
+            var languages = await _languageRepository.GetAllAsync(
+                include: query => query.Include(lang => lang.LanguageTranslations.Where(lt => lt.TranslationLanguageId == languageId)),
+                AsNoTracking: true
+            );
+
+            var languageViewModels = languages.Select(lang => new LanguageViewModel
+            {
+                Id = lang.Id,
+                Name = lang.LanguageTranslations.FirstOrDefault()?.Name ?? lang.IsoCode,
+                IsoCode = lang.IsoCode
+            }).ToList();
+
+            return new SportFilterViewModel
+            {
+                SportTypes = sportTypeOptions.ToList(),
+                Locations = locationOptions.ToList(),
+                Languages = languageViewModels
+            };
         }
     }
 

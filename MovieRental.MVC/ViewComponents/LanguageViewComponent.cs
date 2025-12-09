@@ -17,8 +17,11 @@ namespace MovieRental.MVC.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var languages = await _languageService.GetAllAsync();
             var selectedLanguage = await _cookieService.GetLanguageAsync();
+            var currentLanguageId = selectedLanguage?.Id ?? 1; 
+
+            var languages = await _languageService.GetAllWithTranslationsAsync(currentLanguageId);
+
             var headerViewModel = new HeaderViewModel
             {
                 Languages = languages.ToList(),
