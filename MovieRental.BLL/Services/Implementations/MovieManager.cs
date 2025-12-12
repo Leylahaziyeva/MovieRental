@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MovieRental.BLL.Services.Contracts;
+using MovieRental.BLL.ViewModels.Genre;
 using MovieRental.BLL.ViewModels.Movie;
 using MovieRental.DAL.DataContext.Entities;
-using MovieRental.DAL.Repositories.Contracts;
 
 namespace MovieRental.BLL.Services.Implementations
 {
@@ -61,9 +61,9 @@ namespace MovieRental.BLL.Services.Implementations
             {
                 Title = createViewModel.Title,
                 Plot = createViewModel.Plot,
-                Director = createViewModel.DirectorNames,   
-                Writers = createViewModel.WriterNames,      
-                Cast = createViewModel.CastNames,           
+                Director = createViewModel.DirectorNames,
+                Writers = createViewModel.WriterNames,
+                Cast = createViewModel.CastNames,
                 MovieId = createdMovie.Id,
                 LanguageId = createViewModel.LanguageId
             };
@@ -169,9 +169,9 @@ namespace MovieRental.BLL.Services.Implementations
             {
                 translation.Title = updateViewModel.Title ?? translation.Title;
                 translation.Plot = updateViewModel.Plot ?? translation.Plot;
-                translation.Director = updateViewModel.DirectorNames ?? translation.Director;   
-                translation.Writers = updateViewModel.WriterNames ?? translation.Writers;       
-                translation.Cast = updateViewModel.CastNames ?? translation.Cast;               
+                translation.Director = updateViewModel.DirectorNames ?? translation.Director;
+                translation.Writers = updateViewModel.WriterNames ?? translation.Writers;
+                translation.Cast = updateViewModel.CastNames ?? translation.Cast;
                 await _translationRepository.UpdateAsync(translation);
             }
 
@@ -633,6 +633,43 @@ namespace MovieRental.BLL.Services.Implementations
         {
             var movies = await _movieRepository.GetAllAsync(m => m.IsActive);
             return movies.Count();
+        }
+
+
+        public async Task<MovieFilterViewModel> GetFilterOptionsAsync(int languageId)
+        {
+            var allMovies = await _movieRepository.GetAllAsync(
+                predicate: m => m.IsActive,
+                include: q => q
+                    .Include(m => m.MovieGenres)
+                        .ThenInclude(mg => mg.Genre)
+                            .ThenInclude(g => g!.GenreTranslations.Where(gt => gt.LanguageId == languageId))
+            );
+
+            var genreOptions = allMovies
+                .SelectMany(m => m.MovieGenres)
+                .Where(mg => mg.Genre != null)
+                .GroupBy(mg => new
+                {
+                    Id = mg.GenreId,
+                    Name = mg.Genre!.GenreTranslations.FirstOrDefault()?.Name ?? "Unknown"
+                })
+                .Select(g => new GenreOption
+                {
+                    Id = g.Key.Id,
+                    Name = g.Key.Name,
+                    Count = g.Count()
+                })
+                .Where(g => g.Count > 0)
+                .OrderByDescending(g => g.Count)
+                .ToList();
+
+            return new MovieFilterViewModel
+            {
+                CurrentLanguageId = languageId,
+                Genres = genreOptions,
+                Formats = new List<string> { "2D", "3D", "4K", "IMAX" }
+            };
         }
     }
 }

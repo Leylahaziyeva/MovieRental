@@ -51,6 +51,7 @@ namespace MovieRental.BLL
             services.AddScoped<IMovieService, MovieManager>();
             services.AddScoped<IWatchlistService, WatchlistManager>();
             services.AddScoped<IUserListService, UserListManager>();
+            services.AddScoped<IRentalService, RentalManager>();
             services.AddScoped<IEventService, EventManager>();
             services.AddScoped<IEventCategoryService, EventCategoryManager>();
             services.AddScoped<ISportService, SportManager>();

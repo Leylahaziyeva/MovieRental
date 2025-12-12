@@ -1,0 +1,92 @@
+﻿@model List<WatchHistoryViewModel>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="col-12 text-center py-5">
+        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+        <p class="text-muted">@localizer.GetValue("NoWatchHistoryYet")</p>
+        <a href="/Movie" class="btn btn-primary btn-sm">@localizer.GetValue("StartWatching")</a>
+    </div>
+}
+else
+{
+    foreach (var history in Model)
+    {
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card m-card shadow-sm border-0">
+                <a href="/Movie/Details/@history.MovieId">
+                    <div class="m-card-cover position-relative">
+                        <!-- Completion Badge -->
+                        @if (history.IsCompleted)
+                        {
+                            <div class="position-absolute" style="top: 10px; right: 10px; z-index: 10;">
+                                <span class="badge badge-success px-2 py-1">
+                                    <i class="fas fa-check-circle mr-1"></i>@localizer.GetValue("Completed")
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="position-absolute" style="top: 10px; right: 10px; z-index: 10;">
+                                <span class="badge badge-warning px-2 py-1">
+                                    @history.CompletionPercentage.ToString("F0")%
+                                </span>
+                            </div>
+                        }
+
+                        <!-- Rental Badge -->
+                        @if (history.WasRented)
+                        {
+                            <div class="position-absolute" style="top: 10px; left: 10px; z-index: 10;">
+                                <span class="badge badge-primary px-2 py-1">
+                                    <i class="fas fa-ticket-alt mr-1"></i>@localizer.GetValue("Rented")
+                                </span>
+                            </div>
+                        }
+
+                        <img src="@history.MoviePosterUrl" class="card-img-top" alt="@history.MovieTitle">
+
+                        <!-- Progress Overlay -->
+                        @if (!history.IsCompleted)
+                        {
+                            <div class="position-absolute" style="bottom: 0; left: 0; right: 0;">
+                                <div class="progress" style="height: 4px; border-radius: 0;">
+                                    <div class="progress-bar bg-danger"
+                                         style="width: @history.CompletionPercentage%"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="card-body p-3">
+                        <h5 class="card-title text-white mb-1">@history.MovieTitle</h5>
+                        <p class="card-text mb-2">
+                            <small class="text-white">
+                                <i class="fas fa-clock mr-1"></i>@history.WatchDurationMinutes min
+                            </small>
+                            <small class="text-muted ml-2">
+                                <i class="fas fa-calendar mr-1"></i>@history.WatchedAt.ToString("MMM dd, yyyy")
+                            </small>
+                        </p>
+
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <i class="fas fa-@(history.DeviceType.ToLower() == "mobile" ? "mobile-alt" : history.DeviceType.ToLower() == "tv" ? "tv" : "desktop") mr-1"></i>
+                                @history.DeviceType
+                            </small>
+                        </p>
+
+                        @if (!history.IsCompleted)
+                        {
+                            <div class="mt-3">
+                                <a href="/Movie/Watch/@history.MovieId" class="btn btn-primary btn-block btn-sm">
+                                    <i class="fas fa-play mr-1"></i>@localizer.GetValue("ContinueWatching") 
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </a>
+            </div>
+        </div>
+    }
+}

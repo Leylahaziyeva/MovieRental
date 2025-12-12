@@ -6,26 +6,31 @@ using System.Security.Claims;
 
 namespace MovieRental.UI.Controllers
 {
+
+    [Authorize]
     public class MovieController : Controller
     {
         private readonly IMovieService _movieService;
         private readonly ICookieService _cookieService;
         private readonly IWatchlistService _watchlistService;
-        private readonly IGenreService _genreService;  
+        private readonly IGenreService _genreService;
         private readonly ILanguageService _languageService;
+        private readonly IRentalService _rentalService;
 
         public MovieController(
             IMovieService movieService,
             ICookieService cookieService,
-            IWatchlistService watchlistService, 
-            IGenreService genreService, 
-            ILanguageService languageService)  
+            IWatchlistService watchlistService,
+            IGenreService genreService,
+            ILanguageService languageService,
+            IRentalService rentalService)
         {
             _movieService = movieService;
             _cookieService = cookieService;
             _watchlistService = watchlistService;
-            _genreService = genreService; 
+            _genreService = genreService;
             _languageService = languageService;
+            _rentalService = rentalService;
         }
 
 
@@ -35,15 +40,10 @@ namespace MovieRental.UI.Controllers
             filter.CurrentLanguageId = languageId;
             var result = await _movieService.GetFilteredMoviesAsync(filter);
 
-            //ViewBag.Genres = await _genreService.GetAllActiveAsync(languageId);
-            //ViewBag.Languages = await _languageService.GetAllWithTranslationsAsync(languageId); 
-            //ViewBag.Formats = new List<string> { "2D", "3D", "4K", "IMAX" };
-            //ViewBag.Years = Enumerable.Range(1900, DateTime.Now.Year - 1900 + 1).Reverse().ToList();
-
-            ViewBag.FilterType = "Movie";
-            ViewBag.Genres = await _genreService.GetAllAsync();
-            ViewBag.Languages = await _languageService.GetAllAsync();
-            ViewBag.Formats = new[] { "2D", "3D", "IMAX", "4K", "Dolby Atmos" };
+            ViewBag.Genres = await _genreService.GetAllActiveAsync(languageId);
+            ViewBag.Languages = await _languageService.GetAllWithTranslationsAsync(languageId);
+            ViewBag.Formats = new List<string> { "2D", "3D", "4K", "IMAX" };
+            ViewBag.Years = Enumerable.Range(1900, DateTime.Now.Year - 1900 + 1).Reverse().ToList();
 
             var currentYear = DateTime.Now.Year;
             ViewBag.Years = Enumerable.Range(1990, currentYear - 1990 + 1).OrderByDescending(y => y).ToList();
@@ -98,7 +98,7 @@ namespace MovieRental.UI.Controllers
 
             return View("Index", viewModel);
         }
-       
+
         public async Task<IActionResult> Popular()
         {
             var languageId = await _cookieService.GetLanguageIdAsync();
@@ -128,7 +128,7 @@ namespace MovieRental.UI.Controllers
 
             return View("Index", viewModel);
         }
-       
+
         // GET: /Movies/Search?q=avengers
         public async Task<IActionResult> Search(string q)
         {
@@ -196,7 +196,6 @@ namespace MovieRental.UI.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> ToggleWatchlist(int movieId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -226,7 +225,47 @@ namespace MovieRental.UI.Controllers
             filter.CurrentLanguageId = languageId;
 
             var result = await _movieService.GetFilteredMoviesAsync(filter);
-            return PartialView("_MovieCardsPartial", result.Movies);   
+            return PartialView("_MovieCardsPartial", result.Movies);
+        }
+
+        public async Task<IActionResult> Watch(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Watch", "Movie", new { id }) });
+            }
+
+            var languageId = await _cookieService.GetLanguageIdAsync();
+            var movie = await _movieService.GetMovieDetailsAsync(id, languageId);
+
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            var hasRental = await _rentalService.HasActiveRentalAsync(userId, id);
+
+            if (!hasRental)
+            {
+                TempData["Error"] = "You need to rent this movie first!";
+                return RedirectToAction("Details", new { id });
+            }
+
+            var rental = await _rentalService.GetActiveRentalForMovieAsync(userId, id);
+
+            if (rental != null)
+            {
+                ViewBag.RentalInfo = rental;
+            }
+
+            return View(movie);
         }
     }
 }

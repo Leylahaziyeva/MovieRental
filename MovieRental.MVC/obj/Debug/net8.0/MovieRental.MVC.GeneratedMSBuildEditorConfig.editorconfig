@@ -80,6 +80,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTW92aWVcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Movie/Watch.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTW92aWVcV2F0Y2guY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Offer/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT2ZmZXJcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -104,10 +108,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZmlsZVxMaXN0RGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Shared/404.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXDQwNC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Shared/Components/Footer/Default.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcRm9vdGVyXERlZmF1bHQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -116,8 +116,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXENvbXBvbmVudHNcSGVhZGVyXERlZmF1bHQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Shared/_ActiveRentalsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BY3RpdmVSZW50YWxzUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Shared/_EventCardsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9FdmVudENhcmRzUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Shared/_ExpiredRentalsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9FeHBpcmVkUmVudGFsc1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Shared/_FiltersPartial.cshtml]
@@ -146,6 +154,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Shared/_WatchHistoryPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9XYXRjaEhpc3RvcnlQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lenovo/source/repos/MovieRental/MovieRental.MVC/Views/Shared/_WatchlistPartial.cshtml]

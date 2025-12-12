@@ -17,6 +17,7 @@ namespace MovieRental.DAL.DataContext.Entities
 
         public virtual List<Review> Reviews { get; set; } = [];
         public virtual List<UserWatchlist> Watchlists { get; set; } = [];
+        public virtual List<WatchHistory> WatchHistories { get; set; } = [];
         public virtual List<Rental> Rentals { get; set; } = [];
         public virtual List<SearchHistory> SearchHistories { get; set; } = [];
         public virtual List<Notification> Notifications { get; set; } = [];

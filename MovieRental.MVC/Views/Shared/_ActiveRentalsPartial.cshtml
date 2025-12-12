@@ -1,0 +1,89 @@
+﻿@model List<MovieRental.BLL.ViewModels.Rental.RentalViewModel>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="col-12 text-center py-5">
+        <i class="fas fa-film fa-3x text-muted mb-3"></i>
+        <p class="text-muted">@localizer.GetValue("NoActiveRentals")</p>
+        <a href="/Movie" class="btn btn-primary btn-sm">@localizer.GetValue("BrowseMovies")</a>
+    </div>
+}
+else
+{
+    foreach (var rental in Model)
+    {
+        <div class="col-xl-4 col-md-6 mb-4 rental-card">
+            <div class="card m-card shadow-sm border-0">
+                <a href="/Movie/Watch/@rental.MovieId">
+                    <div class="m-card-cover position-relative">
+                        <!-- Timer Badge -->
+                        <div class="position-absolute" style="top: 10px; right: 10px; z-index: 10;">
+                            <span class="badge badge-@(rental.DaysRemaining > 1 ? "success" : "danger") px-3 py-2">
+                                <i class="fas fa-clock mr-1"></i>
+                                @rental.TimeRemainingText
+                            </span>
+                        </div>
+
+                        <!-- Watched Badge -->
+                        @if (rental.HasWatched)
+                        {
+                            <div class="position-absolute" style="top: 10px; left: 10px; z-index: 10;">
+                                <span class="badge badge-info px-2 py-1">
+                                    <i class="fas fa-eye mr-1"></i>@localizer.GetValue("Watched")
+                                </span>
+                            </div>
+                        }
+
+                        <img src="@rental.MoviePosterUrl" class="card-img-top" alt="@rental.MovieTitle">
+
+                        <!-- Play Overlay -->
+                        <div class="position-absolute d-flex align-items-center justify-content-center"
+                             style="top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3);">
+                            <i class="fas fa-play-circle text-white" style="font-size: 3rem;"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-3">
+                        <h5 class="card-title text-white mb-1">@rental.MovieTitle</h5>
+                        <p class="card-text mb-2">
+                            <small class="text-white">
+                                <i class="fas fa-language mr-1"></i>@rental.MovieLanguage
+                            </small>
+                            <small class="text-muted ml-2">
+                                <i class="fas fa-calendar mr-1"></i>Rented: @rental.RentalDate.ToString("MMM dd")
+                            </small>
+                        </p>
+
+                        @if (rental.HasWatched)
+                        {
+                            <p class="card-text mb-2">
+                                <small class="text-info">
+                                    <i class="fas fa-clock mr-1"></i>Watched @rental.TotalWatchTimeMinutes min
+                                </small>
+                            </p>
+                        }
+
+                        <!-- Progress Bar -->
+                        <div class="progress mb-2" style="height: 3px;">
+                            @{
+                                var progress = rental.DaysRemaining > 0
+                                ? Math.Min(100, (rental.HoursRemaining / (double)(rental.RentalDurationDays * 24) * 100))
+                                : 0;
+
+                            }
+                            <div class="progress-bar bg-@(rental.DaysRemaining > 1 ? "success" : "danger")"
+                                 style="width: @progress%"></div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button class="btn btn-success btn-block btn-sm"
+                                    onclick="window.location.href='/Movie/Watch/@rental.MovieId'">
+                                <i class="fas fa-play mr-1"></i>@localizer.GetValue("WatchNow")
+                            </button>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    }
+}

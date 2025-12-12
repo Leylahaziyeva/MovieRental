@@ -1,0 +1,106 @@
+﻿@model MovieRental.BLL.ViewModels.Movie.MovieDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Title + " - Watch";
+    Layout = null;
+    var rentalInfo = ViewBag.RentalInfo as MovieRental.BLL.ViewModels.Rental.RentalViewModel;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet" />
+    <link href="~/css/watch.css" rel="stylesheet">
+</head>
+<body>
+    <div class="video-container">
+        <!-- Top Info Bar -->
+        <div class="movie-info-bar" id="infoBar">
+            @if (rentalInfo != null && rentalInfo.DaysRemaining <= 1)
+            {
+                <div class="rental-warning">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <strong>Rental Expiring Soon!</strong>
+                            <span class="ml-3">@rentalInfo.TimeRemainingText</span>
+                        </div>
+                        <a href="/Movie/Details/@Model.Id" class="btn btn-light btn-sm">
+                            <i class="fas fa-redo mr-1"></i> Rent Again
+                        </a>
+                    </div>
+                </div>
+            }
+
+            <div class="movie-header">
+                <div>
+                    <h3 class="movie-title">@Model.Title</h3>
+                    <div class="movie-meta">
+                        <span class="badge badge-primary">@Model.Year</span>
+                        <span class="badge badge-secondary">@Model.Duration min</span>
+                        <span class="badge badge-info">@Model.Format</span>
+                        @if (rentalInfo != null)
+                        {
+                            <span class="badge badge-success">
+                                <i class="fas fa-clock mr-1"></i> @rentalInfo.TimeRemainingText
+                            </span>
+                        }
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-player" id="exitFullscreen" title="Exit Player">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Player -->
+        <video id="movie-player"
+               class="video-js vjs-big-play-centered"
+               controls
+               preload="auto"
+               poster="@Model.CoverImageUrl"
+               data-setup='{}'>
+            <source src="@Model.VideoUrl" type="video/mp4">
+            <p class="vjs-no-js">
+                To view this video please enable JavaScript, and consider upgrading to a web browser that
+                <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+            </p>
+        </video>
+
+        <!-- Bottom Controls Bar -->
+        <div class="controls-bar" id="controlsBar">
+            <div class="controls-content">
+                <div class="controls-info">
+                    <h5 class="controls-title">@Model.Title</h5>
+                </div>
+                <div class="controls-actions">
+                    <a href="/Profile/Index#sidebar-1-5" class="btn btn-player-sm" title="My Rentals">
+                        <i class="fas fa-list"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
+    @Html.AntiForgeryToken()
+    <script src="~/js/watch.js"></script>
+
+    <script>
+        window.movieData = {
+            id: @Model.Id,
+            title: '@Html.Raw(Model.Title)'
+        };
+    </script>
+</body>
+</html>

@@ -21,20 +21,46 @@ namespace MovieRental.BLL.Services.Implementations
 
         public async Task<IEnumerable<EventCategoryOption>> GetCategoriesForFilterAsync(int languageId)
         {
-            var categories = await Repository.GetAllAsync(
-                include: query => query
-                    .Include(c => c.Translations.Where(t => t.LanguageId == languageId))
-                    .Include(c => c.Events),
-                AsNoTracking: true
-            );
-
-            return categories.Select(c => new EventCategoryOption
+            try
             {
-                Id = c.Id,
-                Name = c.Translations.FirstOrDefault()?.Name ?? "Unknown",
-                Count = c.Events?.Count(e => e.IsActive) ?? 0
-            }).Where(c => c.Count > 0)
-              .OrderByDescending(c => c.Count);
+                var categories = await Repository.GetAllAsync(
+                    include: query => query
+                        .Include(c => c.Translations.Where(t => t.LanguageId == languageId))
+                        .Include(c => c.Events),
+                    AsNoTracking: true
+                );
+
+                if (categories == null)
+                {
+                    Console.WriteLine("[EventCategoryManager] No categories found in database");
+                    return new List<EventCategoryOption>();
+                }
+
+                var result = categories
+                    .Select(c => new EventCategoryOption
+                    {
+                        Id = c.Id,
+                        Name = c.Translations.FirstOrDefault()?.Name ?? "Unknown",
+                        Count = c.Events?.Count(e => e.IsActive) ?? 0
+                    })
+                    .Where(c => c.Count > 0)
+                    .OrderByDescending(c => c.Count)
+                    .ToList(); 
+
+                Console.WriteLine($"[EventCategoryManager] Returning {result.Count} categories");
+
+                foreach (var cat in result)
+                {
+                    Console.WriteLine($"  - {cat.Name}: {cat.Count} events");
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[EventCategoryManager] ERROR: {ex.Message}");
+                return new List<EventCategoryOption>();
+            }
         }
 
         public async Task<string?> GetCategoryNameAsync(int categoryId, int languageId)
@@ -106,5 +132,4 @@ namespace MovieRental.BLL.Services.Implementations
             return true;
         }
     }
-
 }

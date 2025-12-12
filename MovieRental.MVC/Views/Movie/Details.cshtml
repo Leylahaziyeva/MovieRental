@@ -130,6 +130,62 @@
                 </div>
             </div>
 
+            @if (Model.IsAvailableForRent && User.Identity!.IsAuthenticated)
+            {
+                <div class="card bg-dark text-white shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h5 class="mb-2">
+                                    <i class="fas fa-ticket-alt text-warning mr-2"></i>
+                                    @localizer.GetValue("RentThisMovie")
+                                </h5>
+                                <p class="mb-2">
+                                    <span class="badge badge-success mr-2 px-3 py-2">@Model.FormattedPrice</span>
+                                    <small class="text-muted">@Model.RentalDurationDays @localizer.GetValue("Days") @localizer.GetValue("For")</small>
+                                </p>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    @localizer.GetValue("WatchUnlimitedTimes")
+                                </small>
+                            </div>
+                            <div class="col-md-4 text-md-right mt-3 mt-md-0">
+                                <div id="rental-status-container">
+                                    <div class="text-center py-3">
+                                        <div class="spinner-border spinner-border-sm text-light" role="status">
+                                            <span class="sr-only">@localizer.GetValue("Checking...")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Model.IsAvailableForRent && !User.Identity!.IsAuthenticated)
+            {
+                <div class="card bg-warning text-dark shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h5 class="mb-2">
+                                    <i class="fas fa-lock mr-2"></i>
+                                    Login to rent this movie
+                                </h5>
+                                <p class="mb-0">
+                                    Rent for <strong>@Model.FormattedPrice</strong> and watch for @Model.RentalDurationDays days
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-md-right mt-3 mt-md-0">
+                                <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" class="btn btn-dark btn-block">
+                                    <i class="fas fa-sign-in-alt mr-2"></i>Login to Rent
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
             <!-- Tabs -->
             <div class="bg-white p-3 widget shadow-sm rounded mb-4">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -332,6 +388,8 @@
 </div>
 
 @section Scripts {
+    @Html.AntiForgeryToken()
+    
     <script>
         $(document).ready(function() {
             var hash = window.location.hash;
@@ -342,6 +400,110 @@
             $('.nav-tabs a').on('shown.bs.tab', function(e) {
                 window.location.hash = e.target.hash;
             });
+
+            @if (Model.IsAvailableForRent && User.Identity!.IsAuthenticated)
+            {
+                <text>
+                const movieId = @Model.Id;
+                checkMovieRentalStatus();
+                
+                function checkMovieRentalStatus() {
+                    $.ajax({
+                        url: '/Rental/CheckRentalStatus',
+                        type: 'GET',
+                        data: { movieId: movieId },
+                        success: function(response) {
+                            if (response.isRented && response.rental) {
+                                showRentedStatus(response.rental);
+                            } else {
+                                showRentButton();
+                            }
+                        },
+                        error: function() {
+                            showRentButton();
+                        }
+                    });
+                }
+                
+                function showRentedStatus(rental) {
+                    const statusHtml = `
+                        <div class="alert alert-success mb-2 py-2">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            <strong>@localizer.GetValue("AlreadyRented")</strong>
+                            <div class="mt-1">
+                                <small>
+                                    <i class="fas fa-clock mr-1"></i>
+                                    @localizer.GetValue("Expires"): ${rental.timeRemainingText}
+                                </small>
+                            </div>
+                        </div>
+                        <a href="/Movie/Watch/${movieId}" class="btn btn-success btn-block">
+                            <i class="fas fa-play mr-2"></i>@localizer.GetValue("WatchNow")
+                        </a>
+                    `;
+                    $('#rental-status-container').html(statusHtml);
+                }
+                
+                function showRentButton() {
+                    const buttonHtml = `
+                        <button class="btn btn-warning btn-block" id="rent-movie-btn">
+                            <i class="fas fa-ticket-alt mr-2"></i>
+                            >@localizer.GetValue("WatchNow") - @Model.FormattedPrice
+                        </button>
+                        <small class="text-muted d-block mt-2 text-center">
+                            <i class="fas fa-shield-alt mr-1"></i>
+                            >@localizer.GetValue("SecurePayment")
+                        </small>
+                    `;
+                    $('#rental-status-container').html(buttonHtml);
+                }
+                
+                // Rent movie handler
+                $(document).on('click', '#rent-movie-btn', function() {
+                    const btn = $(this);
+                    
+                    if (!confirm('Rent "@Model.Title" for @Model.FormattedPrice?')) {
+                        return;
+                    }
+                    
+                    btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Processing...');
+                    
+                    $.ajax({
+                        url: '/Rental/RentMovie',
+                        type: 'POST',
+                        data: { 
+                            movieId: movieId,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                if (typeof toastr !== 'undefined') {
+                                    toastr.success(response.message);
+                                } else {
+                                    alert(response.message);
+                                }
+                                checkMovieRentalStatus();
+                            } else {
+                                if (typeof toastr !== 'undefined') {
+                                    toastr.error(response.message);
+                                } else {
+                                    alert(response.message);
+                                }
+                                btn.prop('disabled', false).html('<i class="fas fa-ticket-alt mr-2"></i>Rent Now - @Model.FormattedPrice');
+                            }
+                        },
+                        error: function() {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error('An error occurred. Please try again.');
+                            } else {
+                                alert('An error occurred. Please try again.');
+                            }
+                            btn.prop('disabled', false).html('<i class="fas fa-ticket-alt mr-2"></i>Rent Now - @Model.FormattedPrice');
+                        }
+                    });
+                });
+                </text>
+            }
         });
     </script>
 }

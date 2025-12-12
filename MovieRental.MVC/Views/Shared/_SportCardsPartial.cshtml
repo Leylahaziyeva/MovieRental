@@ -6,7 +6,7 @@
         <div class="card e-card shadow-sm border-0">
             <a asp-controller="Sport" asp-action="Details" asp-route-id="@sport.Id">
                 <div class="m-card-cover">
-                    <img src="~/img/@sport.ImageUrl" class="card-img-top" alt="@sport.Name">
+                    <img src="@sport.ImageUrl" class="card-img-top" alt="@sport.Name">
                 </div>
                 <div class="card-body p-0">
                     <div class="row no-gutters align-items-center">

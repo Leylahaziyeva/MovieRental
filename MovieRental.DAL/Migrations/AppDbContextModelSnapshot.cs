@@ -22,17 +22,17 @@ namespace MovieRental.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("EventPerson", b =>
+            modelBuilder.Entity("EventArtists", b =>
                 {
+                    b.Property<int>("EventsId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ArtistsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
+                    b.HasKey("EventsId", "ArtistsId");
 
-                    b.HasKey("ArtistsId", "EventId");
-
-                    b.HasIndex("EventId");
+                    b.HasIndex("ArtistsId");
 
                     b.ToTable("EventArtists", (string)null);
                 });
@@ -1634,6 +1634,9 @@ namespace MovieRental.DAL.Migrations
                     b.Property<DateTime>("ExpiryDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("FirstWatchedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("HasWatched")
                         .HasColumnType("bit");
 
@@ -1643,14 +1646,38 @@ namespace MovieRental.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastWatchedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("MovieId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentIntentId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("RentalDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("TotalWatchTimeSeconds")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1664,9 +1691,15 @@ namespace MovieRental.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ExpiryDate");
+
                     b.HasIndex("MovieId");
 
+                    b.HasIndex("Status");
+
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "Status");
 
                     b.ToTable("Rentals");
                 });
@@ -2333,22 +2366,81 @@ namespace MovieRental.DAL.Migrations
                     b.ToTable("UserWatchlists");
                 });
 
-            modelBuilder.Entity("PersonSport", b =>
+            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.WatchHistory", b =>
                 {
-                    b.Property<int>("PlayersId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("SportId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("CompletionPercentage")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeviceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MovieId")
                         .HasColumnType("int");
 
-                    b.HasKey("PlayersId", "SportId");
+                    b.Property<int?>("RentalId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("SportId");
+                    b.Property<int>("TotalDurationSeconds")
+                        .HasColumnType("int");
 
-                    b.ToTable("SportPlayers", (string)null);
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("WatchDurationSeconds")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("WatchedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
+
+                    b.HasIndex("RentalId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WatchedAt");
+
+                    b.HasIndex("UserId", "WatchedAt");
+
+                    b.ToTable("WatchHistories");
                 });
 
-            modelBuilder.Entity("EventPerson", b =>
+            modelBuilder.Entity("EventArtists", b =>
                 {
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Person", null)
                         .WithMany()
@@ -2358,7 +2450,7 @@ namespace MovieRental.DAL.Migrations
 
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Event", null)
                         .WithMany()
-                        .HasForeignKey("EventId")
+                        .HasForeignKey("EventsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2762,13 +2854,13 @@ namespace MovieRental.DAL.Migrations
                     b.HasOne("MovieRental.DAL.DataContext.Entities.Movie", "Movie")
                         .WithMany("Rentals")
                         .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MovieRental.DAL.DataContext.Entities.AppUser", "User")
                         .WithMany("Rentals")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Movie");
@@ -3004,19 +3096,30 @@ namespace MovieRental.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PersonSport", b =>
+            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.WatchHistory", b =>
                 {
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Person", null)
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Movie", "Movie")
                         .WithMany()
-                        .HasForeignKey("PlayersId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MovieRental.DAL.DataContext.Entities.Sport", null)
-                        .WithMany()
-                        .HasForeignKey("SportId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.Rental", "Rental")
+                        .WithMany("WatchHistories")
+                        .HasForeignKey("RentalId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("MovieRental.DAL.DataContext.Entities.AppUser", "User")
+                        .WithMany("WatchHistories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Movie");
+
+                    b.Navigation("Rental");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.AppUser", b =>
@@ -3028,6 +3131,8 @@ namespace MovieRental.DAL.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("SearchHistories");
+
+                    b.Navigation("WatchHistories");
 
                     b.Navigation("Watchlists");
                 });
@@ -3109,6 +3214,11 @@ namespace MovieRental.DAL.Migrations
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Person", b =>
                 {
                     b.Navigation("PersonTranslations");
+                });
+
+            modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Rental", b =>
+                {
+                    b.Navigation("WatchHistories");
                 });
 
             modelBuilder.Entity("MovieRental.DAL.DataContext.Entities.Review", b =>

@@ -28,7 +28,6 @@ namespace MovieRental.BLL.ViewModels.Sport
         public string? Languages { get; set; }
 
         public CurrencyViewModel? Currency { get; set; }
-        public List<PersonViewModel>? Players { get; set; }
 
         public int DaysUntilEvent => (EventDate - DateTime.Now).Days;
         public bool IsUpcoming => EventDate > DateTime.Now;

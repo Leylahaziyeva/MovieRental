@@ -34,7 +34,7 @@ namespace MovieRental.BLL.Services.Implementations
             _eventCategoryService = eventCategoryService;
         }
 
-        #region Get Methods
+        #region Get Methods - FIXED
 
         public async Task<IEnumerable<EventViewModel>> GetUpcomingEventsAsync(int languageId)
         {
@@ -49,7 +49,7 @@ namespace MovieRental.BLL.Services.Implementations
                         .ThenInclude(ec => ec.Translations.Where(t => t.LanguageId == languageId))
                     .Include(e => e.Location!)
                         .ThenInclude(l => l.Translations.Where(t => t.LanguageId == languageId))
-                    .Include(e => e.Artists!.Where(a => a.PersonType == PersonType.Artist))
+                    .Include(e => e.Artists!) // FIXED: Remove filter here
                         .ThenInclude(a => a.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
                 AsNoTracking: true
             );
@@ -68,12 +68,23 @@ namespace MovieRental.BLL.Services.Implementations
                         .ThenInclude(ec => ec.Translations.Where(t => t.LanguageId == languageId))
                     .Include(e => e.Location!)
                         .ThenInclude(l => l.Translations.Where(t => t.LanguageId == languageId))
-                    .Include(e => e.Artists!.Where(a => a.PersonType == PersonType.Artist))
+                    .Include(e => e.Artists!) // FIXED: Load all artists
                         .ThenInclude(a => a.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
                 AsNoTracking: true
             );
 
             if (eventEntity == null) return null;
+
+            // Debug logging
+            Console.WriteLine($"Event loaded: {eventEntity.Id}");
+            Console.WriteLine($"Artists count: {eventEntity.Artists?.Count ?? 0}");
+            if (eventEntity.Artists != null)
+            {
+                foreach (var artist in eventEntity.Artists)
+                {
+                    Console.WriteLine($"- Artist: {artist.Id}, Type: {artist.PersonType}");
+                }
+            }
 
             var viewModels = await MapToViewModelsAsync(new List<Event> { eventEntity }, languageId);
             return viewModels.FirstOrDefault();
@@ -81,7 +92,7 @@ namespace MovieRental.BLL.Services.Implementations
 
         #endregion
 
-        #region Filtering & Pagination
+        #region Filtering & Pagination - FIXED
 
         public async Task<EventFilterResultViewModel> GetFilteredEventsAsync(EventFilterViewModel filter)
         {
@@ -128,7 +139,7 @@ namespace MovieRental.BLL.Services.Implementations
                          .ThenInclude(ec => ec.Translations.Where(t => t.LanguageId == filter.CurrentLanguageId))
                      .Include(e => e.Location!)
                          .ThenInclude(l => l.Translations.Where(t => t.LanguageId == filter.CurrentLanguageId))
-                     .Include(e => e.Artists!.Where(a => a.PersonType == PersonType.Artist))
+                     .Include(e => e.Artists!) // FIXED: Remove PersonType filter
                          .ThenInclude(a => a.PersonTranslations!.Where(pt => pt.LanguageId == filter.CurrentLanguageId));
 
             var (items, totalCount) = await Repository.GetPagedAsync(
@@ -171,7 +182,7 @@ namespace MovieRental.BLL.Services.Implementations
 
         #endregion
 
-        #region Create & Update
+        #region Create & Update - FIXED
 
         public override async Task<EventViewModel> CreateAsync(EventCreateViewModel model)
         {
@@ -202,19 +213,15 @@ namespace MovieRental.BLL.Services.Implementations
                 }
             };
 
+            // FIXED: Load artists properly
             if (model.SelectedArtistIds != null && model.SelectedArtistIds.Any())
             {
-                eventEntity.Artists = new List<Person>();
-                foreach (var artistId in model.SelectedArtistIds)
-                {
-                    var artist = await _personRepository.GetAsync(
-                        predicate: p => p.Id == artistId && p.PersonType == PersonType.Artist
-                    );
-                    if (artist != null)
-                    {
-                        eventEntity.Artists.Add(artist);
-                    }
-                }
+                var artists = await _personRepository.GetAllAsync(
+                    predicate: p => model.SelectedArtistIds.Contains(p.Id)
+                );
+                eventEntity.Artists = artists.ToList();
+
+                Console.WriteLine($"Creating event with {artists.Count()} artists");
             }
 
             var createdEntity = await Repository.AddAsync(eventEntity);
@@ -278,20 +285,19 @@ namespace MovieRental.BLL.Services.Implementations
                 });
             }
 
+            // FIXED: Update artists properly
             if (model.SelectedArtistIds != null)
             {
                 eventEntity.Artists?.Clear();
-                eventEntity.Artists = new List<Person>();
 
-                foreach (var artistId in model.SelectedArtistIds)
+                if (model.SelectedArtistIds.Any())
                 {
-                    var artist = await _personRepository.GetAsync(
-                        predicate: p => p.Id == artistId && p.PersonType == PersonType.Artist
+                    var artists = await _personRepository.GetAllAsync(
+                        predicate: p => model.SelectedArtistIds.Contains(p.Id)
                     );
-                    if (artist != null)
-                    {
-                        eventEntity.Artists.Add(artist);
-                    }
+                    eventEntity.Artists = artists.ToList();
+
+                    Console.WriteLine($"Updating event with {artists.Count()} artists");
                 }
             }
 
@@ -319,7 +325,7 @@ namespace MovieRental.BLL.Services.Implementations
 
         #endregion
 
-        #region Artist Management
+        #region Artist Management - FIXED
 
         public async Task<bool> AddArtistsToEventAsync(int eventId, List<int> artistIds)
         {
@@ -330,13 +336,17 @@ namespace MovieRental.BLL.Services.Implementations
 
             if (eventEntity == null) return false;
 
-            foreach (var artistId in artistIds)
+            // FIXED: Load all requested artists at once
+            var artists = await _personRepository.GetAllAsync(
+                predicate: p => artistIds.Contains(p.Id)
+            );
+
+            foreach (var artist in artists)
             {
-                var artist = await _personRepository.GetByIdAsync(artistId);
-                if (artist != null && artist.PersonType == PersonType.Artist &&
-                    !eventEntity.Artists!.Any(a => a.Id == artistId))
+                if (!eventEntity.Artists!.Any(a => a.Id == artist.Id))
                 {
                     eventEntity.Artists!.Add(artist);
+                    Console.WriteLine($"Added artist {artist.Id} to event {eventId}");
                 }
             }
 
@@ -358,6 +368,7 @@ namespace MovieRental.BLL.Services.Implementations
             {
                 eventEntity.Artists!.Remove(artist);
                 await Repository.UpdateAsync(eventEntity);
+                Console.WriteLine($"Removed artist {artistId} from event {eventId}");
                 return true;
             }
 
@@ -366,7 +377,7 @@ namespace MovieRental.BLL.Services.Implementations
 
         #endregion
 
-        #region Helper Methods
+        #region Helper Methods - FIXED
 
         private async Task<IEnumerable<EventViewModel>> MapToViewModelsAsync(List<Event> events, int languageId)
         {
@@ -395,6 +406,7 @@ namespace MovieRental.BLL.Services.Implementations
                     viewModel.LocationName = locationTranslation?.Name;
                 }
 
+                // FIXED: Map all artists without filtering
                 if (eventEntity.Artists?.Any() == true)
                 {
                     viewModel.Artists = new List<PersonViewModel>();
@@ -408,6 +420,8 @@ namespace MovieRental.BLL.Services.Implementations
                             personViewModel.Biography = personTranslation.Biography;
                         }
                         viewModel.Artists.Add(personViewModel);
+
+                        Console.WriteLine($"Mapped artist: {personViewModel.Name} (ID: {artist.Id})");
                     }
                 }
 

@@ -86,15 +86,6 @@ namespace MovieRental.UI.Controllers
                 model.Events = events.ToList();
             }
 
-            if (person.PersonType == PersonType.Sportsman)
-            {
-                var sports = await _sportService.GetAllAsync(
-                    predicate: s => s.Players!.Any(p => p.Id == id),
-                    AsNoTracking: true
-                );
-                model.Sports = sports.ToList();
-            }
-
             return View(model);
         }
 

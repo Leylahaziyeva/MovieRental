@@ -17,13 +17,11 @@ namespace MovieRental.BLL.Services.Implementations
             return _stringLocalizer.GetString(key);
         }
 
-        // Parametrli versiya 
         public string GetValue(string key, params object[] arguments)
         {
             return _stringLocalizer.GetString(key, arguments);
         }
 
-        // Indexer (istəyə görə)
         public string this[string key] => GetValue(key);
     }
 }

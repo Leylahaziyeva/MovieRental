@@ -1,5 +1,4 @@
-﻿using MovieRental.BLL.ViewModels.Language;
-using MovieRental.BLL.ViewModels.Location;
+﻿using MovieRental.BLL.ViewModels.Location;
 using MovieRental.BLL.ViewModels.SportType;
 
 namespace MovieRental.BLL.ViewModels.Sport
@@ -11,8 +10,10 @@ namespace MovieRental.BLL.ViewModels.Sport
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        public List<SportTypeOption> SportTypes { get; set; } = new();
-        public List<LocationOption> Locations { get; set; } = new();
-        public List<LanguageViewModel> Languages { get; set; } = new();
+        public List<int> SportTypeIds { get; set; } = [];
+        public List<int> LocationIds { get; set; } = [];
+
+        public List<SportTypeOption> SportTypes { get; set; } = [];
+        public List<LocationOption> Locations { get; set; } = [];
     }
 }

@@ -94,14 +94,23 @@
 
             $('#loadingSpinner').show();
 
+            var sportTypeIds = $('input[name="SportTypeIds"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            var locationIds = $('input[name="LocationIds"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+
             $.ajax({
                 url: '@Url.Action("LoadMoreSports")',
                 type: 'GET',
+                traditional: true,
                 data: {
                     page: currentPage,
                     pageSize: pageSize,
-                    location: '@ViewData["Location"]',
-                    category: '@ViewData["Category"]'
+                    sportTypeIds: sportTypeIds,
+                    locationIds: locationIds
                 },
                 success: function(data) {
                     if (data.trim() === '') {

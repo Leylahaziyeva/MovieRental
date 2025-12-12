@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using MovieRental.BLL.Services.Contracts;
 using MovieRental.BLL.ViewModels.Language;
-using MovieRental.BLL.ViewModels.Person;
 using MovieRental.BLL.ViewModels.Sport;
 using MovieRental.BLL.ViewModels.Sport.MovieRental.BLL.ViewModels.Sport;
 using MovieRental.BLL.ViewModels.SportType;
@@ -17,8 +16,6 @@ namespace MovieRental.BLL.Services.Implementations
         private readonly ICloudinaryService _cloudinaryService;
         private readonly ICookieService _cookieService;
         private readonly ICurrencyService _currencyService;
-        private readonly IRepositoryAsync<Person> _personRepository;
-        private readonly IPersonService _personService;
         private readonly ISportTypeService _sportTypeService;
         private readonly ILocationService _locationService;
         private readonly IRepositoryAsync<Language> _languageRepository;
@@ -29,8 +26,6 @@ namespace MovieRental.BLL.Services.Implementations
             ICloudinaryService cloudinaryService,
             ICookieService cookieService,
             ICurrencyService currencyService,
-            IRepositoryAsync<Person> personRepository,
-            IPersonService personService,
             ISportTypeService sportTypeService,
             ILocationService locationService,
             IRepositoryAsync<Language> languageRepository)
@@ -39,8 +34,6 @@ namespace MovieRental.BLL.Services.Implementations
             _cloudinaryService = cloudinaryService;
             _cookieService = cookieService;
             _currencyService = currencyService;
-            _personRepository = personRepository;
-            _personService = personService;
             _sportTypeService = sportTypeService;
             _locationService = locationService;
             _languageRepository = languageRepository;
@@ -56,11 +49,9 @@ namespace MovieRental.BLL.Services.Implementations
                     .Include(s => s.SportTranslations.Where(st => st.LanguageId == languageId))
                     .Include(s => s.Currency)
                     .Include(s => s.SportType)
-                        .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
+                    .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
                     .Include(s => s.Location)
-                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
-                    .Include(s => s.Players)
-                        .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
+                    .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId)),
                 AsNoTracking: true
             );
 
@@ -94,24 +85,6 @@ namespace MovieRental.BLL.Services.Implementations
                 // Əgər Location ayrıca field lazımdırsa: viewModel.LocationName = locationTranslation?.Name;
             }
 
-            if (sport.Players?.Any() == true)
-            {
-                viewModel.Players = new List<PersonViewModel>();
-                foreach (var player in sport.Players)
-                {
-                    var personViewModel = Mapper.Map<PersonViewModel>(player);
-
-                    var personTranslation = player.PersonTranslations?.FirstOrDefault();
-                    if (personTranslation != null)
-                    {
-                        personViewModel.Name = personTranslation.Name;
-                        personViewModel.Biography = personTranslation.Biography;
-                    }
-
-                    viewModel.Players.Add(personViewModel);
-                }
-            }
-
             if (sport.Price.HasValue && sport.Currency != null)
             {
                 viewModel.FormattedPrice = $"{sport.Currency.Symbol}{sport.Price.Value:N2}";
@@ -136,9 +109,7 @@ namespace MovieRental.BLL.Services.Implementations
                     .Include(s => s.SportType)
                         .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
                     .Include(s => s.Location)
-                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
-                    .Include(s => s.Players)
-                        .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
+                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId));
 
                 return include != null ? include(included) : included;
             };
@@ -169,22 +140,6 @@ namespace MovieRental.BLL.Services.Implementations
                     viewModel.Categories = sportTypeTranslation?.Name ?? string.Empty;
                 }
 
-                if (sport.Players?.Any() == true)
-                {
-                    viewModel.Players = new List<PersonViewModel>();
-                    foreach (var player in sport.Players)
-                    {
-                        var personViewModel = Mapper.Map<PersonViewModel>(player);
-                        var personTranslation = player.PersonTranslations?.FirstOrDefault();
-                        if (personTranslation != null)
-                        {
-                            personViewModel.Name = personTranslation.Name;
-                            personViewModel.Biography = personTranslation.Biography;
-                        }
-                        viewModel.Players.Add(personViewModel);
-                    }
-                }
-
                 if (sport.Price.HasValue && sport.Currency != null)
                 {
                     viewModel.FormattedPrice = $"{sport.Currency.Symbol}{sport.Price.Value:N2}";
@@ -211,9 +166,7 @@ namespace MovieRental.BLL.Services.Implementations
                     .Include(s => s.SportType)
                         .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
                     .Include(s => s.Location)
-                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
-                    .Include(s => s.Players)
-                        .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId)),
+                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId)),
                 AsNoTracking: true
             );
 
@@ -350,48 +303,6 @@ namespace MovieRental.BLL.Services.Implementations
             return await GetByIdAsync(id);
         }
 
-        public async Task<bool> AddPlayersToSportAsync(int sportId, List<int> playerIds)
-        {
-            var sport = await Repository.GetAsync(
-                predicate: x => x.Id == sportId,
-                include: query => query.Include(s => s.Players)
-            );
-
-            if (sport == null) return false;
-
-            foreach (var playerId in playerIds)
-            {
-                var player = await _personRepository.GetByIdAsync(playerId);
-                if (player != null && !sport.Players.Any(p => p.Id == playerId))
-                {
-                    sport.Players.Add(player);
-                }
-            }
-
-            await Repository.UpdateAsync(sport);
-            return true;
-        }
-
-        public async Task<bool> RemovePlayerFromSportAsync(int sportId, int playerId)
-        {
-            var sport = await Repository.GetAsync(
-                predicate: x => x.Id == sportId,
-                include: query => query.Include(s => s.Players)
-            );
-
-            if (sport == null) return false;
-
-            var player = sport.Players.FirstOrDefault(p => p.Id == playerId);
-            if (player != null)
-            {
-                sport.Players.Remove(player);
-                await Repository.UpdateAsync(sport);
-                return true;
-            }
-
-            return false;
-        }
-
         public async Task<(IEnumerable<SportViewModel> Sports, int TotalCount)> GetSportsPagedAsync(
             int page = 1,
             int pageSize = 12,
@@ -425,9 +336,7 @@ namespace MovieRental.BLL.Services.Implementations
                     .Include(s => s.SportType)
                         .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
                     .Include(s => s.Location)
-                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
-                    .Include(s => s.Players)
-                        .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
+                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId));
 
             var (items, totalCount) = await Repository.GetPagedAsync(
                 predicate: predicate,
@@ -449,16 +358,14 @@ namespace MovieRental.BLL.Services.Implementations
 
             Expression<Func<Sport, bool>> predicate = x => x.IsActive && x.EventDate > DateTime.Now;
 
-            if (filter.SportTypes?.Any(st => st.Id > 0) == true)
+            if (filter.SportTypeIds?.Any() == true)
             {
-                var selectedTypeIds = filter.SportTypes.Select(st => st.Id).ToList();
-                predicate = predicate.And(x => x.SportTypeId.HasValue && selectedTypeIds.Contains(x.SportTypeId.Value));
+                predicate = predicate.And(x => x.SportTypeId.HasValue && filter.SportTypeIds.Contains(x.SportTypeId.Value));
             }
 
-            if (filter.Locations?.Any(l => l.Id > 0) == true)
+            if (filter.LocationIds?.Any() == true)
             {
-                var selectedLocationIds = filter.Locations.Select(l => l.Id).ToList();
-                predicate = predicate.And(x => x.LocationId.HasValue && selectedLocationIds.Contains(x.LocationId.Value));
+                predicate = predicate.And(x => x.LocationId.HasValue && filter.LocationIds.Contains(x.LocationId.Value));
             }
 
             if (filter.StartDate.HasValue)
@@ -478,9 +385,7 @@ namespace MovieRental.BLL.Services.Implementations
                     .Include(s => s.SportType)
                         .ThenInclude(st => st!.Translations.Where(stt => stt.LanguageId == languageId))
                     .Include(s => s.Location)
-                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId))
-                    .Include(s => s.Players)
-                        .ThenInclude(p => p.PersonTranslations!.Where(pt => pt.LanguageId == languageId));
+                        .ThenInclude(l => l!.Translations.Where(lt => lt.LanguageId == languageId));
 
             var (items, totalCount) = await Repository.GetPagedAsync(
                 predicate: predicate,
@@ -517,23 +422,10 @@ namespace MovieRental.BLL.Services.Implementations
 
             var locationOptions = await _locationService.GetLocationsForFilterAsync(languageId);
 
-            var languages = await _languageRepository.GetAllAsync(
-                include: query => query.Include(lang => lang.LanguageTranslations.Where(lt => lt.TranslationLanguageId == languageId)),
-                AsNoTracking: true
-            );
-
-            var languageViewModels = languages.Select(lang => new LanguageViewModel
-            {
-                Id = lang.Id,
-                Name = lang.LanguageTranslations.FirstOrDefault()?.Name ?? lang.IsoCode,
-                IsoCode = lang.IsoCode
-            }).ToList();
-
             return new SportFilterViewModel
             {
                 SportTypes = sportTypeOptions.ToList(),
-                Locations = locationOptions.ToList(),
-                Languages = languageViewModels
+                Locations = locationOptions.ToList()
             };
         }
     }

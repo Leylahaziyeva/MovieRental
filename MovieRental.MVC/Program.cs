@@ -1,14 +1,13 @@
 ﻿using Mailing;
 using Mailing.MailKitImplementations;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MovieRental.BLL;
 using MovieRental.BLL.Mapping;
 using MovieRental.DAL;
 using MovieRental.DAL.DataContext;
 using MovieRental.DAL.DataContext.Entities;
-
+using MovieRental.MVC.BackgroundServices;
 
 namespace MovieRental.MVC
 {
@@ -29,7 +28,6 @@ namespace MovieRental.MVC
 
             builder.Services.AddDataAccessLayerServices(builder.Configuration);
             builder.Services.AddBusinessLogicLayerServices();
-            //builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddAutoMapper(cfg =>
             {
@@ -38,8 +36,9 @@ namespace MovieRental.MVC
                 cfg.AddProfile<GenreMappingProfile>();
                 cfg.AddProfile<PersonMappingProfile>();
                 cfg.AddProfile<EventMappingProfile>();
+                cfg.AddProfile<SportMappingProfile>();
+                cfg.AddProfile<SportTypeMappingProfile>();
             });
-
 
             builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
             {
@@ -58,15 +57,14 @@ namespace MovieRental.MVC
 
             builder.Services.AddScoped<IMailService, MailKitMailService>();
 
-            //FilePathConstants.ProductImagePath = Path.Combine(builder.Environment.WebRootPath, "images", "products");
-            //FilePathConstants.ProfileImagePath = Path.Combine(builder.Environment.WebRootPath, "images", "users");
+            // ✅ Background Service for Auto-Expiring Rentals
+            builder.Services.AddHostedService<RentalExpirationService>();
 
             var app = builder.Build();
 
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -83,8 +81,8 @@ namespace MovieRental.MVC
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
                 string adminRole = "Admin";
-                string adminEmail = "admin@moviebok.com";  
-                string adminPassword = "Admin@123456";      
+                string adminEmail = "admin@moviebok.com";
+                string adminPassword = "Admin@123456";
 
                 if (!await roleManager.RoleExistsAsync(adminRole))
                     await roleManager.CreateAsync(new IdentityRole(adminRole));
@@ -97,9 +95,9 @@ namespace MovieRental.MVC
                         UserName = adminEmail,
                         Email = adminEmail,
                         EmailConfirmed = true,
-                        FirstName = "Admin",      
-                        LastName = "User",  
-                        IsActive = true         
+                        FirstName = "Admin",
+                        LastName = "User",
+                        IsActive = true
                     };
                     await userManager.CreateAsync(adminUser, adminPassword);
                 }
@@ -108,12 +106,10 @@ namespace MovieRental.MVC
                     await userManager.AddToRoleAsync(adminUser, adminRole);
             }
 
-
             app.UseHttpsRedirection();
-            app.UseStaticFiles();  
+            app.UseStaticFiles();
 
             var locOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
-
             app.UseRequestLocalization(locOptions!.Value);
 
             app.UseRouting();

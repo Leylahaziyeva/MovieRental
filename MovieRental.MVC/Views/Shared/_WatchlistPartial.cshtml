@@ -2,7 +2,7 @@
 
 @foreach (var movie in Model)
 {
-    <div class="col-xl-3 col-md-6 mb-4">
+    <div class="col-xl-3 col-md-6 mb-4" data-movie-card="@movie.Id">
         <div class="card m-card shadow-sm border-0">
             <div class="m-card-cover position-relative">
                 <a href="@Url.Action("Details", "Movie", new { id = movie.Id })">
@@ -12,6 +12,14 @@
                         </h6>
                         <small class="text-muted">@movie.VotesCount.ToString("N0")</small>
                     </div>
+
+                    <!-- Rental Status Badge (Hidden by default) -->
+                    <div class="position-absolute rental-badge-@movie.Id" style="top: 10px; right: 10px; display: none; z-index: 10;">
+                        <span class="badge badge-success px-2 py-1">
+                            <i class="fas fa-check-circle mr-1"></i> Rented
+                        </span>
+                    </div>
+
                     <img src="@movie.PosterImageUrl" class="card-img-top" alt="@movie.Title">
                 </a>
             </div>
@@ -25,49 +33,151 @@
                         </small>
                     </p>
                 </a>
+
+                <!-- Rental Price Badge -->
+                @if (movie.IsAvailableForRent)
+                {
+                    <p class="card-text mb-2">
+                        <small class="text-success">
+                            <i class="fas fa-ticket-alt mr-1"></i>
+                            <strong>@movie.FormattedPrice</strong> / @movie.RentalDurationDays days
+                        </small>
+                    </p>
+                }
+
                 <div class="mt-3">
-                    <button type="button"
-                            class="btn btn-danger btn-block btn-sm btn-remove-watchlist"
-                            data-movie-id="@movie.Id">
-                        <i class="fas fa-trash"></i> @localizer.GetValue("Remove")
-                    </button>
+                    <!-- Not Rented State -->
+                    <div class="not-rented-@movie.Id">
+                        <div class="row">
+                            @if (movie.IsAvailableForRent)
+                            {
+                                <div class="col-6 pr-1">
+                                    <button type="button"
+                                            class="btn btn-primary btn-block btn-sm btn-rent-movie"
+                                            data-movie-id="@movie.Id"
+                                            data-movie-title="@movie.Title"
+                                            data-movie-price="@movie.FormattedPrice">
+                                        <i class="fas fa-ticket-alt"></i> Rent
+                                    </button>
+                                </div>
+                                <div class="col-6 pl-1">
+                                    <button type="button"
+                                            class="btn btn-danger btn-block btn-sm btn-remove-watchlist"
+                                            data-movie-id="@movie.Id">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-12">
+                                    <button type="button"
+                                            class="btn btn-danger btn-block btn-sm btn-remove-watchlist"
+                                            data-movie-id="@movie.Id">
+                                        <i class="fas fa-trash"></i> @localizer.GetValue("Remove")
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Rented State (Hidden by default) -->
+                    <div class="rented-@movie.Id" style="display: none;">
+                        <div class="alert alert-success mb-2 py-2 px-2">
+                            <small class="mb-0">
+                                <i class="fas fa-clock mr-1"></i>
+                                <span class="rental-time-@movie.Id">@localizer.GetValue("Checking")</span>
+                            </small>
+                        </div>
+                        <a href="/Movie/Watch/@movie.Id" class="btn btn-success btn-block btn-sm">
+                            <i class="fas fa-play mr-1"></i> @localizer.GetValue("WatchNow")
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 }
 
+<script>
+    // Check rental status for all movies when loaded
+    $(document).ready(function() {
+        @foreach (var movie in Model)
+        {
+                <text>checkMovieRentalStatus(@movie.Id);</text>
+        }
+    });
 
-@* @foreach (var movie in Model)
-{
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card m-card shadow-sm border-0">
-            <a href="@Url.Action("Details", "Movie", new { id = movie.Id })">
-                <div class="m-card-cover">
-                    <div class="position-absolute bg-white shadow-sm rounded text-center p-2 m-2 love-box">
-                        <h6 class="text-gray-900 mb-0 font-weight-bold">
-                            <i class="fas fa-heart text-danger"></i> @movie.LovePercentage%
-                        </h6>
-                        <small class="text-muted">@movie.VotesCount.ToString("N0")</small>
-                    </div>
-                    <img src="@movie.PosterImageUrl" class="card-img-top" alt="@movie.Title">
-                </div>
-                <div class="card-body p-3">
-                    <h5 class="card-title text-white mb-1">@movie.Title</h5>
-                    <p class="card-text">
-                        <small class="text-white">@movie.LanguageName</small>
-                        <small class="text-danger ml-2">
-                            <i class="fas fa-calendar-alt fa-sm"></i> @movie.ReleaseDate.ToString("dd MMM yyyy")
-                        </small>
-                    </p>
-                    <div class="mt-3">
-                        <button class="btn btn-danger btn-block btn-sm btn-remove-watchlist"
-                                data-movie-id="@movie.Id">
-                            <i class="fas fa-trash"></i> @localizer.GetValue("Remove")
-                        </button>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
-}  *@
+    function checkMovieRentalStatus(movieId) {
+        $.ajax({
+            url: '/Rental/CheckRentalStatus',
+            type: 'GET',
+            data: { movieId: movieId },
+            success: function(response) {
+                if (response.isRented && response.rental) {
+                    // Show rented state
+                    $(`.not-rented-${movieId}`).hide();
+                    $(`.rented-${movieId}`).show();
+                    $(`.rental-badge-${movieId}`).show();
+                    $(`.rental-time-${movieId}`).text(response.rental.timeRemainingText);
+                } else {
+                    // Show not rented state
+                    $(`.not-rented-${movieId}`).show();
+                    $(`.rented-${movieId}`).hide();
+                    $(`.rental-badge-${movieId}`).hide();
+                }
+            }
+        });
+    }
+
+    // Rent Movie Handler
+    $(document).on('click', '.btn-rent-movie', function(e) {
+        e.preventDefault();
+
+        const button = $(this);
+        const movieId = button.data('movie-id');
+        const movieTitle = button.data('movie-title');
+        const moviePrice = button.data('movie-price');
+        const originalHtml = button.html();
+
+        if (!confirm(`Rent "${movieTitle}" for ${moviePrice}?`)) {
+            return;
+        }
+
+        button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+
+        $.ajax({
+            url: '/Rental/RentMovie',
+            type: 'POST',
+            data: {
+                movieId: movieId,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    showNotification(response.message, 'success');
+                    checkMovieRentalStatus(movieId);
+                    updateActiveRentalsCount();
+                } else {
+                    showNotification(response.message, 'error');
+                    button.prop('disabled', false).html(originalHtml);
+                }
+            },
+            error: function() {
+                showNotification('An error occurred. Please try again.', 'error');
+                button.prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+
+    function updateActiveRentalsCount() {
+        $.ajax({
+            url: '/Profile/LoadActiveRentals',
+            type: 'GET',
+            success: function(data) {
+                const count = $(data).find('.rental-card').length;
+                $('#active-rentals-badge').text(count > 0 ? count : '');
+            }
+        });
+    }
+</script>

@@ -30,6 +30,8 @@ namespace MovieRental.BLL.ViewModels.Movie
         public LanguageViewModel? Language { get; set; }
         public string? LanguageName { get; set; }
 
+        public int RentalDurationDays { get; set; } 
+
         public int Rating => LovePercentage;
         public string PosterUrl => PosterImageUrl;
         public string FormattedDuration => $"{Duration / 60}h {Duration % 60}m";

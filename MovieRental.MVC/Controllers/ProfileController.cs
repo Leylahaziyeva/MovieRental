@@ -14,6 +14,7 @@ namespace MovieRental.MVC.Controllers
         private readonly IAccountService _accountService;
         private readonly IWatchlistService _watchlistService;
         private readonly IUserListService _userListService;
+        private readonly IRentalService _rentalService;
         private readonly StringLocalizerManager _localizer;
         private readonly ILogger<ProfileController> _logger;
 
@@ -21,12 +22,14 @@ namespace MovieRental.MVC.Controllers
             IAccountService accountService,
             IWatchlistService watchlistService,
             IUserListService userListService,
+            IRentalService rentalService,
             StringLocalizerManager localizer,
             ILogger<ProfileController> logger)
         {
             _accountService = accountService;
             _watchlistService = watchlistService;
             _userListService = userListService;
+            _rentalService = rentalService;
             _localizer = localizer;
             _logger = logger;
         }
@@ -452,6 +455,56 @@ namespace MovieRental.MVC.Controllers
             }
 
             return View(list);
+        }
+
+        #endregion
+
+        #region My Rentals
+
+        [HttpGet]
+        public async Task<IActionResult> LoadActiveRentals()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var rentals = await _rentalService.GetUserActiveRentalsAsync(userId);
+            return PartialView("_ActiveRentalsPartial", rentals);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LoadExpiredRentals()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var rentals = await _rentalService.GetUserExpiredRentalsAsync(userId);
+            return PartialView("_ExpiredRentalsPartial", rentals);
+        }
+
+        #endregion
+
+        #region Watch History
+
+        [HttpGet]
+        public async Task<IActionResult> LoadWatchHistory(int page = 1)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var history = await _rentalService.GetWatchHistoryAsync(userId, page, 12);
+            return PartialView("_WatchHistoryPartial", history);
         }
 
         #endregion

@@ -31,28 +31,67 @@ namespace MovieRental.MVC.Controllers
             _locationService = locationService;
         }
 
-        public async Task<IActionResult> Index(SportFilterViewModel filter)
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 12,
+    List<int>? sportTypeIds = null, List<int>? locationIds = null,
+    DateTime? startDate = null, DateTime? endDate = null)
         {
             var languageId = await _cookieService.GetLanguageIdAsync();
 
+            // POPULATE FILTER OPTIONS
             var filterOptions = await _sportService.GetFilterOptionsAsync(languageId);
 
-            filter.SportTypes = filterOptions.SportTypes;
-            filter.Locations = filterOptions.Locations;
-            filter.Languages = filterOptions.Languages;
+            var filter = new SportFilterViewModel
+            {
+                Page = page,
+                PageSize = pageSize,
+                SportTypeIds = sportTypeIds ?? new List<int>(),
+                LocationIds = locationIds ?? new List<int>(),
+                StartDate = startDate,
+                EndDate = endDate,
+                SportTypes = filterOptions.SportTypes,
+                Locations = filterOptions.Locations
+            };
 
             var result = await _sportService.GetFilteredSportsAsync(filter);
 
+            // SET VIEWBAG FOR PARTIAL
             ViewBag.FilterType = "Sport";
             ViewBag.ActionName = "Index";
-            ViewBag.Filter = result.Filter;  
+            ViewBag.Filter = result.Filter;
             ViewBag.SportTypes = result.Filter.SportTypes;
             ViewBag.Locations = result.Filter.Locations;
-            ViewBag.Languages = result.Filter.Languages;
 
             return View(result.Sports);
         }
 
+        //public async Task<IActionResult> Index(int page = 1, int pageSize = 12, List<int>? sportTypeIds = null, List<int>? locationIds = null, DateTime? startDate = null, DateTime? endDate = null)
+        //{
+        //    var languageId = await _cookieService.GetLanguageIdAsync();
+
+        //    var filterOptions = await _sportService.GetFilterOptionsAsync(languageId);
+
+        //    var filter = new SportFilterViewModel
+        //    {
+        //        Page = page,
+        //        PageSize = pageSize,
+        //        SportTypeIds = sportTypeIds ?? new List<int>(),
+        //        LocationIds = locationIds ?? new List<int>(),
+        //        StartDate = startDate,
+        //        EndDate = endDate,
+        //        SportTypes = filterOptions.SportTypes,
+        //        Locations = filterOptions.Locations
+        //    };
+
+        //    var result = await _sportService.GetFilteredSportsAsync(filter);
+
+        //    ViewBag.FilterType = "Sport";
+        //    ViewBag.ActionName = "Index";
+        //    ViewBag.Filter = result.Filter;
+        //    ViewBag.SportTypes = result.Filter.SportTypes;
+        //    ViewBag.Locations = result.Filter.Locations;
+
+        //    return View(result.Sports);
+        //}
         public async Task<IActionResult> Details(int id)
         {
             var sport = await _sportService.GetSportDetailAsync(id);
@@ -230,56 +269,6 @@ namespace MovieRental.MVC.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddPlayers(int sportId, List<int> playerIds)
-        {
-            try
-            {
-                var result = await _sportService.AddPlayersToSportAsync(sportId, playerIds);
-
-                if (!result)
-                {
-                    TempData["Error"] = "Failed to add players!";
-                }
-                else
-                {
-                    TempData["Success"] = "Players successfully added!";
-                }
-
-                return RedirectToAction(nameof(Details), new { id = sportId });
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = $"Error: {ex.Message}";
-                return RedirectToAction(nameof(Details), new { id = sportId });
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> RemovePlayer(int sportId, int playerId)
-        {
-            try
-            {
-                var result = await _sportService.RemovePlayerFromSportAsync(sportId, playerId);
-
-                if (!result)
-                {
-                    TempData["Error"] = "Failed to remove player!";
-                }
-                else
-                {
-                    TempData["Success"] = "Player successfully removed!";
-                }
-
-                return RedirectToAction(nameof(Details), new { id = sportId });
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = $"Error: {ex.Message}";
-                return RedirectToAction(nameof(Details), new { id = sportId });
-            }
-        }
-
         public async Task<IActionResult> GetUpcoming()
         {
             var sports = await _sportService.GetUpcomingSportsAsync();
@@ -293,14 +282,35 @@ namespace MovieRental.MVC.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> LoadMoreSports(int page = 1, int pageSize = 12, string? location = null, string? category = null)
+        public async Task<IActionResult> LoadMoreSports(
+    int page = 1,
+    int pageSize = 12,
+    List<int>? sportTypeIds = null,
+    List<int>? locationIds = null,
+    DateTime? startDate = null,
+    DateTime? endDate = null)
         {
-            var (sports, totalCount) = await _sportService.GetSportsPagedAsync(page, pageSize, location, category);
+            var languageId = await _cookieService.GetLanguageIdAsync();
+            var filterOptions = await _sportService.GetFilterOptionsAsync(languageId);
 
-            if (!sports.Any())
+            var filter = new SportFilterViewModel
+            {
+                Page = page,
+                PageSize = pageSize,
+                SportTypeIds = sportTypeIds ?? new List<int>(),
+                LocationIds = locationIds ?? new List<int>(),
+                StartDate = startDate,
+                EndDate = endDate,
+                SportTypes = filterOptions.SportTypes,
+                Locations = filterOptions.Locations
+            };
+
+            var result = await _sportService.GetFilteredSportsAsync(filter);
+
+            if (!result.Sports.Any())
                 return Content(string.Empty);
 
-            return PartialView("_SportCardsPartial", sports);
+            return PartialView("_SportCardsPartial", result.Sports);
         }
     }
 }

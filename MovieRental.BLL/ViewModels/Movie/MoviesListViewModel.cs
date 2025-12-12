@@ -5,7 +5,7 @@
         public IEnumerable<MovieViewModel> Movies { get; set; } = [];
         public MovieFilterViewModel Filter { get; set; } = new();
         public int TotalCount { get; set; }
-        public string PageTitle { get; set; } = "All Movies";
+        public string? PageTitle { get; set; } 
 
         public int TotalPages => (int)Math.Ceiling(TotalCount / (double)Filter.PageSize);
         public bool HasPreviousPage => Filter.Page > 1;

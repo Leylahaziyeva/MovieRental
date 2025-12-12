@@ -25,7 +25,6 @@
         public Location? Location { get; set; }
 
         public List<SportTranslation> SportTranslations { get; set; } = [];
-        public List<Person> Players { get; set; } = [];
     }
 
     public class SportTranslation : TimeStample

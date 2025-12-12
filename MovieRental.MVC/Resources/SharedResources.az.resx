@@ -1026,4 +1026,106 @@
   <data name="Alerts" xml:space="preserve">
     <value>Bildirişlər</value>
   </data>
+  <data name="AllMovies" xml:space="preserve">
+    <value>Bütün Filmlər</value>
+  </data>
+  <data name="NoMoreSports" xml:space="preserve">
+    <value>Yüklənəcək başqa idman yoxdur</value>
+  </data>
+  <data name="NoMoreEvents" xml:space="preserve">
+    <value>Yüklənəcək başqa tədbir yoxdur</value>
+  </data>
+  <data name="NoMoreMovies" xml:space="preserve">
+    <value>Yüklənəcək başqa film yoxdur</value>
+  </data>
+  <data name="ActiveRentals" xml:space="preserve">
+    <value>Aktiv İcarələr</value>
+  </data>
+  <data name="PastRentals" xml:space="preserve">
+    <value>Keçmiş İcarələr</value>
+  </data>
+  <data name="WatchHistory" xml:space="preserve">
+    <value>İzləmə Keçmişi</value>
+  </data>
+  <data name="ContinueWatching" xml:space="preserve">
+    <value>İzləməyə davam etmək</value>
+  </data>
+  <data name="Rented" xml:space="preserve">
+    <value>İcarə olunub</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Tamamlanıb</value>
+  </data>
+  <data name="StartWatching" xml:space="preserve">
+    <value>İzləməyə Başla</value>
+  </data>
+  <data name="NoWatchHistoryYet" xml:space="preserve">
+    <value>İzləmə keçmişi hələ boşdur</value>
+  </data>
+  <data name="MyRentals" xml:space="preserve">
+    <value>Mənim İcarələrim</value>
+  </data>
+  <data name="BrowseMovies" xml:space="preserve">
+    <value>Filmlərə Bax</value>
+  </data>
+  <data name="NoActiveRentals" xml:space="preserve">
+    <value>Hazırda aktiv icarəniz yoxdur</value>
+  </data>
+  <data name="Watched" xml:space="preserve">
+    <value>İzlənib</value>
+  </data>
+  <data name="WatchNow" xml:space="preserve">
+    <value>İndi İzlə</value>
+  </data>
+  <data name="NoPastRentals" xml:space="preserve">
+    <value>Keçmiş icarələriniz yoxdur</value>
+  </data>
+  <data name="Checking" xml:space="preserve">
+    <value>Yoxlama...</value>
+  </data>
+  <data name="RentAgain" xml:space="preserve">
+    <value>Təkrar İcarə Et</value>
+  </data>
+  <data name="WatchUnlimitedTimes" xml:space="preserve">
+    <value>İcarə müddətində limitsiz izləyin</value>
+  </data>
+  <data name="RentThisMovie" xml:space="preserve">
+    <value>Bu filmi icarəyə götür</value>
+  </data>
+  <data name="AlreadyRented" xml:space="preserve">
+    <value>Artıq İcarəyə verilib</value>
+  </data>
+  <data name="Expires" xml:space="preserve">
+    <value>Bitmə vaxtı</value>
+  </data>
+  <data name="For" xml:space="preserve">
+    <value>üçün</value>
+  </data>
+  <data name="RentNow" xml:space="preserve">
+    <value>İndi İcarəyə Götür</value>
+  </data>
+  <data name="SecurePayment" xml:space="preserve">
+    <value>Təhlükəsiz Ödəniş</value>
+  </data>
+  <data name="Exit" xml:space="preserve">
+    <value>Çıxış</value>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>İşlənir...</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Uğurlu</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Xəta</value>
+  </data>
+  <data name="MovieRentedSuccessfully" xml:space="preserve">
+    <value>Film uğurla icarəyə götürüldü!</value>
+  </data>
+  <data name="ErrorOccurred" xml:space="preserve">
+    <value>Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.</value>
+  </data>
+  <data name="RentConfirmation" xml:space="preserve">
+    <value>"{0}" filmini {1} qiymətinə icarəyə götürmək istəyirsiniz?</value>
+  </data>
 </root>

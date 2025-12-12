@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Query;
 using MovieRental.DAL.DataContext;
 using MovieRental.DAL.DataContext.Entities;
-using MovieRental.DAL.Repositories.Contracts;
 using System.Linq.Expressions;
 
 namespace MovieRental.DAL.Repositories

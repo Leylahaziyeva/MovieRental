@@ -1,5 +1,11 @@
 ﻿@model EventFilterResultViewModel
 
+
+@* @{
+    ViewBag.FilterType = "Event";
+    ViewBag.ActionName = "Index";
+}
+ *@
 <div class="container">
     <div class="d-sm-flex align-items-center justify-content-between mt-5 mb-3 overflow-hidden">
         <h1 class="h5 mb-0 float-left">@localizer.GetValue("Events")</h1>
@@ -19,7 +25,7 @@
                     </a>
                 </div>
                 <div id="mobile-filters" class="filters-body collapse multi-collapse">
-                    @await Html.PartialAsync("_FiltersPartial", Model.Filter)
+                    <partial name="_FiltersPartial" model="Model.Filter" />
                 </div>
             </div>
 
@@ -29,7 +35,7 @@
                     <h6 class="m-0 text-dark">@localizer.GetValue("FilterBy")</h6>
                 </div>
                 <div class="filters-body">
-                    @await Html.PartialAsync("_FiltersPartial", Model.Filter)
+                    <partial name="_FiltersPartial" model="Model.Filter" />
                 </div>
             </div>
         </div>

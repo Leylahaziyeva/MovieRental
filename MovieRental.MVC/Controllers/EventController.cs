@@ -33,21 +33,7 @@ namespace MovieRental.MVC.Controllers
             _eventCategoryService = eventCategoryService;
         }
 
-        #region Index & Details
-
-        public async Task<IActionResult> Index(EventFilterViewModel filter)
-        {
-            var currentLanguageId = await _cookieService.GetLanguageIdAsync();
-            filter.CurrentLanguageId = currentLanguageId;
-
-            var filterOptions = await _eventService.GetFilterOptionsAsync(currentLanguageId);
-            filter.Categories = filterOptions.Categories;
-            filter.Locations = filterOptions.Locations;
-
-            var viewModel = await _eventService.GetFilteredEventsAsync(filter);
-
-            return View(viewModel);
-        }
+        #region Details with Artists
 
         public async Task<IActionResult> Details(int id)
         {
@@ -57,7 +43,31 @@ namespace MovieRental.MVC.Controllers
             if (eventEntity == null)
                 return NotFound();
 
+            // Debug: Check if artists are loaded
+            Console.WriteLine($"Event ID: {id}");
+            Console.WriteLine($"Artists Count: {eventEntity.Artists?.Count ?? 0}");
+            if (eventEntity.Artists != null)
+            {
+                foreach (var artist in eventEntity.Artists)
+                {
+                    Console.WriteLine($"Artist: {artist.Name} (ID: {artist.Id})");
+                }
+            }
+
             return View(eventEntity);
+        }
+
+        #endregion
+
+        #region Index
+        public async Task<IActionResult> Index(EventFilterViewModel filter)
+        {
+            var currentLanguageId = await _cookieService.GetLanguageIdAsync();
+            filter.CurrentLanguageId = currentLanguageId;
+
+            var viewModel = await _eventService.GetFilteredEventsAsync(filter);
+
+            return View(viewModel);
         }
 
         #endregion
@@ -164,7 +174,7 @@ namespace MovieRental.MVC.Controllers
                 CurrencyId = eventEntity.Currency?.Id,
                 EventCategoryId = GetCategoryIdFromName(eventEntity.CategoryName, categories),
                 LocationId = GetLocationIdFromName(eventEntity.LocationName, locations),
-                SelectedArtistIds = eventEntity.Artists?.Select(a => a.Id).ToList(),
+                SelectedArtistIds = eventEntity.Artists?.Select(a => a.Id).ToList() ?? new List<int>(),
                 CurrencyList = currencies.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
@@ -257,13 +267,19 @@ namespace MovieRental.MVC.Controllers
 
         #endregion
 
-        #region Artist Management
+        #region Artist Management - FIXED
 
         [HttpPost]
         public async Task<IActionResult> AddArtists(int eventId, List<int> artistIds)
         {
             try
             {
+                if (artistIds == null || !artistIds.Any())
+                {
+                    TempData["Error"] = "Please select at least one artist!";
+                    return RedirectToAction(nameof(Details), new { id = eventId });
+                }
+
                 var result = await _eventService.AddArtistsToEventAsync(eventId, artistIds);
 
                 if (!result)
@@ -272,7 +288,7 @@ namespace MovieRental.MVC.Controllers
                 }
                 else
                 {
-                    TempData["Success"] = "Artists successfully added!";
+                    TempData["Success"] = $"{artistIds.Count} artist(s) successfully added!";
                 }
 
                 return RedirectToAction(nameof(Details), new { id = eventId });
@@ -307,6 +323,28 @@ namespace MovieRental.MVC.Controllers
                 TempData["Error"] = $"Error: {ex.Message}";
                 return RedirectToAction(nameof(Details), new { id = eventId });
             }
+        }
+
+        // NEW: Manage Artists Page
+        public async Task<IActionResult> ManageArtists(int id)
+        {
+            var currentLanguageId = await _cookieService.GetLanguageIdAsync();
+            var eventEntity = await _eventService.GetEventByIdWithTranslationsAsync(id, currentLanguageId);
+
+            if (eventEntity == null)
+            {
+                return NotFound();
+            }
+
+            var allArtists = await _personService.GetArtistsAsync();
+            var currentArtistIds = eventEntity.Artists?.Select(a => a.Id).ToList() ?? new List<int>();
+
+            ViewBag.EventId = id;
+            ViewBag.EventName = eventEntity.Name;
+            ViewBag.CurrentArtistIds = currentArtistIds;
+            ViewBag.AllArtists = allArtists;
+
+            return View(eventEntity);
         }
 
         #endregion

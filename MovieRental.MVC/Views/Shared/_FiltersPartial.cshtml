@@ -94,7 +94,7 @@
             </div>
             <div id="collapseCategory" class="collapse show" aria-labelledby="headingCategory" data-parent="#accordion">
                 <div class="filters-card-body card-shop-filters">
-                    @if (filterType == "Movie" && ViewBag.Genres != null)
+                    @if (filterType == "Movie" && Model.Genres != null && Model.Genres.Count > 0)
                     {
                         <form class="filters-search mb-3">
                             <div class="form-group mb-3">
@@ -104,7 +104,7 @@
                         </form>
 
                         <div class="category-list">
-                            @foreach (var genre in ViewBag.Genres)
+                            @foreach (var genre in Model.Genres)
                             {
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input category-checkbox filter-radio"
@@ -113,7 +113,7 @@
                                            value="@genre.Id"
                                            @(Model.GenreId == genre.Id ? "checked" : "")>
                                     <label class="custom-control-label" for="category_@genre.Id">
-                                        @genre.Name
+                                        @genre.Name <small class="text-black-50">@genre.Count</small>
                                     </label>
                                 </div>
                             }
@@ -129,7 +129,7 @@
                             </div>
                         </div>
                     }
-                    else if (filterType == "Event" && Model.Categories != null && Model.Categories.Any())
+                    else if (filterType == "Event" && Model.Categories != null && Model.Categories.Count > 0)
                     {
                         <form class="filters-search mb-3">
                             <div class="form-group mb-3">
@@ -177,10 +177,11 @@
                             @foreach (var sportType in ViewBag.SportTypes)
                             {
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input category-checkbox"
+                                    <input type="checkbox" class="custom-control-input category-checkbox filter-checkbox"
                                            id="sport_@sportType.Id"
                                            name="SportTypeIds"
-                                           value="@sportType.Id">
+                                           value="@sportType.Id"
+                                           @(Model.SportTypeIds != null && Model.SportTypeIds.Contains(sportType.Id) ? "checked" : "")>
                                     <label class="custom-control-label" for="sport_@sportType.Id">
                                         @sportType.Name <small class="text-black-50">@sportType.Count</small>
                                     </label>
@@ -193,8 +194,8 @@
             </div>
         </div>
 
-        @* Language Filter - Movie və Sport üçün *@
-        @if (filterType == "Movie" || filterType == "Sport")
+        @* Language Filter - Yalnız Movie üçün *@
+        @if (filterType == "Movie")
         {
             <div class="filters-card border-bottom p-3">
                 <div class="filters-card-header" id="headingLanguage">
@@ -218,10 +219,6 @@
                                            @(Model.Language == language.Name ? "checked" : "")>
                                     <label class="custom-control-label" for="lang_@language.Id">
                                         @language.Name
-                                        @if (filterType == "Sport")
-                                        {
-                                            <small class="text-black-50">@language.Count</small>
-                                        }
                                     </label>
                                 </div>
                             }
@@ -235,10 +232,6 @@
                                     <small>@localizer.GetValue("AllLanguages")</small>
                                 </label>
                             </div>
-                        }
-                        @if (filterType == "Sport")
-                        {
-                            <div class="mt-2"><a href="#" class="link">@localizer.GetValue("SeeAll")</a></div>
                         }
                     </div>
                 </div>
@@ -259,7 +252,7 @@
                 </div>
                 <div id="collapseLocation" class="collapse @(filterType == "Event" ? "show" : "")" aria-labelledby="headingLocation" data-parent="#accordion">
                     <div class="filters-card-body card-shop-filters">
-                        @if (filterType == "Event" && Model.Locations != null && Model.Locations.Any())
+                        @if (filterType == "Event" && Model.Locations != null && Model.Locations.Count > 0)
                         {
                             <form class="filters-search mb-3">
                                 <div class="form-group mb-3">
@@ -299,10 +292,11 @@
                             @foreach (var location in ViewBag.Locations)
                             {
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input"
+                                    <input type="checkbox" class="custom-control-input location-checkbox-sport filter-checkbox"
                                            id="location_@location.Id"
                                            name="LocationIds"
-                                           value="@location.Id">
+                                           value="@location.Id"
+                                           @(Model.LocationIds != null && Model.LocationIds.Contains(location.Id) ? "checked" : "")>
                                     <label class="custom-control-label" for="location_@location.Id">
                                         @location.Name <small class="text-black-50">@location.Count</small>
                                     </label>
@@ -456,56 +450,98 @@
 </form>
 
 <script>
-    document.getElementById('categorySearch')?.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const checkboxes = document.querySelectorAll('.category-checkbox');
+    document.addEventListener('DOMContentLoaded', function() {
+        const categorySearchInput = document.getElementById('categorySearch');
 
-        checkboxes.forEach(function(checkbox) {
-            const label = checkbox.nextElementSibling.textContent.toLowerCase();
-            const parent = checkbox.closest('.custom-control');
+        if (categorySearchInput) {
+            categorySearchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const categoryList = this.closest('.filters-card-body').querySelector('.category-list');
 
-            if (label.includes(searchTerm)) {
-                parent.style.display = 'block';
-            } else {
-                parent.style.display = 'none';
-            }
-        });
-    });
+                if (categoryList) {
+                    const items = categoryList.querySelectorAll('.custom-control');
 
-    document.getElementById('locationSearch')?.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const checkboxes = document.querySelectorAll('.location-checkbox');
+                    items.forEach(function(item) {
+                        if (item.querySelector('input[value="0"]') ||
+                            item.querySelector('input[value=""]') ||
+                            item.querySelector('.text-muted')) {
+                            return;
+                        }
 
-        checkboxes.forEach(function(checkbox) {
-            const label = checkbox.nextElementSibling.textContent.toLowerCase();
-            const parent = checkbox.closest('.custom-control');
+                        const label = item.querySelector('label');
+                        if (label) {
+                            const labelText = label.textContent.toLowerCase();
 
-            if (label.includes(searchTerm)) {
-                parent.style.display = 'block';
-            } else {
-                parent.style.display = 'none';
-            }
-        });
-    });
+                            if (labelText.includes(searchTerm)) {
+                                item.style.display = 'block';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+            });
+        }
 
-    document.querySelectorAll('.filter-radio').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            document.getElementById('sharedFilterForm').submit();
-        });
-    });
+        const locationSearchInput = document.getElementById('locationSearch');
 
-    document.querySelectorAll('.filter-select').forEach(function(select) {
-        select.addEventListener('change', function() {
-            document.getElementById('sharedFilterForm').submit();
-        });
-    });
+        if (locationSearchInput) {
+            locationSearchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const locationList = this.closest('.filters-card-body').querySelector('.location-list');
 
-    document.querySelectorAll('.filter-input').forEach(function(input) {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
+                if (locationList) {
+                    const items = locationList.querySelectorAll('.custom-control');
+
+                    items.forEach(function(item) {
+                        if (item.querySelector('input[value=""]') ||
+                            item.querySelector('.text-muted')) {
+                            return;
+                        }
+
+                        const label = item.querySelector('label');
+                        if (label) {
+                            const labelText = label.textContent.toLowerCase();
+
+                            if (labelText.includes(searchTerm)) {
+                                item.style.display = 'block';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        document.querySelectorAll('.filter-radio').forEach(function(radio) {
+            radio.addEventListener('change', function() {
                 document.getElementById('sharedFilterForm').submit();
-            }
+            });
+        });
+
+        document.querySelectorAll('.filter-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                document.getElementById('sharedFilterForm').submit();
+            });
+        });
+
+        document.querySelectorAll('.filter-input').forEach(function(input) {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('sharedFilterForm').submit();
+                }
+            });
+        });
+
+        document.querySelectorAll('.filter-checkbox').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                clearTimeout(window.filterTimeout);
+                window.filterTimeout = setTimeout(function() {
+                    document.getElementById('sharedFilterForm').submit();
+                }, 800); 
+            });
         });
     });
 </script>

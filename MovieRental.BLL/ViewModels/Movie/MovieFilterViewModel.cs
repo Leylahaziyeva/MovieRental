@@ -1,4 +1,6 @@
-﻿namespace MovieRental.BLL.ViewModels.Movie
+﻿using MovieRental.BLL.ViewModels.Genre;
+
+namespace MovieRental.BLL.ViewModels.Movie
 {
     public class MovieFilterViewModel
     {
@@ -13,5 +15,8 @@
 
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 12;
+
+        public List<GenreOption> Genres { get; set; } = [];
+        public List<string> Formats { get; set; } = [];
     }
 }

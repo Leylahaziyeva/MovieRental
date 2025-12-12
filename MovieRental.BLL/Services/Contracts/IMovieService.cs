@@ -3,10 +3,11 @@ using MovieRental.DAL.DataContext.Entities;
 
 namespace MovieRental.BLL.Services.Contracts
 {
-    public interface IMovieService : ICrudService<Movie, MovieViewModel, MovieCreateViewModel, MovieUpdateViewModel>
+    public interface IMovieService : ICrudService<Movie,MovieViewModel, MovieCreateViewModel, MovieUpdateViewModel>
     {
         Task<MoviesListViewModel> GetFilteredMoviesAsync(MovieFilterViewModel filter);
         Task<MovieDetailsViewModel?> GetMovieDetailsAsync(int movieId, int languageId);
+        Task<MovieFilterViewModel> GetFilterOptionsAsync(int languageId);
 
         Task<IEnumerable<MovieViewModel>> GetFeaturedMoviesAsync(int languageId, int count = 10);
         Task<IEnumerable<MovieViewModel>> GetLatestMoviesAsync(int languageId, int count = 10);

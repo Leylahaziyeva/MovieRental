@@ -28,6 +28,7 @@ namespace MovieRental.DAL.DataContext
         public required DbSet<UserList> UserLists { get; set; }
         public required DbSet<UserListMovie> UserListMovies { get; set; }
         public required DbSet<UserWatchlist> UserWatchlists { get; set; }
+        public required DbSet<WatchHistory> WatchHistories { get; set; }
         public required DbSet<Genre> Genres { get; set; }
         public required DbSet<GenreTranslation> GenreTranslations { get; set; }
         public required DbSet<Event> Events { get; set; }
@@ -375,7 +376,87 @@ namespace MovieRental.DAL.DataContext
 
             #endregion
 
-            #region Event Configuration
+            #region Rental Configuration
+
+            modelBuilder.Entity<Rental>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+
+                entity.Property(r => r.Price)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(r => r.Status)
+                    .HasConversion<string>();
+
+                entity.Property(r => r.PaymentIntentId)
+                    .HasMaxLength(255);
+
+                entity.Property(r => r.TransactionId)
+                    .HasMaxLength(255);
+
+                entity.HasOne(r => r.User)
+                    .WithMany(u => u.Rentals)
+                    .HasForeignKey(r => r.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(r => r.Movie)
+                    .WithMany(m => m.Rentals)
+                    .HasForeignKey(r => r.MovieId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(r => r.UserId);
+                entity.HasIndex(r => r.MovieId);
+                entity.HasIndex(r => r.Status);
+                entity.HasIndex(r => r.ExpiryDate);
+                entity.HasIndex(r => new { r.UserId, r.Status });
+
+                entity.HasQueryFilter(r => !r.IsDeleted);
+            });
+
+            #endregion
+
+            #region WatchHistory Configuration
+
+            modelBuilder.Entity<WatchHistory>(entity =>
+            {
+                entity.HasKey(wh => wh.Id);
+
+                entity.Property(wh => wh.CompletionPercentage)
+                    .HasColumnType("decimal(5,2)");
+
+                entity.Property(wh => wh.DeviceType)
+                    .HasMaxLength(50);
+
+                entity.Property(wh => wh.IpAddress)
+                    .HasMaxLength(45);
+
+                entity.HasOne(wh => wh.User)
+                    .WithMany(u => u.WatchHistories)
+                    .HasForeignKey(wh => wh.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(wh => wh.Movie)
+                    .WithMany()
+                    .HasForeignKey(wh => wh.MovieId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(wh => wh.Rental)
+                    .WithMany(r => r.WatchHistories)
+                    .HasForeignKey(wh => wh.RentalId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasIndex(wh => wh.UserId);
+                entity.HasIndex(wh => wh.MovieId);
+                entity.HasIndex(wh => wh.RentalId);
+                entity.HasIndex(wh => wh.WatchedAt);
+                entity.HasIndex(wh => new { wh.UserId, wh.WatchedAt });
+
+                entity.HasQueryFilter(wh => !wh.IsDeleted);
+            });
+
+            #endregion
+
+            #region Event Configuration 
 
             modelBuilder.Entity<Event>(entity =>
             {
@@ -429,7 +510,24 @@ namespace MovieRental.DAL.DataContext
 
                 entity.HasMany(e => e.Artists)
                     .WithMany()
-                    .UsingEntity(j => j.ToTable("EventArtists"));
+                    .UsingEntity<Dictionary<string, object>>(
+                        "EventArtists", 
+                        j => j
+                            .HasOne<Person>()
+                            .WithMany()
+                            .HasForeignKey("ArtistsId") 
+                            .OnDelete(DeleteBehavior.Cascade),
+                        j => j
+                            .HasOne<Event>()
+                            .WithMany()
+                            .HasForeignKey("EventsId") 
+                            .OnDelete(DeleteBehavior.Cascade),
+                        j =>
+                        {
+                            j.HasKey("EventsId", "ArtistsId"); 
+                            j.ToTable("EventArtists");
+                            j.HasIndex("ArtistsId"); 
+                        });
 
                 entity.HasIndex(e => e.EventDate);
                 entity.HasIndex(e => e.IsActive);
@@ -470,6 +568,102 @@ namespace MovieRental.DAL.DataContext
             });
 
             #endregion
+
+            //#region Event Configuration
+
+            //modelBuilder.Entity<Event>(entity =>
+            //{
+            //    entity.HasKey(e => e.Id);
+
+            //    entity.Property(e => e.ImageUrl)
+            //        .IsRequired()
+            //        .HasMaxLength(500);
+
+            //    entity.Property(e => e.CoverImageUrl)
+            //        .HasMaxLength(500);
+
+            //    entity.Property(e => e.Price)
+            //        .HasColumnType("decimal(18,2)");
+
+            //    entity.Property(e => e.ContactPhone)
+            //        .HasMaxLength(50);
+
+            //    entity.Property(e => e.ContactEmail)
+            //        .HasMaxLength(200);
+
+            //    entity.Property(e => e.Venue)
+            //        .HasMaxLength(500);
+
+            //    entity.Property(e => e.GoogleMapsUrl)
+            //        .HasMaxLength(500);
+
+            //    entity.Property(e => e.AgeRestriction)
+            //        .HasMaxLength(50);
+
+            //    entity.Property(e => e.IsActive)
+            //        .HasDefaultValue(true);
+
+            //    entity.Property(e => e.IsFeatured)
+            //        .HasDefaultValue(false);
+
+            //    entity.HasOne(e => e.Currency)
+            //        .WithMany()
+            //        .HasForeignKey(e => e.CurrencyId)
+            //        .OnDelete(DeleteBehavior.Restrict);
+
+            //    entity.HasOne(e => e.EventCategory)
+            //        .WithMany(ec => ec.Events)
+            //        .HasForeignKey(e => e.EventCategoryId)
+            //        .OnDelete(DeleteBehavior.Restrict);
+
+            //    entity.HasOne(e => e.Location)
+            //        .WithMany(l => l.Events)
+            //        .HasForeignKey(e => e.LocationId)
+            //        .OnDelete(DeleteBehavior.Restrict);
+
+            //    entity.HasMany(e => e.Artists)
+            //        .WithMany()
+            //        .UsingEntity(j => j.ToTable("EventArtists"));
+
+            //    entity.HasIndex(e => e.EventDate);
+            //    entity.HasIndex(e => e.IsActive);
+            //    entity.HasIndex(e => e.IsFeatured);
+            //    entity.HasIndex(e => e.EventCategoryId);
+            //    entity.HasIndex(e => e.LocationId);
+            //    entity.HasIndex(e => e.IsDeleted);
+
+            //    entity.HasQueryFilter(e => !e.IsDeleted);
+            //});
+
+            //modelBuilder.Entity<EventTranslation>(entity =>
+            //{
+            //    entity.HasKey(et => et.Id);
+
+            //    entity.Property(et => et.Name)
+            //        .IsRequired()
+            //        .HasMaxLength(200);
+
+            //    entity.Property(et => et.Description)
+            //        .IsRequired()
+            //        .HasMaxLength(2000);
+
+            //    entity.HasOne(et => et.Event)
+            //        .WithMany(e => e.EventTranslations)
+            //        .HasForeignKey(et => et.EventId)
+            //        .OnDelete(DeleteBehavior.Cascade);
+
+            //    entity.HasOne(et => et.Language)
+            //        .WithMany()
+            //        .HasForeignKey(et => et.LanguageId)
+            //        .OnDelete(DeleteBehavior.Restrict);
+
+            //    entity.HasIndex(et => new { et.EventId, et.LanguageId })
+            //        .IsUnique();
+
+            //    entity.HasQueryFilter(et => !et.IsDeleted);
+            //});
+
+            //#endregion
 
             #region Sport Configuration
 
@@ -522,10 +716,6 @@ namespace MovieRental.DAL.DataContext
                     .WithMany(l => l.Sports)
                     .HasForeignKey(s => s.LocationId)
                     .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasMany(s => s.Players)
-                    .WithMany()
-                    .UsingEntity(j => j.ToTable("SportPlayers"));
 
                 entity.HasIndex(s => s.EventDate);
                 entity.HasIndex(s => s.IsActive);
